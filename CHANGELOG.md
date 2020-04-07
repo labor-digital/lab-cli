@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.1](https://github.com/labor-digital/lab-cli/compare/v3.1.0...v3.1.1) (2020-04-07)
+
+
+### Bug Fixes
+
+* **FileFinder:** add missing "package.json" when when it's path was resolved ([18c33c8](https://github.com/labor-digital/lab-cli/commit/18c33c8f846ce60a957760e5d36adb79ee23ae80))
+
 ## 3.1.0 (2020-04-07)
 
 
