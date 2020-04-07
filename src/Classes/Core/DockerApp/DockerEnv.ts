@@ -112,7 +112,6 @@ export class DockerEnv {
 				value = value.trim();
 				if (value.length === 0) value = null;
 				key = key.trim();
-				if (isUndefined(key)) console.log(arguments);
 				if (env.has(key))
 					throw new Error("Invalid .env file! There was a duplicate key: " + key);
 				env.set(key.trim(), value);
@@ -131,7 +130,6 @@ export class DockerEnv {
 	protected write(): void {
 		// Build the content based on the template and the current storage
 		const keys: Array<string> = getListKeys(this._env) as any;
-		console.log(this._tpl, this._env);
 		let contents = this._tpl.replace(/{{pair}}/g, () => {
 			const key = keys.shift();
 			const value = this._env.get(key);
