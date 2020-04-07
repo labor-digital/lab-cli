@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.2](https://github.com/labor-digital/lab-cli/compare/v3.1.1...v3.1.2) (2020-04-07)
+
+
+### Bug Fixes
+
+* **DockerEnv:** remove unwanted console log ([6b15101](https://github.com/labor-digital/lab-cli/commit/6b15101e4e2e56d7751c8816249d1b9fce45c400))
+
 ### [3.1.1](https://github.com/labor-digital/lab-cli/compare/v3.1.0...v3.1.1) (2020-04-07)
 
 
