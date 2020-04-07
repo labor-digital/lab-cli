@@ -20,13 +20,13 @@ import * as childProcess from "child_process";
 import {Command} from "commander";
 import {Processes} from "../Api/Processes";
 import {AppContext} from "../Core/AppContext";
-import {DockerApp} from "../Core/DockerApp/dockerApp";
+import {DockerApp} from "../Core/DockerApp/DockerApp";
 
 export class DockerComposeUpCommand {
 	
 	public execute(cmd: Command, context: AppContext): Promise<void> {
 		if (cmd.separateWindow === true) return this.runInSeparateWindow(cmd, context);
-		return (new DockerApp(context)).initialize().then((app) => {
+		return (new DockerApp(context)).initialize().then(app => {
 			return app.dockerCompose.up(cmd.follow === true, cmd.pull === true);
 		});
 	}

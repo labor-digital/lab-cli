@@ -26,7 +26,7 @@ import {AppRegistry} from "./AppRegistry";
 import {CommandRegistry} from "./Command/CommandRegistry";
 import {Config} from "./Configuration/Config";
 import {ConfigLoader} from "./Configuration/ConfigLoader";
-import {FileFinder} from "./fileFinder";
+import {FileFinder} from "./FileFinder";
 import {Registry} from "./Registry";
 
 export class AppContext {
