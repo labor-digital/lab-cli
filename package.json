@@ -1,0 +1,38 @@
+{
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com:labor-digital/lab-cli.git"
+	},
+	"homepage": "https://github.com/labor-digital/lab-cli",
+	"name": "@labor-digital/lab-cli",
+	"version": "3.0.0",
+	"description": "A CLI for your development environment based on docker",
+	"main": "lib/index.js",
+	"preferGlobal": true,
+	"author": "LABOR.digital Agentur für moderne Kommunikation",
+	"contributors": [
+		"Martin Neundorfer (Neunerlei)"
+	],
+	"license": "Apache-2.0",
+	"bin": {
+		"lab": "lib/index.js"
+	},
+	"scripts": {
+		"build": "node flushLib.js && tsc",
+		"watch": "node flushLib.js && tsc --watch"
+	},
+	"dependencies": {
+		"@labor-digital/helferlein": "^3.17.5",
+		"chalk": "4.0.0",
+		"commander": "5.0.0",
+		"dockerode": "^3.2.0",
+		"inquirer": "7.1.0",
+		"requireg": "^0.2.2",
+		"yamljs": "0.3.0"
+	},
+	"devDependencies": {
+		"@types/inquirer": "^6.5.0",
+		"@types/node": "^13.11.0",
+		"typescript": "^3.8.3"
+	}
+}
