@@ -63,7 +63,7 @@ export class FileFinder {
 		if (fs.existsSync(packageJson)) return packageJson;
 		
 		// Check if we can find it in the cwd
-		return this.findFileInCwd(context, "package.json");
+		return path.join(this.findFileInCwd(context, "package.json"), "package.json");
 	}
 	
 	/**
