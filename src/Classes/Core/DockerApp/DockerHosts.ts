@@ -16,6 +16,7 @@
  * Last modified: 2020.04.06 at 09:06
  */
 
+import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
 import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import * as fs from "fs";
 import * as path from "path";
@@ -55,9 +56,9 @@ export class DockerHosts {
 	protected _domains: Map<number, string>;
 	
 	/**
-	 * The list of app names for each line
+	 * The list of app directories to flush
 	 */
-	protected _appNames: Map<number, string>;
+	protected _directories: Map<number, string>;
 	
 	/**
 	 * DockerHosts constructor
@@ -77,16 +78,16 @@ export class DockerHosts {
 	 */
 	set(ip: string, domain: string) {
 		let updateHappened = false;
-		const appName = this._context.rootDirectory;
+		const rootDirectory = this._context.rootDirectory;
 		
 		// Check if there is a domain conflict
 		this._domains.forEach((d, k) => {
 			if (d === domain) {
-				const dAppName = this._appNames.get(k);
-				if (dAppName !== appName) {
-					if (!isUndefined(dAppName)) {
+				const dRootDirectory = this._directories.get(k);
+				if (dRootDirectory !== rootDirectory) {
+					if (!isUndefined(dRootDirectory)) {
 						throw new Error("Hosts file conflict: The domain " + domain +
-							" was already registered with another app: " + dAppName + "!");
+							" was already registered with another app at: " + dRootDirectory + "!");
 					} else {
 						throw new Error("Hosts file conflict: The domain " + domain + " is already in your hosts file!");
 					}
@@ -112,9 +113,24 @@ export class DockerHosts {
 			this._tpl.set(newLineKey, "{ip} {domain}");
 			this._ips.set(newLineKey, ip);
 			this._domains.set(newLineKey, domain);
-			this._appNames.set(newLineKey, appName);
+			this._directories.set(newLineKey, rootDirectory);
 			this._isDirty = true;
 		}
+	}
+	
+	/**
+	 * Removes the hosts entry for the current app
+	 */
+	public removeCurrent(): DockerHosts {
+		forEach(this._directories, (dir: string, k: number) => {
+			if (dir !== this._context.rootDirectory) return;
+			this._tpl.delete(k);
+			this._ips.delete(k);
+			this._domains.delete(k);
+			this._directories.delete(k);
+			this._isDirty = true;
+		});
+		return this;
 	}
 	
 	/**
@@ -137,10 +153,10 @@ export class DockerHosts {
 			// Build base line
 			const domain = this._domains.get(k);
 			let line = t.replace(/{ip}/, ip);
-			if (!this._appNames.has(k))
+			if (!this._directories.has(k))
 				lines.push(line.replace(/{domain}/, domain));
 			else
-				lines.push(line.replace(/{domain}/, domain + " #lab-docker-app " + this._appNames.get(k)));
+				lines.push(line.replace(/{domain}/, domain + " #lab-docker-app " + this._directories.get(k)));
 		});
 		const content = lines.join("\r\n");
 		const tmpFile = path.join(this._context.platform.tempDirectory, "lab-tmp-hosts.txt");
@@ -164,7 +180,7 @@ export class DockerHosts {
 		this._tpl = new Map();
 		this._ips = new Map();
 		this._domains = new Map();
-		this._appNames = new Map();
+		this._directories = new Map();
 		let c = -1;
 		lines.forEach(line => {
 			c++;
@@ -180,7 +196,7 @@ export class DockerHosts {
 				(a, before, ip, between, domain, appName, after) => {
 					this._ips.set(c, ip);
 					this._domains.set(c, domain);
-					if (typeof appName === "string") this._appNames.set(c, appName);
+					if (typeof appName === "string") this._directories.set(c, appName);
 					return before + "{ip}" + between + "{domain}" + after;
 				}));
 		});
