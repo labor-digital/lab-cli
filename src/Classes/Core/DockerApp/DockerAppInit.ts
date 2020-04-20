@@ -181,12 +181,18 @@ export class DockerAppInit {
 				setValueIfKeyExistsAndEmpty("APP_OPT_DIR", path.join(this._context.rootDirectory, "opt") + path.sep);
 				
 				// Set optional values
+				const passwordGenerator = function (): string {
+					return (md5(projectName + Math.random()) + "ABCDEJKLOXYZ-_!#")
+						.split("").sort(function () {
+							return 0.5 - Math.random();
+						}).join("");
+				};
 				setValueIfKeyExistsAndEmpty("APP_MYSQL_DATABASE", projectShortName + "_d");
 				setValueIfKeyExistsAndEmpty("APP_MYSQL_USER", projectShortName + "_d");
-				setValueIfKeyExistsAndEmpty("APP_MYSQL_PASS", md5(projectName + Math.random()));
+				setValueIfKeyExistsAndEmpty("APP_MYSQL_PASS", passwordGenerator());
 				setValueIfKeyExistsAndEmpty("APP_MYSQL_PORT", "3306");
-				setValueIfKeyExistsAndEmpty("MYSQL_ROOT_PASSWORD", md5(projectName + Math.random()));
-				setValueIfKeyExistsAndEmpty("APP_SQL_PASS", md5(projectName + Math.random()));
+				setValueIfKeyExistsAndEmpty("MYSQL_ROOT_PASSWORD", passwordGenerator());
+				setValueIfKeyExistsAndEmpty("APP_SQL_PASS", passwordGenerator());
 				setValueIfKeyExistsAndEmpty("APP_SQL_PORT", "1433");
 				setValueIfKeyExistsAndEmpty("APP_SQL_DATABASE", projectShortName + "_d");
 				setValueIfKeyExistsAndEmpty("APP_PROTOCOL", "https://");
