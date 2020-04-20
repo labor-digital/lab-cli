@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/labor-digital/lab-cli/compare/v3.1.2...v3.2.0) (2020-04-13)
+
+
+### Features
+
+* **down:** add the option to remove the hosts file entry for an app when the "down" command is executed ([98c7b4f](https://github.com/labor-digital/lab-cli/commit/98c7b4fbc7e80be4daf21d31ac1b47beb2df2a79))
+
 ### [3.1.2](https://github.com/labor-digital/lab-cli/compare/v3.1.1...v3.1.2) (2020-04-07)
 
 
