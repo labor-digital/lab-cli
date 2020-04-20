@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.2.1](https://github.com/labor-digital/lab-cli/compare/v3.2.0...v3.2.1) (2020-04-20)
+
+
+### Bug Fixes
+
+* **DockerAppInit:** use a stronger password generator to satisfy mssql server ([7b8c5d7](https://github.com/labor-digital/lab-cli/commit/7b8c5d75b514edef53a763ecffeb3b419d1c11a1))
+
 ## [3.2.0](https://github.com/labor-digital/lab-cli/compare/v3.1.2...v3.2.0) (2020-04-13)
 
 
