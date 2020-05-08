@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/labor-digital/lab-cli/compare/v3.2.1...v3.3.0) (2020-05-08)
+
+
+### Features
+
+* implement import and export commands ([9702fc2](https://github.com/labor-digital/lab-cli/commit/9702fc22db95088830caa8ae44edd397f0351986))
+
 ### [3.2.1](https://github.com/labor-digital/lab-cli/compare/v3.2.0...v3.2.1) (2020-04-20)
 
 
