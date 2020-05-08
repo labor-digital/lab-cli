@@ -17,7 +17,6 @@
  */
 
 import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import chalk from "chalk";
 import {Command} from "commander";
 import * as fs from "fs";
 import inquirer from "inquirer";
@@ -35,11 +34,6 @@ export abstract class AbstractImportExportCommand {
 	
 	public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void> {
 		return (new DockerApp(context)).initialize().then(app => {
-			if (!app.dockerCompose.isRunning) {
-				console.log(chalk.yellowBright("Docker has to be running for this task!"));
-				return;
-			}
-			
 			// Check if we have an import container
 			let hasImportContainer = false;
 			forEach(app.dockerCompose.getServiceList(), (container: { key: string, containerName: string }) => {
