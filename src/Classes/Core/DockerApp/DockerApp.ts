@@ -131,6 +131,15 @@ export class DockerApp {
 	}
 	
 	/**
+	 * Returns the path to the import / export directory
+	 */
+	public get importExportDirectory(): string {
+		let importDir = this.env.get("APP_IMPORT_DIR");
+		if (isString(importDir)) return importDir;
+		return path.join(this._context.rootDirectory, "import");
+	}
+	
+	/**
 	 * Returns the instance of the docker api
 	 */
 	public get docker(): Docker {

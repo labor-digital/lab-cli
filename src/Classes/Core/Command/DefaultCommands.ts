@@ -160,6 +160,14 @@ export class DefaultCommands {
 			]
 		});
 		
+		context.commandRegistry.registerCommand("import", "../../Command/ProjectImportCommand", {
+			description: "triggers the import process using the LABOR import/export container"
+		});
+		
+		context.commandRegistry.registerCommand("export", "../../Command/ProjectExportCommand", {
+			description: "triggers the export process using the LABOR import/export container"
+		});
+		
 		return Promise.resolve(context);
 	}
 }
