@@ -49,6 +49,7 @@ export class Unison {
 				"-repeat=watch " +
 				(allowNodeModules ? "" : "-ignore=\"Name node_modules\" ") +
 				"-ignore=\"Name *.dev-symlink-bkp\" " +
+				"-ignore=\"Name perms.set\" " +
 				"-prefer=\"" + hostPath + "\" " +
 				"-ignorecase=false " +
 				"-auto " +
