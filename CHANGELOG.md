@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.3.1](https://github.com/labor-digital/lab-cli/compare/v3.3.0...v3.3.1) (2020-05-08)
+
+
+### Bug Fixes
+
+* **importExport:** the app must not be running to import or export the data ([5470069](https://github.com/labor-digital/lab-cli/commit/547006931c5e57ab6510bc5bb0923def96c3ad81))
+
 ## [3.3.0](https://github.com/labor-digital/lab-cli/compare/v3.2.1...v3.3.0) (2020-05-08)
 
 

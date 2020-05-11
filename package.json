@@ -5,7 +5,7 @@
 	},
 	"homepage": "https://github.com/labor-digital/lab-cli",
 	"name": "@labor-digital/lab-cli",
-	"version": "3.3.0",
+	"version": "3.3.1",
 	"description": "A CLI for your development environment based on docker",
 	"main": "lib/index.js",
 	"preferGlobal": true,
