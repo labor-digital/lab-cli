@@ -96,7 +96,7 @@ export class DefaultConfig {
 						volumes_from: [],
 						environment: [
 							"APP_VOLUME=/var/www/html/",
-							"OWNER_UID=1000",
+							"OWNER_UID=33",
 							"GROUP_ID=33"
 						],
 						ports: []
