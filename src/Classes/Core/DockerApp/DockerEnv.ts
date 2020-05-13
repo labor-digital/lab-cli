@@ -20,7 +20,8 @@ import {asObject} from "@labor-digital/helferlein/lib/FormatAndConvert/asObject"
 import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
 import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
 import {getListKeys} from "@labor-digital/helferlein/lib/Lists/listAccess";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
+import {isEmpty} from "@labor-digital/helferlein/lib/Types/isEmpty";
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import * as fs from "fs";
 
 export class DockerEnv {
@@ -104,18 +105,28 @@ export class DockerEnv {
 			let lineWork = line.trim();
 			
 			// Skip comments and empty lines
-			if (lineWork.length === 0 || lineWork.charAt(0) === "#" || lineWork.indexOf("=") === -1) return;
+			if (lineWork.length === 0 || lineWork.charAt(0) === "#" || lineWork.indexOf("=") === -1) {
+				tpl.push(lineWork);
+				return;
+			}
 			
 			// Extract key value and store the line in the template
-			tpl.push(lineWork.replace(/^([^=]*?)(?:\s+)?=(?:\s+)?(.*?)(#|$)/, (a, key, value, comment) => {
+			tpl.push(lineWork.replace(/^([^=]*?)(?:\s+)?=(?:\s+)?(.*?)(\s#|$)/, (a, key, value, comment) => {
 				// Prepare value
 				value = value.trim();
 				if (value.length === 0) value = null;
+				
+				// Handle comment only value
+				if (isString(value) && value.charAt(0) === "#") {
+					comment = " " + value;
+					value = null;
+				}
+				
 				key = key.trim();
 				if (env.has(key))
 					throw new Error("Invalid .env file! There was a duplicate key: " + key);
 				env.set(key.trim(), value);
-				return "{{pair}}" + (isUndefined(comment) ? " " + comment : "");
+				return "{{pair}}" + (!isEmpty(comment) ? comment : "");
 			}));
 		});
 		
