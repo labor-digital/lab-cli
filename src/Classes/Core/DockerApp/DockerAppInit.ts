@@ -147,7 +147,7 @@ export class DockerAppInit {
 		)()
 			.then((projectName: string) => {
 				const projectShortName = projectName.trim().split("-")
-					.map(v => v.trim().substr(0, 3)).join("_").toLowerCase();
+					.map(v => v.replace(/_/, "").trim().substr(0, 3)).join("_").toLowerCase();
 				
 				// Prepare the app base directory
 				const baseDir = path.join(this._context.rootDirectory, "..");
