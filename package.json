@@ -22,17 +22,17 @@
 		"watch": "node flushLib.js && tsc --watch"
 	},
 	"dependencies": {
-		"@labor-digital/helferlein": "^3.17.5",
-		"chalk": "4.0.0",
-		"commander": "5.0.0",
+		"@labor-digital/helferlein": "^3.21.0",
+		"chalk": "4.1.0",
+		"commander": "5.1.0",
 		"dockerode": "^3.2.0",
-		"inquirer": "7.1.0",
+		"inquirer": "7.3.0",
 		"requireg": "^0.2.2",
 		"yamljs": "0.3.0"
 	},
 	"devDependencies": {
 		"@types/inquirer": "^6.5.0",
-		"@types/node": "^13.11.0",
-		"typescript": "^3.8.3"
+		"@types/node": "^14.0.20",
+		"typescript": "^3.9.6"
 	}
 }
