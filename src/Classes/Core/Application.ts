@@ -96,15 +96,23 @@ export class Application
     protected showFancyIntro(context: AppContext): Promise<AppContext>
     {
         const lang = [
-            ['Guten Morgen', 'Guten Tag', 'Guten Abend'],
-            ['Good morning', 'Good day', 'Good evening'],
-            ['Buenos días', 'Buenos días', 'Buenas noches'],
-            ['Bonjour', 'Bonne journée', 'Bonsoir'],
-            ['Godmorgen', 'God dag', 'God aften'],
-            ['Dobro jutro', 'Dobar dan', 'Dobra večer'],
-            ['Maidin mhaith', 'Dea-lá', 'Dea-oíche'],
-            ['Buongiorno', 'Buona giornata', 'Buona sera'],
-            ['Günaydın', 'Iyi günler', 'İyi aksamlar']
+            ['Guten Morgen', 'Guten Tag', 'Guten Abend'], // German
+            ['Good morning', 'Good day', 'Good evening'], // English
+            ['Buenos días', 'Buenos días', 'Buenas noches'], // Spanish
+            ['Bonjour', 'Bonne journée', 'Bonsoir'], // French
+            ['Godmorgen', 'God dag', 'God aften'], // Danish
+            ['Buongiorno', 'Buona giornata', 'Buonasera'], // Italian
+            ['Dobro jutro', 'Dobar dan', 'Dobra večer'], // Croatian
+            ['Maidin mhaith', 'Dea-lá', 'Dea-oíche'], // Irish
+            ['Günaydın', 'Iyi günler', 'İyi aksamlar'], // Turkish
+            ['Dobroye utro', 'Dobryy den\'', 'Dobryy vecher'], // Russian (save for CLI without cyrillic font),
+            ['Zǎoshang hǎo', 'měihǎo de yītiān', 'wǎnshàng hǎo'], // Chinese simplified (save for CLI without chinese font),
+            ['Bonum mane', 'Bonus dies', 'Bonum vesperam'], // Latin
+            ['Sawubona', 'Usuku oluhle', 'Sawubona'], // Zulu
+            ['Madainn mhath', 'Latha math', 'Feasgar math'], // Scots Gaelic
+            ['Hyvää huomenta', 'Hyvää päivää', 'Hyvää iltaa'], // Finish
+            ['Kaliméra', 'Kalíméra', 'Kaló apógevma'], // Greek
+            ['Goeie more', 'Goeie dag', 'Goeienaand'] // Afrikaans
         ];
         const h = new Date().getHours();
         const timeKey = h < 12 ? 0 : (h < 18 ? 1 : 2);
