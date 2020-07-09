@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.3.2](https://github.com/labor-digital/lab-cli/compare/v3.3.1...v3.3.2) (2020-05-11)
+
+
+### Bug Fixes
+
+* **unison:** don't copy perms.set files ([a148585](https://github.com/labor-digital/lab-cli/commit/a14858580dd05ea6d4801709f64a0f2e4728afb9))
+
 ### [3.3.1](https://github.com/labor-digital/lab-cli/compare/v3.3.0...v3.3.1) (2020-05-08)
 
 
