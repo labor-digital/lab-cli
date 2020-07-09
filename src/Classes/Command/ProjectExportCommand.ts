@@ -16,12 +16,15 @@
  * Last modified: 2020.05.08 at 12:25
  */
 
-import {AbstractImportExportCommand} from "./AbstractImportExportCommand";
+import {AbstractImportExportCommand} from './AbstractImportExportCommand';
 
-export class ProjectExportCommand extends AbstractImportExportCommand {
-	public constructor() {
-		super();
-		this._actionFileName = "do_export";
-		this._consentMessage = "This will trigger an export for your app: \"%s\". This will override all current import-data. Do you want to proceed?";
-	}
+export class ProjectExportCommand extends AbstractImportExportCommand
+{
+    public constructor()
+    {
+        super();
+        this._actionFileName = 'do_export';
+        this._consentMessage
+            = 'This will trigger an export for your app: "%s". This will override all current import-data. Do you want to proceed?';
+    }
 }

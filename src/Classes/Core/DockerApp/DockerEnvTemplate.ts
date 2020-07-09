@@ -16,32 +16,37 @@
  * Last modified: 2020.04.07 at 13:33
  */
 
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {DockerEnv} from "./DockerEnv";
+import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
+import {DockerEnv} from './DockerEnv';
 
-export class DockerEnvTemplate extends DockerEnv {
-	
-	/**
-	 * Writes the template file for the given docker .env file
-	 * @param env
-	 */
-	public writeTemplate(env: DockerEnv): void {
-		const keepValuesFor = env.get("LAB_CLI_KEEP", "").split(",").map(v => v.trim()).filter(v => v !== "");
-		keepValuesFor.push("LAB_CLI_KEEP");
-		const cleaned: Map<string, string> = new Map();
-		forEach(env.getAll(), (v: string, k: string) => {
-			if (keepValuesFor.indexOf(k) === -1) v = "";
-			cleaned.set(k, v);
-		});
-		this._tpl = env.tpl;
-		this._env = cleaned;
-		this.write();
-	}
-	
-	/**
-	 * Don't do anything here...
-	 */
-	protected read(): void {
-		// Silence
-	}
+export class DockerEnvTemplate extends DockerEnv
+{
+    
+    /**
+     * Writes the template file for the given docker .env file
+     * @param env
+     */
+    public writeTemplate(env: DockerEnv): void
+    {
+        const keepValuesFor = env.get('LAB_CLI_KEEP', '').split(',').map(v => v.trim()).filter(v => v !== '');
+        keepValuesFor.push('LAB_CLI_KEEP');
+        const cleaned: Map<string, string> = new Map();
+        forEach(env.getAll(), (v: string, k: string) => {
+            if (keepValuesFor.indexOf(k) === -1) {
+                v = '';
+            }
+            cleaned.set(k, v);
+        });
+        this._tpl = env.tpl;
+        this._env = cleaned;
+        this.write();
+    }
+    
+    /**
+     * Don't do anything here...
+     */
+    protected read(): void
+    {
+        // Silence
+    }
 }

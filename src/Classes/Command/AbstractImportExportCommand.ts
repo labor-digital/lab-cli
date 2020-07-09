@@ -16,60 +16,71 @@
  * Last modified: 2020.05.08 at 12:28
  */
 
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {Command} from "commander";
-import * as fs from "fs";
-import inquirer from "inquirer";
-import * as path from "path";
-import {AppContext} from "../Core/AppContext";
-import {Bugfixes} from "../Core/Bugfixes";
-import {CommandStack} from "../Core/Command/CommandStack";
-import {DockerApp} from "../Core/DockerApp/DockerApp";
+import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
+import {Command} from 'commander';
+import * as fs from 'fs';
+import inquirer from 'inquirer';
+import * as path from 'path';
+import {AppContext} from '../Core/AppContext';
+import {Bugfixes} from '../Core/Bugfixes';
+import {CommandStack} from '../Core/Command/CommandStack';
+import {DockerApp} from '../Core/DockerApp/DockerApp';
 
-export abstract class AbstractImportExportCommand {
-	
-	protected _actionFileName: "do_import" | "do_export";
-	
-	protected _consentMessage: string;
-	
-	public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void> {
-		return (new DockerApp(context)).initialize().then(app => {
-			// Check if we have an import container
-			let hasImportContainer = false;
-			forEach(app.dockerCompose.getServiceList(), (container: { key: string, containerName: string }) => {
-				if (container.key === "import") {
-					hasImportContainer = true;
-				}
-			});
-			if (!hasImportContainer)
-				return Promise.reject(Error("It seems like your composition does not have an \"import\" container. Make sure your docker-compose override file defines a service with key: \"import\" which uses the LABOR import container!"));
-			
-			// Perform the import if the user consented
-			return this.askForConsent(context).then(execute => {
-				if (!execute) return Promise.resolve();
-				if (!fs.existsSync(app.importExportDirectory)) fs.mkdirSync(app.importExportDirectory);
-				fs.writeFileSync(path.join(app.importExportDirectory, this._actionFileName), "");
-				stack.push(["up"]);
-				return;
-			});
-		});
-	}
-	
-	/**
-	 * Asks the user for consent to stop all containers
-	 */
-	protected askForConsent(context: AppContext): Promise<boolean> {
-		return new Promise((resolve) => {
-			inquirer.prompt({
-				name: "ok",
-				type: "confirm",
-				message: this._consentMessage.replace(/%s/g, context.rootDirectory)
-			}).then((answers) => {
-				Bugfixes.inquirerChildProcessReadLineFix();
-				if (!answers.ok) return resolve(false);
-				resolve(true);
-			});
-		});
-	}
-	
+export abstract class AbstractImportExportCommand
+{
+    
+    protected _actionFileName: 'do_import' | 'do_export';
+    
+    protected _consentMessage: string;
+    
+    public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void>
+    {
+        return (new DockerApp(context)).initialize().then(app => {
+            // Check if we have an import container
+            let hasImportContainer = false;
+            forEach(app.dockerCompose.getServiceList(), (container: { key: string, containerName: string }) => {
+                if (container.key === 'import') {
+                    hasImportContainer = true;
+                }
+            });
+            if (!hasImportContainer) {
+                return Promise.reject(Error(
+                    'It seems like your composition does not have an "import" container. Make sure your docker-compose override file defines a service with key: "import" which uses the LABOR import container!'));
+            }
+            
+            // Perform the import if the user consented
+            return this.askForConsent(context).then(execute => {
+                if (!execute) {
+                    return Promise.resolve();
+                }
+                if (!fs.existsSync(app.importExportDirectory)) {
+                    fs.mkdirSync(app.importExportDirectory);
+                }
+                fs.writeFileSync(path.join(app.importExportDirectory, this._actionFileName), '');
+                stack.push(['up']);
+                return;
+            });
+        });
+    }
+    
+    /**
+     * Asks the user for consent to stop all containers
+     */
+    protected askForConsent(context: AppContext): Promise<boolean>
+    {
+        return new Promise((resolve) => {
+            inquirer.prompt({
+                name: 'ok',
+                type: 'confirm',
+                message: this._consentMessage.replace(/%s/g, context.rootDirectory)
+            }).then((answers) => {
+                Bugfixes.inquirerChildProcessReadLineFix();
+                if (!answers.ok) {
+                    return resolve(false);
+                }
+                resolve(true);
+            });
+        });
+    }
+    
 }

@@ -16,17 +16,21 @@
  * Last modified: 2020.04.06 at 13:17
  */
 
-import {Command} from "commander";
-import {AppContext} from "../Core/AppContext";
-import {DockerApp} from "../Core/DockerApp/DockerApp";
+import {Command} from 'commander';
+import {AppContext} from '../Core/AppContext';
+import {DockerApp} from '../Core/DockerApp/DockerApp';
 
-export class DockerComposeLogsCommand {
-	
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		return (new DockerApp(context)).initialize().then(app => {
-			if (!app.dockerCompose.isRunning)
-				return Promise.reject(new Error("You can only see the logs of running apps. But the app is currently not running."));
-			return app.dockerCompose.attachToLogs(cmd.lines, cmd.follow);
-		});
-	}
+export class DockerComposeLogsCommand
+{
+    
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        return (new DockerApp(context)).initialize().then(app => {
+            if (!app.dockerCompose.isRunning) {
+                return Promise.reject(
+                    new Error('You can only see the logs of running apps. But the app is currently not running.'));
+            }
+            return app.dockerCompose.attachToLogs(cmd.lines, cmd.follow);
+        });
+    }
 }

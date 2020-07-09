@@ -16,82 +16,90 @@
  * Last modified: 2020.04.05 at 14:36
  */
 
-import {GenericStorage} from "@labor-digital/helferlein/lib/Entities/GenericStorage";
-import {GenericStorageInterface} from "@labor-digital/helferlein/lib/Entities/GenericStorageInterface";
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {AppContext} from "./AppContext";
-import {Registry} from "./Registry";
+import {GenericStorage} from '@labor-digital/helferlein/lib/Entities/GenericStorage';
+import {GenericStorageInterface} from '@labor-digital/helferlein/lib/Entities/GenericStorageInterface';
+import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
+import {AppContext} from './AppContext';
+import {Registry} from './Registry';
 
-export class AppRegistry extends GenericStorage {
-	
-	/**
-	 * The unique storage id for this app
-	 */
-	protected _appId: string;
-	
-	/**
-	 * The registry we use to store our data in
-	 */
-	protected _registry: Registry;
-	
-	/**
-	 * Initializes the registry object
-	 * @param registry
-	 * @param context
-	 */
-	public initialize(registry: Registry, context: AppContext): AppRegistry {
-		this._registry = registry;
-		this._appId = "app:" + context.rootDirectory;
-		return this;
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public get(key?: string | number, fallback?: any): any {
-		this.storage = this.getProjectStorage();
-		return super.get(key, fallback);
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public set(key: string | number, value: any): GenericStorageInterface {
-		this.storage = this.getProjectStorage();
-		super.set(key, value);
-		this._registry.set(this._appId, this.storage);
-		return this;
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public has(key: string | number): boolean {
-		this.storage = this.getProjectStorage();
-		return super.has(key);
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public remove(key: string | number): GenericStorageInterface {
-		this.storage = this.getProjectStorage();
-		super.remove(key);
-		return this;
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public forEach(callback: Function): void {
-		this.storage = this.getProjectStorage();
-		super.forEach(callback);
-	}
-	
-	/**
-	 * Loads the app storage from the global registry
-	 */
-	protected getProjectStorage(): PlainObject {
-		return this._registry.get(this._appId, {});
-	}
+export class AppRegistry extends GenericStorage
+{
+    
+    /**
+     * The unique storage id for this app
+     */
+    protected _appId: string;
+    
+    /**
+     * The registry we use to store our data in
+     */
+    protected _registry: Registry;
+    
+    /**
+     * Initializes the registry object
+     * @param registry
+     * @param context
+     */
+    public initialize(registry: Registry, context: AppContext): AppRegistry
+    {
+        this._registry = registry;
+        this._appId = 'app:' + context.rootDirectory;
+        return this;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public get(key?: string | number, fallback?: any): any
+    {
+        this.storage = this.getProjectStorage();
+        return super.get(key, fallback);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public set(key: string | number, value: any): GenericStorageInterface
+    {
+        this.storage = this.getProjectStorage();
+        super.set(key, value);
+        this._registry.set(this._appId, this.storage);
+        return this;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public has(key: string | number): boolean
+    {
+        this.storage = this.getProjectStorage();
+        return super.has(key);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public remove(key: string | number): GenericStorageInterface
+    {
+        this.storage = this.getProjectStorage();
+        super.remove(key);
+        return this;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public forEach(callback: Function): void
+    {
+        this.storage = this.getProjectStorage();
+        super.forEach(callback);
+    }
+    
+    /**
+     * Loads the app storage from the global registry
+     */
+    protected getProjectStorage(): PlainObject
+    {
+        return this._registry.get(this._appId, {});
+    }
 }

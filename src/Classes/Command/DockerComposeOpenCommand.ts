@@ -16,55 +16,62 @@
  * Last modified: 2020.04.06 at 19:30
  */
 
-import * as childProcess from "child_process";
-import {Command} from "commander";
-import inquirer from "inquirer";
-import {AppContext} from "../Core/AppContext";
-import {Bugfixes} from "../Core/Bugfixes";
-import {CommandStack} from "../Core/Command/CommandStack";
-import {DockerApp} from "../Core/DockerApp/DockerApp";
+import * as childProcess from 'child_process';
+import {Command} from 'commander';
+import inquirer from 'inquirer';
+import {AppContext} from '../Core/AppContext';
+import {Bugfixes} from '../Core/Bugfixes';
+import {CommandStack} from '../Core/Command/CommandStack';
+import {DockerApp} from '../Core/DockerApp/DockerApp';
 
-export class DockerComposeOpenCommand {
-	public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void> {
-		return (new DockerApp(context)).initialize().then(app => {
-			if (!app.dockerCompose.isRunning) return this.askToStartContainer(context, stack);
-			
-			const domain = app.env.get("APP_DOMAIN", app.env.get("APP_IP"));
-			const protocol = app.env.get("APP_PROTOCOL", "http://");
-			const url = protocol + domain;
-			
-			console.log("Opening website \"" + url + "\" in your default browser!");
-			const command = context.platform.choose({
-				windows: () => {
-					return "start \"\" \"" + url + "\"";
-				},
-				linux: () => {
-					return "xdg-open " + url;
-				}
-			})();
-			
-			childProcess.execSync(command);
-		});
-	}
-	
-	/**
-	 * Asks the user to start the container
-	 * @param context
-	 * @param stack
-	 */
-	protected askToStartContainer(context: AppContext, stack: CommandStack): Promise<void> {
-		return new Promise((resolve, reject) => {
-			inquirer.prompt({
-				name: "startApp",
-				type: "confirm",
-				message: "Can't open your app, because it is currently not running! Should I start it for you?"
-			}).then((answers) => {
-				Bugfixes.inquirerChildProcessReadLineFix();
-				if (!answers.startApp) return reject(new Error("The app has to be running before you can open it!"));
-				stack.push(["up"]);
-				stack.push(["open"]);
-				resolve();
-			});
-		});
-	}
+export class DockerComposeOpenCommand
+{
+    public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void>
+    {
+        return (new DockerApp(context)).initialize().then(app => {
+            if (!app.dockerCompose.isRunning) {
+                return this.askToStartContainer(context, stack);
+            }
+            
+            const domain = app.env.get('APP_DOMAIN', app.env.get('APP_IP'));
+            const protocol = app.env.get('APP_PROTOCOL', 'http://');
+            const url = protocol + domain;
+            
+            console.log('Opening website "' + url + '" in your default browser!');
+            const command = context.platform.choose({
+                windows: () => {
+                    return 'start "" "' + url + '"';
+                },
+                linux: () => {
+                    return 'xdg-open ' + url;
+                }
+            })();
+            
+            childProcess.execSync(command);
+        });
+    }
+    
+    /**
+     * Asks the user to start the container
+     * @param context
+     * @param stack
+     */
+    protected askToStartContainer(context: AppContext, stack: CommandStack): Promise<void>
+    {
+        return new Promise((resolve, reject) => {
+            inquirer.prompt({
+                name: 'startApp',
+                type: 'confirm',
+                message: 'Can\'t open your app, because it is currently not running! Should I start it for you?'
+            }).then((answers) => {
+                Bugfixes.inquirerChildProcessReadLineFix();
+                if (!answers.startApp) {
+                    return reject(new Error('The app has to be running before you can open it!'));
+                }
+                stack.push(['up']);
+                stack.push(['open']);
+                resolve();
+            });
+        });
+    }
 }

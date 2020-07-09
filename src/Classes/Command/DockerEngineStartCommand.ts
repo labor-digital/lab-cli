@@ -16,18 +16,20 @@
  * Last modified: 2020.04.05 at 20:12
  */
 
-import chalk from "chalk";
-import {Command} from "commander";
-import {Docker} from "../Api/Docker";
-import {AppContext} from "../Core/AppContext";
+import chalk from 'chalk';
+import {Command} from 'commander';
+import {Docker} from '../Api/Docker';
+import {AppContext} from '../Core/AppContext';
 
-export class DockerEngineStartCommand {
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		const api = new Docker(context);
-		if (api.isRunning) {
-			console.log(chalk.greenBright("The docker engine is already running!"));
-			return Promise.resolve();
-		}
-		return api.startEngine();
-	}
+export class DockerEngineStartCommand
+{
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        const api = new Docker(context);
+        if (api.isRunning) {
+            console.log(chalk.greenBright('The docker engine is already running!'));
+            return Promise.resolve();
+        }
+        return api.startEngine();
+    }
 }

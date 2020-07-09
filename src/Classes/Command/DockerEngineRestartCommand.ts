@@ -16,13 +16,15 @@
  * Last modified: 2020.04.05 at 20:44
  */
 
-import {Command} from "commander";
-import {Docker} from "../Api/Docker";
-import {AppContext} from "../Core/AppContext";
+import {Command} from 'commander';
+import {Docker} from '../Api/Docker';
+import {AppContext} from '../Core/AppContext';
 
-export class DockerEngineRestartCommand {
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		const api = new Docker(context);
-		return api.restartEngine();
-	}
+export class DockerEngineRestartCommand
+{
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        const api = new Docker(context);
+        return api.restartEngine();
+    }
 }

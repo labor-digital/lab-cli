@@ -16,19 +16,21 @@
  * Last modified: 2020.04.06 at 12:24
  */
 
-import chalk from "chalk";
-import {Command} from "commander";
-import {AppContext} from "../Core/AppContext";
-import {DockerApp} from "../Core/DockerApp/DockerApp";
+import chalk from 'chalk';
+import {Command} from 'commander';
+import {AppContext} from '../Core/AppContext';
+import {DockerApp} from '../Core/DockerApp/DockerApp';
 
-export class DockerComposeStopCommand {
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		return (new DockerApp(context)).initialize().then(app => {
-			if (!app.dockerCompose.isRunning) {
-				console.log(chalk.yellowBright("The app is currently not running!"));
-				return;
-			}
-			return app.dockerCompose.stop(cmd.force === true);
-		});
-	}
+export class DockerComposeStopCommand
+{
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        return (new DockerApp(context)).initialize().then(app => {
+            if (!app.dockerCompose.isRunning) {
+                console.log(chalk.yellowBright('The app is currently not running!'));
+                return;
+            }
+            return app.dockerCompose.stop(cmd.force === true);
+        });
+    }
 }

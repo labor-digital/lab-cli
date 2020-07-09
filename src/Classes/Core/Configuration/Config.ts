@@ -16,53 +16,60 @@
  * Last modified: 2020.04.03 at 19:43
  */
 
-import {ListPath} from "@labor-digital/helferlein/lib/Interfaces/List";
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {merge} from "@labor-digital/helferlein/lib/Lists/merge";
-import {getPath} from "@labor-digital/helferlein/lib/Lists/Paths/getPath";
-import {hasPath} from "@labor-digital/helferlein/lib/Lists/Paths/hasPath";
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
+import {ListPath} from '@labor-digital/helferlein/lib/Interfaces/List';
+import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
+import {merge} from '@labor-digital/helferlein/lib/Lists/merge';
+import {getPath} from '@labor-digital/helferlein/lib/Lists/Paths/getPath';
+import {hasPath} from '@labor-digital/helferlein/lib/Lists/Paths/hasPath';
+import {isPlainObject} from '@labor-digital/helferlein/lib/Types/isPlainObject';
 
 
-export class Config {
-	
-	/**
-	 * The configuration object
-	 */
-	protected config: PlainObject;
-	
-	/**
-	 * Config constructor
-	 * @param config The raw configuration object
-	 */
-	constructor(config: PlainObject) {
-		this.config = config;
-	}
-	
-	/**
-	 * Returns true if the given config key exists, false if not
-	 * @param key
-	 */
-	public has(key: ListPath): boolean {
-		return hasPath(this.config, key);
-	}
-	
-	/**
-	 * Returns the required configuration based on the given key
-	 * @param key
-	 * @param fallback
-	 */
-	public get(key: ListPath, fallback?: any): any {
-		return getPath(this.config, key, fallback);
-	}
-	
-	/**
-	 * Used to extend the current configuration with additional options.
-	 * @param mergeConfig The configuration to merge into the current config object
-	 */
-	public extend(mergeConfig: PlainObject): Config {
-		if (!isPlainObject(mergeConfig)) throw new Error("The given config is not a plain object!");
-		this.config = merge(this.config, mergeConfig);
-		return this;
-	}
+export class Config
+{
+    
+    /**
+     * The configuration object
+     */
+    protected config: PlainObject;
+    
+    /**
+     * Config constructor
+     * @param config The raw configuration object
+     */
+    constructor(config: PlainObject)
+    {
+        this.config = config;
+    }
+    
+    /**
+     * Returns true if the given config key exists, false if not
+     * @param key
+     */
+    public has(key: ListPath): boolean
+    {
+        return hasPath(this.config, key);
+    }
+    
+    /**
+     * Returns the required configuration based on the given key
+     * @param key
+     * @param fallback
+     */
+    public get(key: ListPath, fallback?: any): any
+    {
+        return getPath(this.config, key, fallback);
+    }
+    
+    /**
+     * Used to extend the current configuration with additional options.
+     * @param mergeConfig The configuration to merge into the current config object
+     */
+    public extend(mergeConfig: PlainObject): Config
+    {
+        if (!isPlainObject(mergeConfig)) {
+            throw new Error('The given config is not a plain object!');
+        }
+        this.config = merge(this.config, mergeConfig);
+        return this;
+    }
 }

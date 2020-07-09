@@ -16,18 +16,20 @@
  * Last modified: 2020.04.05 at 20:17
  */
 
-import chalk from "chalk";
-import {Command} from "commander";
-import {Docker} from "../Api/Docker";
-import {AppContext} from "../Core/AppContext";
+import chalk from 'chalk';
+import {Command} from 'commander';
+import {Docker} from '../Api/Docker';
+import {AppContext} from '../Core/AppContext';
 
-export class DockerEngineStopCommand {
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		const api = new Docker(context);
-		if (!api.isRunning && cmd.force !== true) {
-			console.log(chalk.yellowBright("The docker engine is currently not running!"));
-			return Promise.resolve();
-		}
-		return api.stopEngine(cmd.force);
-	}
+export class DockerEngineStopCommand
+{
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        const api = new Docker(context);
+        if (!api.isRunning && cmd.force !== true) {
+            console.log(chalk.yellowBright('The docker engine is currently not running!'));
+            return Promise.resolve();
+        }
+        return api.stopEngine(cmd.force);
+    }
 }

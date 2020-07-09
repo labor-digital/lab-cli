@@ -15,42 +15,49 @@
  *
  * Last modified: 2020.04.05 at 23:44
  */
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from 'fs';
+import * as path from 'path';
 
-export class FilesAndFolders {
-	
-	/**
-	 * Helper to recursively delete a directory with contents
-	 * @param dirname The dirname to the directory to delete
-	 * @param removeSelf If set to false, the parent directory will not be removed
-	 */
-	static rmdirRecursive(dirname: string, removeSelf?: boolean) {
-		if (fs.existsSync(dirname)) {
-			fs.readdirSync(dirname).forEach(function (file, index) {
-				var curPath = dirname + path.sep + file;
-				if (fs.lstatSync(curPath).isDirectory()) { // recurse
-					module.exports.rmdirRecursive(curPath);
-				} else { // delete file
-					fs.unlinkSync(curPath);
-				}
-			});
-			if (removeSelf !== false) fs.rmdirSync(dirname);
-		}
-	}
-	
-	/**
-	 * Generates a directory recursively
-	 * @see https://gist.github.com/bpedro/742162#gistcomment-828133
-	 * @param directory The directory to create
-	 */
-	static mkdirRecursive(directory: string): void {
-		var parts = directory.replace(/[\\\/]/g, "/").replace(/\/$/, "").split("/");
-		
-		for (var i = 1; i <= parts.length; i++) {
-			var segment = parts.slice(0, i).join("/");
-			if (segment === "" || segment === undefined) continue;
-			!fs.existsSync(segment) ? fs.mkdirSync(segment) : null;
-		}
-	}
+export class FilesAndFolders
+{
+    
+    /**
+     * Helper to recursively delete a directory with contents
+     * @param dirname The dirname to the directory to delete
+     * @param removeSelf If set to false, the parent directory will not be removed
+     */
+    static rmdirRecursive(dirname: string, removeSelf?: boolean)
+    {
+        if (fs.existsSync(dirname)) {
+            fs.readdirSync(dirname).forEach(function (file, index) {
+                var curPath = dirname + path.sep + file;
+                if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                    module.exports.rmdirRecursive(curPath);
+                } else { // delete file
+                    fs.unlinkSync(curPath);
+                }
+            });
+            if (removeSelf !== false) {
+                fs.rmdirSync(dirname);
+            }
+        }
+    }
+    
+    /**
+     * Generates a directory recursively
+     * @see https://gist.github.com/bpedro/742162#gistcomment-828133
+     * @param directory The directory to create
+     */
+    static mkdirRecursive(directory: string): void
+    {
+        var parts = directory.replace(/[\\\/]/g, '/').replace(/\/$/, '').split('/');
+        
+        for (var i = 1; i <= parts.length; i++) {
+            var segment = parts.slice(0, i).join('/');
+            if (segment === '' || segment === undefined) {
+                continue;
+            }
+            !fs.existsSync(segment) ? fs.mkdirSync(segment) : null;
+        }
+    }
 }

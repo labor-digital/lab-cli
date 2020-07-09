@@ -16,62 +16,67 @@
  * Last modified: 2020.04.06 at 15:05
  */
 
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
-import * as childProcess from "child_process";
-import * as fs from "fs";
-import * as path from "path";
-import {DockerApp} from "../Core/DockerApp/DockerApp";
+import {isString} from '@labor-digital/helferlein/lib/Types/isString';
+import * as childProcess from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+import {DockerApp} from '../Core/DockerApp/DockerApp';
 
-export class Unison {
-	
-	/**
-	 * Starts the unison sync for a given docker app
-	 * @param app The docker app to run unison for
-	 * @param force True to force unison to run without archives
-	 */
-	static startUnison(app: DockerApp, force?: boolean): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
-			// Prepare options
-			const additionalArgs: string = app.context.config.get("union.additionalArgs", "").trim();
-			const allowNodeModules: boolean = app.context.config.get("unison.allowNodeModules", false);
-			const targetPort = app.context.config.get("unison.target.port", 5000);
-			const targetIp = app.context.config.get("unison.target.ip", app.env.get("APP_IP"));
-			let hostPath = app.context.config.get("unison.host.directory");
-			if (!isString(hostPath)) {
-				if (fs.existsSync(path.join(app.context.rootDirectory, "src")))
-					hostPath = path.join(app.context.rootDirectory, "src");
-				else hostPath = app.context.rootDirectory;
-			}
-			
-			// Build the command
-			const command = "\"" + Unison.getUnisonExecutable(app) + "\" \"" + hostPath + "\" " +
-				"\"socket://" + targetIp + ":" + targetPort + "\" " +
-				"-repeat=watch " +
-				(allowNodeModules ? "" : "-ignore=\"Name node_modules\" ") +
-				"-ignore=\"Name *.dev-symlink-bkp\" " +
-				"-ignore=\"Name perms.set\" " +
-				"-prefer=\"" + hostPath + "\" " +
-				"-ignorecase=false " +
-				"-auto " +
-				"-links=false " +
-				"-label=\"APP: " + app.context.rootDirectory + " \" " +
-				(force ? "-ignorearchives=true -ignorelocks=true " : "") +
-				" " + additionalArgs;
-			
-			try {
-				childProcess.execSync(command, {stdio: "inherit"});
-				resolve();
-			} catch (e) {
-				reject(e);
-			}
-		});
-	}
-	
-	/**
-	 * Returns the absolute path to the unison executable
-	 * @param app
-	 */
-	protected static getUnisonExecutable(app: DockerApp): string {
-		return path.join(app.context.cliDirectory, "bin/unison/unison 2.48.4 text.exe");
-	}
+export class Unison
+{
+    
+    /**
+     * Starts the unison sync for a given docker app
+     * @param app The docker app to run unison for
+     * @param force True to force unison to run without archives
+     */
+    static startUnison(app: DockerApp, force?: boolean): Promise<void>
+    {
+        return new Promise<void>((resolve, reject) => {
+            // Prepare options
+            const additionalArgs: string = app.context.config.get('union.additionalArgs', '').trim();
+            const allowNodeModules: boolean = app.context.config.get('unison.allowNodeModules', false);
+            const targetPort = app.context.config.get('unison.target.port', 5000);
+            const targetIp = app.context.config.get('unison.target.ip', app.env.get('APP_IP'));
+            let hostPath = app.context.config.get('unison.host.directory');
+            if (!isString(hostPath)) {
+                if (fs.existsSync(path.join(app.context.rootDirectory, 'src'))) {
+                    hostPath = path.join(app.context.rootDirectory, 'src');
+                } else {
+                    hostPath = app.context.rootDirectory;
+                }
+            }
+            
+            // Build the command
+            const command = '"' + Unison.getUnisonExecutable(app) + '" "' + hostPath + '" ' +
+                            '"socket://' + targetIp + ':' + targetPort + '" ' +
+                            '-repeat=watch ' +
+                            (allowNodeModules ? '' : '-ignore="Name node_modules" ') +
+                            '-ignore="Name *.dev-symlink-bkp" ' +
+                            '-ignore="Name perms.set" ' +
+                            '-prefer="' + hostPath + '" ' +
+                            '-ignorecase=false ' +
+                            '-auto ' +
+                            '-links=false ' +
+                            '-label="APP: ' + app.context.rootDirectory + ' " ' +
+                            (force ? '-ignorearchives=true -ignorelocks=true ' : '') +
+                            ' ' + additionalArgs;
+            
+            try {
+                childProcess.execSync(command, {stdio: 'inherit'});
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+    
+    /**
+     * Returns the absolute path to the unison executable
+     * @param app
+     */
+    protected static getUnisonExecutable(app: DockerApp): string
+    {
+        return path.join(app.context.cliDirectory, 'bin/unison/unison 2.48.4 text.exe');
+    }
 }

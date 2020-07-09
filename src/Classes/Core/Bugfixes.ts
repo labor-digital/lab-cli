@@ -15,18 +15,20 @@
  *
  * Last modified: 2020.04.06 at 14:14
  */
-import * as readline from "readline";
+import * as readline from 'readline';
 
-export class Bugfixes {
-	/**
-	 * Implemented because there is an issue when inquirer is used in
-	 * combination with childProcess's that require inputs
-	 */
-	static inquirerChildProcessReadLineFix() {
-		const rl = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout
-		});
-		rl.close();
-	}
+export class Bugfixes
+{
+    /**
+     * Implemented because there is an issue when inquirer is used in
+     * combination with childProcess's that require inputs
+     */
+    static inquirerChildProcessReadLineFix()
+    {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        rl.close();
+    }
 }

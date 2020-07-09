@@ -17,42 +17,49 @@
  */
 
 
-export class CommandStack {
-	/**
-	 * The list of commands to process
-	 */
-	protected _commands: Array<Array<string>>;
-	
-	/**
-	 * CommandStack constructor
-	 */
-	public constructor() {
-		this._commands = [];
-	}
-	
-	/**
-	 * A command that should be executed as a cli command but without the "lab" prefix.
-	 * All parts of the command have to be given as array: so if you want to call "lab up -f" just pass: ["up", "-f"]
-	 *
-	 * @param command
-	 */
-	public push(command: Array<string>): CommandStack {
-		this._commands.push(command);
-		return this;
-	}
-	
-	/**
-	 * Returns true if there is a next command required
-	 */
-	public hasNext(): boolean {
-		return this._commands.length > 0;
-	}
-	
-	/**
-	 * Returns the next command that should be executed
-	 */
-	public getNext(): Array<string> {
-		if (!this.hasNext()) throw new Error("There is no next command!");
-		return this._commands.shift();
-	}
+export class CommandStack
+{
+    /**
+     * The list of commands to process
+     */
+    protected _commands: Array<Array<string>>;
+    
+    /**
+     * CommandStack constructor
+     */
+    public constructor()
+    {
+        this._commands = [];
+    }
+    
+    /**
+     * A command that should be executed as a cli command but without the "lab" prefix.
+     * All parts of the command have to be given as array: so if you want to call "lab up -f" just pass: ["up", "-f"]
+     *
+     * @param command
+     */
+    public push(command: Array<string>): CommandStack
+    {
+        this._commands.push(command);
+        return this;
+    }
+    
+    /**
+     * Returns true if there is a next command required
+     */
+    public hasNext(): boolean
+    {
+        return this._commands.length > 0;
+    }
+    
+    /**
+     * Returns the next command that should be executed
+     */
+    public getNext(): Array<string>
+    {
+        if (!this.hasNext()) {
+            throw new Error('There is no next command!');
+        }
+        return this._commands.shift();
+    }
 }

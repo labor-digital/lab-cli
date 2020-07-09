@@ -16,79 +16,88 @@
  * Last modified: 2020.04.06 at 13:02
  */
 
-import {Command} from "commander";
-import inquirer from "inquirer";
-import {AppContext} from "../Core/AppContext";
-import {Bugfixes} from "../Core/Bugfixes";
-import {DockerApp} from "../Core/DockerApp/DockerApp";
-import {DockerHosts} from "../Core/DockerApp/DockerHosts";
+import {Command} from 'commander';
+import inquirer from 'inquirer';
+import {AppContext} from '../Core/AppContext';
+import {Bugfixes} from '../Core/Bugfixes';
+import {DockerApp} from '../Core/DockerApp/DockerApp';
+import {DockerHosts} from '../Core/DockerApp/DockerHosts';
 
-export class DockerComposeDownCommand {
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		return (new DockerApp(context)).initialize().then(app => {
-			return Promise.resolve()
-				.then(() => this.askForConsent(context))
-				.then((consent: boolean) => {
-					if (!consent) {
-						console.log("Ok, aborting the process!");
-						return Promise.resolve();
-					}
-					return app.dockerCompose.down();
-				})
-				.then(() => this.askForHostsCleanup(context))
-				.then((consent: boolean) => {
-					if (!consent) {
-						console.log("Ok, I keep the host file as it is...");
-						return Promise.resolve();
-					}
-					
-					// Remove the entry from the hosts file
-					const hosts = new DockerHosts(context);
-					hosts.removeCurrent().write();
-					
-					// Update the app hash, so we are forced to check it when we do "up" again
-					const config = context.appRegistry.get("dockerApp", {});
-					config.hash = "-1";
-					context.appRegistry.set("dockerApp", config);
-				});
-		});
-	}
-	
-	/**
-	 * Asks the user if he really wants to remove the containers
-	 * @param context
-	 */
-	protected askForConsent(context: AppContext): Promise<boolean> {
-		return new Promise((resolve) => {
-			inquirer.prompt({
-				name: "executeDown",
-				type: "confirm",
-				message: "ATTENTION! This may be harmful! This action will destroy all instances of your application: \"" + context.rootDirectory + "\". Do you want to proceed?",
-				default: true
-			}).then((answers) => {
-				Bugfixes.inquirerChildProcessReadLineFix();
-				if (!answers.executeDown) return resolve(false);
-				resolve(true);
-			});
-		});
-	}
-	
-	/**
-	 * Asks if the user wants to remove the entry in the hosts file
-	 * @param context
-	 */
-	protected askForHostsCleanup(context: AppContext): Promise<boolean> {
-		return new Promise((resolve) => {
-			inquirer.prompt({
-				name: "removeHosts",
-				type: "confirm",
-				message: "Should I also remove the apps entry in your hosts file? (Cleanup to permanently remove the app)",
-				default: false
-			}).then((answers) => {
-				Bugfixes.inquirerChildProcessReadLineFix();
-				if (!answers.removeHosts) return resolve(false);
-				resolve(true);
-			});
-		});
-	}
+export class DockerComposeDownCommand
+{
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        return (new DockerApp(context)).initialize().then(app => {
+            return Promise.resolve()
+                          .then(() => this.askForConsent(context))
+                          .then((consent: boolean) => {
+                              if (!consent) {
+                                  console.log('Ok, aborting the process!');
+                                  return Promise.resolve();
+                              }
+                              return app.dockerCompose.down();
+                          })
+                          .then(() => this.askForHostsCleanup(context))
+                          .then((consent: boolean) => {
+                              if (!consent) {
+                                  console.log('Ok, I keep the host file as it is...');
+                                  return Promise.resolve();
+                              }
+                
+                              // Remove the entry from the hosts file
+                              const hosts = new DockerHosts(context);
+                              hosts.removeCurrent().write();
+                
+                              // Update the app hash, so we are forced to check it when we do "up" again
+                              const config = context.appRegistry.get('dockerApp', {});
+                              config.hash = '-1';
+                              context.appRegistry.set('dockerApp', config);
+                          });
+        });
+    }
+    
+    /**
+     * Asks the user if he really wants to remove the containers
+     * @param context
+     */
+    protected askForConsent(context: AppContext): Promise<boolean>
+    {
+        return new Promise((resolve) => {
+            inquirer.prompt({
+                name: 'executeDown',
+                type: 'confirm',
+                message: 'ATTENTION! This may be harmful! This action will destroy all instances of your application: "' +
+                         context.rootDirectory + '". Do you want to proceed?',
+                default: true
+            }).then((answers) => {
+                Bugfixes.inquirerChildProcessReadLineFix();
+                if (!answers.executeDown) {
+                    return resolve(false);
+                }
+                resolve(true);
+            });
+        });
+    }
+    
+    /**
+     * Asks if the user wants to remove the entry in the hosts file
+     * @param context
+     */
+    protected askForHostsCleanup(context: AppContext): Promise<boolean>
+    {
+        return new Promise((resolve) => {
+            inquirer.prompt({
+                name: 'removeHosts',
+                type: 'confirm',
+                message: 'Should I also remove the apps entry in your hosts file? (Cleanup to permanently remove the app)',
+                default: false
+            }).then((answers) => {
+                Bugfixes.inquirerChildProcessReadLineFix();
+                if (!answers.removeHosts) {
+                    return resolve(false);
+                }
+                resolve(true);
+            });
+        });
+    }
 }

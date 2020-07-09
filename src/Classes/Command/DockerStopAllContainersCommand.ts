@@ -16,35 +16,42 @@
  * Last modified: 2020.04.06 at 18:17
  */
 
-import {Command} from "commander";
-import inquirer from "inquirer";
-import {Docker} from "../Api/Docker";
-import {AppContext} from "../Core/AppContext";
-import {Bugfixes} from "../Core/Bugfixes";
+import {Command} from 'commander';
+import inquirer from 'inquirer';
+import {Docker} from '../Api/Docker';
+import {AppContext} from '../Core/AppContext';
+import {Bugfixes} from '../Core/Bugfixes';
 
-export class DockerStopAllContainersCommand {
-	
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		return this.askForConsent().then(execute => {
-			if (!execute) return Promise.resolve();
-			return (new Docker(context)).stopAllContainers();
-		});
-	}
-	
-	/**
-	 * Asks the user for consent to stop all containers
-	 */
-	protected askForConsent(): Promise<boolean> {
-		return new Promise((resolve) => {
-			inquirer.prompt({
-				name: "stopAll",
-				type: "confirm",
-				message: "This will stop >ALL< currently running docker containers. Do you want to proceed?"
-			}).then((answers) => {
-				Bugfixes.inquirerChildProcessReadLineFix();
-				if (!answers.stopAll) return resolve(false);
-				resolve(true);
-			});
-		});
-	}
+export class DockerStopAllContainersCommand
+{
+    
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        return this.askForConsent().then(execute => {
+            if (!execute) {
+                return Promise.resolve();
+            }
+            return (new Docker(context)).stopAllContainers();
+        });
+    }
+    
+    /**
+     * Asks the user for consent to stop all containers
+     */
+    protected askForConsent(): Promise<boolean>
+    {
+        return new Promise((resolve) => {
+            inquirer.prompt({
+                name: 'stopAll',
+                type: 'confirm',
+                message: 'This will stop >ALL< currently running docker containers. Do you want to proceed?'
+            }).then((answers) => {
+                Bugfixes.inquirerChildProcessReadLineFix();
+                if (!answers.stopAll) {
+                    return resolve(false);
+                }
+                resolve(true);
+            });
+        });
+    }
 }

@@ -16,15 +16,17 @@
  * Last modified: 2020.04.06 at 12:44
  */
 
-import {Command} from "commander";
-import {AppContext} from "../Core/AppContext";
-import {DockerApp} from "../Core/DockerApp/DockerApp";
+import {Command} from 'commander';
+import {AppContext} from '../Core/AppContext';
+import {DockerApp} from '../Core/DockerApp/DockerApp';
 
-export class DockerComposeRestartCommand {
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		return (new DockerApp(context)).initialize().then(app => {
-			return (app.dockerCompose.isRunning ? app.dockerCompose.stop() : Promise.resolve())
-				.then(() => app.dockerCompose.up());
-		});
-	}
+export class DockerComposeRestartCommand
+{
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        return (new DockerApp(context)).initialize().then(app => {
+            return (app.dockerCompose.isRunning ? app.dockerCompose.stop() : Promise.resolve())
+                .then(() => app.dockerCompose.up());
+        });
+    }
 }

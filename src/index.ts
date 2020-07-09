@@ -17,6 +17,6 @@
  * Last modified: 2020.04.03 at 18:51
  */
 
-import {Application} from "./Classes/Core/Application";
+import {Application} from './Classes/Core/Application';
 
 (new Application()).run();

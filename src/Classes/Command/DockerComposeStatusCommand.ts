@@ -16,17 +16,22 @@
  * Last modified: 2020.04.06 at 18:23
  */
 
-import chalk from "chalk";
-import {Command} from "commander";
-import {AppContext} from "../Core/AppContext";
-import {DockerApp} from "../Core/DockerApp/DockerApp";
+import chalk from 'chalk';
+import {Command} from 'commander';
+import {AppContext} from '../Core/AppContext';
+import {DockerApp} from '../Core/DockerApp/DockerApp';
 
-export class DockerComposeStatusCommand {
-	public execute(cmd: Command, context: AppContext): Promise<void> {
-		return (new DockerApp(context)).initialize().then(app => {
-			if (app.dockerCompose.isRunning) console.log(chalk.greenBright("The app is currently running!"));
-			else console.log(chalk.yellowBright("The app is currently NOT running!"));
-			return Promise.resolve();
-		});
-	}
+export class DockerComposeStatusCommand
+{
+    public execute(cmd: Command, context: AppContext): Promise<void>
+    {
+        return (new DockerApp(context)).initialize().then(app => {
+            if (app.dockerCompose.isRunning) {
+                console.log(chalk.greenBright('The app is currently running!'));
+            } else {
+                console.log(chalk.yellowBright('The app is currently NOT running!'));
+            }
+            return Promise.resolve();
+        });
+    }
 }
