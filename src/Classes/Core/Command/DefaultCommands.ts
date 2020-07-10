@@ -174,6 +174,9 @@ export class DefaultCommands
             description: 'triggers the export process using the LABOR import/export container'
         });
         
+        context.commandRegistry.registerCommand('init', '../../Command/ProjectInitCommand', {
+            description: 'initializes a new application stub based on our boilerplate'
+        });
         return Promise.resolve(context);
     }
 }

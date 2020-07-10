@@ -18,6 +18,7 @@
 
 import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
 import {md5} from '@labor-digital/helferlein/lib/Misc/md5';
+import {mkdirRecursiveSync} from '@labor-digital/helferlein/lib/Node/FileSystem/mkdirRecursiveSync';
 import {isString} from '@labor-digital/helferlein/lib/Types/isString';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
@@ -25,7 +26,6 @@ import * as path from 'path';
 import {AppContext} from '../AppContext';
 import {AppEventList} from '../AppEventList';
 import {Bugfixes} from '../Bugfixes';
-import {FilesAndFolders} from '../FilesAndFolders';
 import {DockerComposeServiceSelectWizard} from '../Ui/DockerComposeServiceSelectWizard';
 import {ProjectNameInputWizard} from '../Ui/ProjectNameInputWizard';
 import {DockerApp} from './DockerApp';
@@ -283,7 +283,7 @@ export class DockerAppInit
                                return;
                            }
                            forEach(missingDirectories, (dir: string) => {
-                               FilesAndFolders.mkdirRecursive(dir);
+                               mkdirRecursiveSync(dir);
                            });
                        });
     }

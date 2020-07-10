@@ -114,7 +114,6 @@ export class AppContext
         this._version = version;
         this._program = program;
         this._eventEmitter = eventEmitter;
-        this._cwd = process.cwd().replace(/[\\\/\s]+$/, path.sep) + path.sep;
         this._cliDirectory = path.join(__dirname, '../../../');
         this._platform = platform;
         this._rootDirectory = fileFinder.findRootDirectory(this);
@@ -154,7 +153,7 @@ export class AppContext
      */
     public get cwd(): string
     {
-        return this._cwd;
+        return process.cwd().replace(/[\\\/\s]+$/, path.sep) + path.sep;
     }
     
     /**
