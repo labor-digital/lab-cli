@@ -206,12 +206,14 @@ export class DockerHosts
             }
             
             this._tpl.set(c, line.replace(
-                /^([\s\t]*?)([^\s]*)([\s\t]*)([^\s]*)(?:\s#lab-docker-app\s)?([^\s]*)?(\s|$)/,
-                (a, before, ip, between, domain, appName, after) => {
+                /^([\s\t]*?)([^\s]*)([\s\t]*)([^\s]*)(\s#lab-docker-app\s)?(.*?$)/,
+                (a, before, ip, between, domain, appMarker, appName) => {
                     this._ips.set(c, ip);
                     this._domains.set(c, domain);
-                    if (typeof appName === 'string') {
-                        this._directories.set(c, appName);
+                    let after = appName;
+                    if (typeof appMarker === 'string') {
+                        this._directories.set(c, appName.trim());
+                        after = '';
                     }
                     return before + '{ip}' + between + '{domain}' + after;
                 }));
