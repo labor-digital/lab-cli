@@ -123,6 +123,25 @@ export class DockerHosts
     }
     
     /**
+     * Removes a single domain from the hosts setup
+     * @param domain
+     */
+    public removeDomain(domain: string): DockerHosts
+    {
+        forEach(this._domains, (_domain: string, k: number) => {
+            if (_domain !== domain) {
+                return;
+            }
+            this._tpl.delete(k);
+            this._ips.delete(k);
+            this._domains.delete(k);
+            this._directories.delete(k);
+            this._isDirty = true;
+        });
+        return this;
+    }
+    
+    /**
      * Removes the hosts entry for the current app
      */
     public removeCurrent(): DockerHosts

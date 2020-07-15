@@ -20,6 +20,7 @@ import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
 import {md5} from '@labor-digital/helferlein/lib/Misc/md5';
 import {mkdirRecursiveSync} from '@labor-digital/helferlein/lib/Node/FileSystem/mkdirRecursiveSync';
 import {isString} from '@labor-digital/helferlein/lib/Types/isString';
+import chalk from 'chalk';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
 import * as path from 'path';
@@ -73,27 +74,28 @@ export class DockerAppInit
         console.log('Found changes on your docker app files! Checking your setup...');
         
         return Promise.resolve()
-                      .then(
-                          () => this._context.emitSequentialHook(AppEventList.DOCKER_APP_BEFORE_INIT, {app: this._app}))
+                      .then(() => this._context.emitSequentialHook(
+                          AppEventList.DOCKER_APP_BEFORE_INIT, {app: this._app}))
                       .then(() => this.clearCachedValues())
                       .then(() => this.makeSureEnvFileExists())
-                      .then(() => this._context.emitSequentialHook(AppEventList.DOCKER_APP_AFTER_ENV_FILE_CHECK,
-                          {app: this._app}))
+                      .then(() => this._context.emitSequentialHook(
+                          AppEventList.DOCKER_APP_AFTER_ENV_FILE_CHECK, {app: this._app}))
                       .then(() => this.fillEmptyValuesInEnvFile())
                       .then(() => this.generateEnvTemplateFile())
-                      .then(() => this._context.emitSequentialHook(AppEventList.DOCKER_APP_AFTER_ENV_INIT,
-                          {app: this._app}))
+                      .then(() => this._context.emitSequentialHook(
+                          AppEventList.DOCKER_APP_AFTER_ENV_INIT, {app: this._app}))
                       .then(() => this.registerDomainInHostsFile())
-                      .then(() => this._context.emitSequentialHook(AppEventList.DOCKER_APP_AFTER_HOST_FILE_UPDATE,
-                          {app: this._app}))
+                      .then(() => this._context.emitSequentialHook(
+                          AppEventList.DOCKER_APP_AFTER_HOST_FILE_UPDATE, {app: this._app}))
                       .then(() => this.createRegisteredDirectories())
-                      .then(() => this._context.emitSequentialHook(AppEventList.DOCKER_APP_AFTER_DIRECTORIES,
-                          {app: this._app}))
+                      .then(() => this._context.emitSequentialHook(
+                          AppEventList.DOCKER_APP_AFTER_DIRECTORIES, {app: this._app}))
                       .then(() => this.selectDefaultService())
-                      .then(() => this._context.emitSequentialHook(AppEventList.DOCKER_APP_AFTER_DEFAULT_SERVICE,
-                          {app: this._app}))
+                      .then(() => this._context.emitSequentialHook(
+                          AppEventList.DOCKER_APP_AFTER_DEFAULT_SERVICE, {app: this._app}))
                       .then(() => this.writeDockerAppConfig())
-                      .then(() => this._context.emitSequentialHook(AppEventList.DOCKER_APP_INIT_DONE, {app: this._app}))
+                      .then(() => this._context.emitSequentialHook(
+                          AppEventList.DOCKER_APP_INIT_DONE, {app: this._app}))
                       .then(() => {
                       });
     }
@@ -239,9 +241,39 @@ export class DockerAppInit
     protected registerDomainInHostsFile(): Promise<void>
     {
         const hosts = new DockerHosts(this._context);
-        hosts.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));
-        hosts.write();
-        return Promise.resolve();
+        try {
+            hosts.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));
+            hosts.write();
+        } catch (e) {
+            // Check if we can handle this error
+            if (e.message.indexOf('Hosts file conflict:') !== 0) {
+                throw e;
+            }
+            return new Promise<void>(resolve => {
+                console.log(chalk.yellowBright(e.message));
+                return inquirer.prompt(
+                    [
+                        {
+                            name: 'ok',
+                            message: 'It seems like the domain: ' + this._app.env.get('APP_DOMAIN') +
+                                     ' is already in use in your hosts file, should I overwrite it with the config for this app?',
+                            type: 'confirm',
+                            default: true
+                        }
+                    ]).then(
+                    answers => {
+                        Bugfixes.inquirerChildProcessReadLineFix();
+                        if (answers.ok === false) {
+                            console.log(chalk.redBright('Please fix your hosts file before continuing!'));
+                            process.exit();
+                        }
+                        hosts.removeDomain(this._app.env.get('APP_DOMAIN'));
+                        hosts.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));
+                        hosts.write();
+                        resolve();
+                    });
+            });
+        }
     }
     
     /**
@@ -268,24 +300,25 @@ export class DockerAppInit
         }
         
         // Ask if we should create the directories
-        return inquirer.prompt([
-                           {
-                               name: 'ok',
-                               message: 'The following directories do not exist. Should I create them?' + '\n - ' +
-                                        missingDirectories.join('\n - ') + '\n',
-                               type: 'confirm',
-                               default: true
-                           }
-                       ])
-                       .then(answers => {
-                           Bugfixes.inquirerChildProcessReadLineFix();
-                           if (answers.ok === false) {
-                               return;
-                           }
-                           forEach(missingDirectories, (dir: string) => {
-                               mkdirRecursiveSync(dir);
-                           });
-                       });
+        return inquirer.prompt(
+            [
+                {
+                    name: 'ok',
+                    message: 'The following directories do not exist. Should I create them?' + '\n - ' +
+                             missingDirectories.join('\n - ') + '\n',
+                    type: 'confirm',
+                    default: true
+                }
+            ]).then(
+            answers => {
+                Bugfixes.inquirerChildProcessReadLineFix();
+                if (answers.ok === false) {
+                    return;
+                }
+                forEach(missingDirectories, (dir: string) => {
+                    mkdirRecursiveSync(dir);
+                });
+            });
     }
     
     /**
@@ -293,12 +326,16 @@ export class DockerAppInit
      */
     protected selectDefaultService(): Promise<void>
     {
-        return DockerComposeServiceSelectWizard.run(this._app.dockerCompose,
+        return DockerComposeServiceSelectWizard.run(
+            this._app.dockerCompose,
             'use as default service key (shell, open,...)',
-            'app', this._context.appRegistry.get('defaultServiceContainer'))
-                                               .then((key: string) => {
-                                                   this._context.appRegistry.set('defaultServiceContainer', key);
-                                               });
+            'app',
+            this._context.appRegistry.get('defaultServiceContainer')
+        ).then(
+            (key: string) => {
+                this._context.appRegistry.set('defaultServiceContainer', key);
+            }
+        );
     }
     
     /**
