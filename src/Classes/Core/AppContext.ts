@@ -48,11 +48,6 @@ export class AppContext
     private _eventEmitter: EventEmitter;
     
     /**
-     * The directory the script was called in
-     */
-    private _cwd: string;
-    
-    /**
      * The base directory of the cli sources
      */
     private _cliDirectory: string;

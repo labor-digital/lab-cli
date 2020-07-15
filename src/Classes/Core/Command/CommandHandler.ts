@@ -55,6 +55,7 @@ export class CommandHandler
             
             // Register the version command
             context.program.version(context.version + '', '-v, --version');
+            
             // Build the command definitions
             this.buildDefinitions(context, resolve, reject);
             
