@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.0](https://github.com/labor-digital/lab-cli/compare/v3.3.2...v3.4.0) (2020-07-10)
+
+
+### Features
+
+* implement "init" command ([ef7ae9e](https://github.com/labor-digital/lab-cli/commit/ef7ae9e2c98424e7fd20da947a2812696f6b3197))
+* implement new greetings texts ([796da25](https://github.com/labor-digital/lab-cli/commit/796da2596e86c5d51ccd5706be6ecfc465b83571))
+* make code PSR-2 compliant ([8ecd3be](https://github.com/labor-digital/lab-cli/commit/8ecd3be189afbb92ccb9be1cda026bab7cd773f2))
+* update dependencies ([09ea9e8](https://github.com/labor-digital/lab-cli/commit/09ea9e84e6f14e868fc93293e8a27ef1bcf0318e))
+
+
+### Bug Fixes
+
+* **Config:** make sure unison runs with owner UID 33 by default ([c7d836e](https://github.com/labor-digital/lab-cli/commit/c7d836e6aa64f0d4e4cd376b8634868c6a0a06fa))
+* **DockerAppInit:** make sure we remove underscores from the project name when generating the short name ([52f3bf2](https://github.com/labor-digital/lab-cli/commit/52f3bf251bb013575d8974098375839e39dcd499))
+* **DockerEnv:** better handling for .env variables that contain "#" chars that are not comments ([2c5b105](https://github.com/labor-digital/lab-cli/commit/2c5b105486015cfe44fd9d44bfeceaa4bbcde778))
+
 ### [3.3.2](https://github.com/labor-digital/lab-cli/compare/v3.3.1...v3.3.2) (2020-05-11)
 
 
