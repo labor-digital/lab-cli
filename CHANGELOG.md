@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.2](https://github.com/labor-digital/lab-cli/compare/v3.4.1...v3.4.2) (2020-07-15)
+
+
+### Bug Fixes
+
+* **DockerAppInit:** fix broken IP calculation ([1e19ce2](https://github.com/labor-digital/lab-cli/commit/1e19ce234edebd90b51feed3bd653ca1d0738c6c))
+* **DockerAppInit:** handle hosts file conflicts gracefully with a user prompt ([a3450d0](https://github.com/labor-digital/lab-cli/commit/a3450d06392125c1676a41d0ca72a9f2600a4d72))
+* **DockerHosts:** parse directory path's with spaces correctly when reading the hosts file ([0daa5c3](https://github.com/labor-digital/lab-cli/commit/0daa5c3390195cd0a9631d43135c2d5b4f5799e0)), closes [#1](https://github.com/labor-digital/lab-cli/issues/1)
+* minor code cleanup ([d92a9af](https://github.com/labor-digital/lab-cli/commit/d92a9af6e3505aa6beb64feaba92a9baacb356de))
+* reimplement -v or --version options ([f17b7a0](https://github.com/labor-digital/lab-cli/commit/f17b7a007ee4bbe88b097688e7f3ad202d8b150d)), closes [#2](https://github.com/labor-digital/lab-cli/issues/2)
+
 ### [3.4.1](https://github.com/labor-digital/lab-cli/compare/v3.4.0...v3.4.1) (2020-07-15)
 
 ## [3.4.0](https://github.com/labor-digital/lab-cli/compare/v3.3.2...v3.4.0) (2020-07-10)
