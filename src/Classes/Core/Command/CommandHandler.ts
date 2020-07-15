@@ -53,6 +53,8 @@ export class CommandHandler
             // Create the command stack
             this._stack = new CommandStack();
             
+            // Register the version command
+            context.program.version(context.version + '', '-v, --version');
             // Build the command definitions
             this.buildDefinitions(context, resolve, reject);
             
