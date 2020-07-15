@@ -24,6 +24,7 @@ import chalk from 'chalk';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
 import * as path from 'path';
+import {Ip} from '../../Api/Ip';
 import {AppContext} from '../AppContext';
 import {AppEventList} from '../AppEventList';
 import {Bugfixes} from '../Bugfixes';
@@ -170,18 +171,24 @@ export class DockerAppInit
             }) : () => Promise.resolve(env.get('COMPOSE_PROJECT_NAME'))
         )()
             .then((projectName: string) => {
-                const projectShortName = projectName.trim().split('-')
-                                                    .map(v => v.replace(/_/, '').trim().substr(0, 3)).join('_')
-                                                    .toLowerCase();
+                const projectShortName = projectName
+                    .trim()
+                    .split('-')
+                    .map(v => v.replace(/_/, '').trim().substr(0, 3))
+                    .join('_')
+                    .toLowerCase();
                 
                 // Prepare the app base directory
                 const baseDir = path.join(this._context.rootDirectory, '..');
                 
                 // Generate IP if required
                 if (isValueEmpty('APP_IP')) {
-                    let nextIp = this._context.registry.get('nextIp', 127088000001);
-                    const ip = ((nextIp++) + '').match(/.{1,3}/g).map((v) => parseInt(v) + '').join('.');
-                    env.set('APP_IP', ip);
+                    let nextIp = this._context.registry.get('nextIp', 2136473601);
+                    // Handle legacy IP value @todo remove in next major release
+                    if (nextIp >= 127088000001) {
+                        nextIp = Ip.ip2long(Ip.legacy2ip(nextIp));
+                    }
+                    env.set('APP_IP', Ip.long2ip(++nextIp) + '');
                     this._context.registry.set('nextIp', nextIp);
                 }
                 
