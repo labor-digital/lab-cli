@@ -32,6 +32,9 @@ Commands:
   restart-engine                          restarts the docker engine
   status|ps                               checks if the app is currently running or not
   stop-engine [options]                   stops the docker engine, if it is currently running
+  import                                  triggers the import process using the LABOR import/export container
+  export                                  triggers the export process using the LABOR import/export container
+  init                                    initializes a new application stub based on our boilerplate
   help [command]                          display help for command
 ```
 
@@ -156,12 +159,28 @@ const config = {
         ],
         ports: []
       }
+    },      
+    // Project init
+    projectInit: {
+      // The git repository to clone and find boilerplates in
+      boilerplateRepository: 'https://github.com/labor-digital/docker-base-images.git'
     }
   }
 };
 ```
 
-## Env initialization
+## Initialize a new app
+To create your first project with lab cli you can open your command line tool in a new, >empty directory< and simply type "lab init" there.
+The script will first ask you for a "name" for your app using a (hopefully) self-explanatory wizard.
+
+After you have provided an app name the script will clone the configured "boilerplateRepository"
+and search all boilerplates in it. By default the script uses our [Docker Base Image repository](https://github.com/labor-digital/docker-base-images).
+
+You can now select one of the possible boilerplates using the wizard, which will be prepared and ready to run in the current working directory.
+
+Simply call "lab up" and start coding :)
+
+## Initialize an existing app
 When you first start a project using the "up" command or if you changed one of the docker related config files,
 the script will automatically check if your .env file is set up correctly.
 It first checks if your .env file exists; if not, it will check if you have a .env.template. If the script finds a .env.template file, it will create a copy
