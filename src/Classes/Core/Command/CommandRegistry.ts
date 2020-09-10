@@ -161,13 +161,16 @@ export class CommandRegistry
                     default: {windows: true, linux: false, darwin: false},
                     children: {
                         windows: {
-                            type: 'bool'
+                            type: 'bool',
+                            default: true
                         },
                         linux: {
-                            type: 'bool'
+                            type: 'bool',
+                            default: false
                         },
                         darwin: {
-                            type: 'bool'
+                            type: 'bool',
+                            default: false
                         }
                     }
                 }
