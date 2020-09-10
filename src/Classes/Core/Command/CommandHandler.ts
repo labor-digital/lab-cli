@@ -75,7 +75,7 @@ export class CommandHandler
             // Check if a command was found
             if (!this._commandWasExecuted) {
                 console.error(chalk.redBright('Invalid command "' + parseResult.args[0] +
-                                              '" given! \r\nUse "labor help" to see a list of supported commands!'));
+                                              '" given! \r\nUse "lab help" to see a list of supported commands!'));
                 resolve(context);
             }
         });
