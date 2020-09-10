@@ -178,7 +178,7 @@ export class ProjectNameInputWizard
     {
         input = input.trim().toLowerCase().replace(/\s+/g, ' ');
         input = input.replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
-        input = input.replace(/\s/, '_');
+        input = input.replace(/\s/g, '_');
         return input;
     }
     
