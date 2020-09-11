@@ -122,8 +122,11 @@ export class Docker
                     }
                     
                     // Prepare command
-                    var command = 'start /b "" "' + executablePath + '"';
-                    childProcess.exec(command, () => {
+                    childProcess.exec('start /b "" "' + executablePath + '"', () => {
+                    });
+                },
+                darwin: () => {
+                    childProcess.exec('open "/Applications/Docker.app"', () => {
                     });
                 },
                 linux: () => {

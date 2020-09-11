@@ -90,9 +90,10 @@ export class FileFinder
     {
         const cwdParts = context.cwd.split(/[\/\\]/g);
         const minDepth = context.platform.isWindows ? 1 : 0;
+        const pathPrefix = context.platform.isWindows ? '' : path.sep;
         while (cwdParts.length > minDepth) {
             cwdParts.pop();
-            let pathLocal = path.join(...cwdParts);
+            let pathLocal = pathPrefix + path.join(...cwdParts);
             if (context.platform.isWindows && cwdParts.length === 1) {
                 pathLocal =
                     pathLocal.substr(0, pathLocal.length - 1) + path.sep;

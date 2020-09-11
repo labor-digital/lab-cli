@@ -17,6 +17,7 @@
  */
 
 import {isString} from '@labor-digital/helferlein/lib/Types/isString';
+import chalk from 'chalk';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -50,18 +51,19 @@ export class Unison
             // Build the command
             const command = '"' + Unison.getUnisonExecutable(app) + '" "' + hostPath + '" ' +
                             '"socket://' + targetIp + ':' + targetPort + '" ' +
-                            '-repeat=watch ' +
-                            (allowNodeModules ? '' : '-ignore="Name node_modules" ') +
-                            '-ignore="Name *.dev-symlink-bkp" ' +
-                            '-ignore="Name perms.set" ' +
-                            '-prefer="' + hostPath + '" ' +
-                            '-ignorecase=false ' +
+                            '-repeat watch ' +
+                            (allowNodeModules ? '' : '-ignore "Name node_modules" ') +
+                            '-ignore "Name *.dev-symlink-bkp" ' +
+                            '-ignore "Name perms.set" ' +
+                            '-prefer "' + hostPath + '" ' +
+                            '-ignorecase false ' +
                             '-auto ' +
-                            '-links=false ' +
-                            '-label="APP: ' + app.context.rootDirectory + ' " ' +
-                            (force ? '-ignorearchives=true -ignorelocks=true ' : '') +
+                            '-ui text ' +
+                            '-links false ' +
+                            '-label "APP: ' + app.context.rootDirectory + ' " ' +
+                            (force ? '-ignorearchives true -ignorelocks true ' : '') +
                             ' ' + additionalArgs;
-            
+            console.log(command);
             try {
                 childProcess.execSync(command, {stdio: 'inherit'});
                 resolve();
@@ -77,6 +79,37 @@ export class Unison
      */
     protected static getUnisonExecutable(app: DockerApp): string
     {
-        return path.join(app.context.cliDirectory, 'bin/unison/unison 2.48.4 text.exe');
+        return app.context.platform.choose({
+            windows: () => path.join(app.context.cliDirectory, 'bin/unison/unison 2.48.4 text.exe'),
+            darwin: () => {
+                function isUnisonRegisteredAsCliTool(): boolean{
+                    try {
+                        return childProcess.execSync('which unison').toString('utf-8').indexOf('unison') !== -1
+                            && childProcess.execSync('which unison-fsmonitor').toString('utf-8').indexOf('unison-fsmonitor') !== -1;
+                    } catch (e) {
+                        return false;
+                    }
+                }
+                
+                if(isUnisonRegisteredAsCliTool()){
+                    return '/usr/local/bin/unison';
+                }
+                
+                console.log(chalk.yellowBright('Unison is currently not installed as command line utility. You have to install it using the GUI. If it does not ask you to install the CLI utility click on: "Unison" -> "Install Command line tool". Close the GUI after you are done, in order to continue.'));
+                console.log('Unison will start in 3 seconds');
+                const unisonGuiExecutable = path.join(app.context.cliDirectory, 'bin/unison/darwin/Unison.app/Contents/MacOS/cltool');
+                childProcess.execSync('sleep 3 && "' + unisonGuiExecutable + '"', {stdio: 'inherit'});
+    
+                console.log(chalk.yellowBright('Installing fs-monitor into /user/local/bin, this requires root privileges.'));
+                const fsMonitorExecutable = path.join(app.context.cliDirectory, 'bin/unison/darwin/unison-fsmonitor');
+                childProcess.execSync('sudo cp "' + fsMonitorExecutable + '" /usr/local/bin && chmod +x /usr/local/bin/unison-fsmonitor');
+                
+                if(isUnisonRegisteredAsCliTool()){
+                    return '/usr/local/bin/unison';
+                }
+                
+                throw new Error('Unison was not set up correctly!');
+            }
+        })();
     }
 }

@@ -25,6 +25,7 @@ import * as childProcess from 'child_process';
 // @ts-ignore
 import * as yaml from 'yamljs';
 import {DockerApp} from '../Core/DockerApp/DockerApp';
+import {Network} from './Network';
 
 export class DockerCompose
 {
@@ -109,6 +110,10 @@ export class DockerCompose
     {
         return new Promise<void>((resolve, reject) => {
             console.log('Starting application...');
+            
+            (new Network(this._app.context))
+                .registerLoopBackAliasIfRequired(this._app.env.get('APP_IP'));
+            
             const command = this.baseDockerComposeCommand +
                             (pullImages === true ? 'pull && ' + this.baseDockerComposeCommand : '') +
                             (followOutput === true || !this._app.context.platform.isWindows ? '' : '--no-ansi ') +
@@ -202,6 +207,9 @@ export class DockerCompose
                 return;
             }
             if (line.indexOf(' Exit ') !== -1) {
+                return;
+            }
+            if (line.indexOf('Name ') === 0) {
                 return;
             }
             isRunning = true;

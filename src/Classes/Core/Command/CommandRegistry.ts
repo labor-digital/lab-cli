@@ -158,16 +158,19 @@ export class CommandRegistry
                 },
                 platforms: {
                     type: 'plainObject',
-                    default: {windows: true, linux: false, darwin: false},
+                    default: {},
                     children: {
                         windows: {
-                            type: 'bool'
+                            type: 'bool',
+                            default: true
                         },
                         linux: {
-                            type: 'bool'
+                            type: 'bool',
+                            default: false
                         },
                         darwin: {
-                            type: 'bool'
+                            type: 'bool',
+                            default: false
                         }
                     }
                 }

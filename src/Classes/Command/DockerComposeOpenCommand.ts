@@ -42,6 +42,9 @@ export class DockerComposeOpenCommand
                 windows: () => {
                     return 'start "" "' + url + '"';
                 },
+                darwin: () => {
+                    return 'open "' + url + '"';
+                },
                 linux: () => {
                     return 'xdg-open ' + url;
                 }
