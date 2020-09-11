@@ -72,6 +72,7 @@ To perform it manually, open your app's docker compose file: "${app.dockerCompos
         console.log(`  services:
     docker-unison:`);
         console.log(tpl);
+        console.log('6. Execute "lab up" once, to start the unison container\n');
         console.log(chalk.yellowBright('Scroll up a bit...'));
         return Promise.resolve();
     }

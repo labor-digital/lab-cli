@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://github.com/labor-digital/lab-cli/compare/v3.4.4...v3.5.0) (2020-09-11)
+
+
+### Features
+
+* provide mac osx support for most of the commands ([7726ed3](https://github.com/labor-digital/lab-cli/commit/7726ed358ac27d7b6e77f9bd52b5aa578a2bf78b))
+
+### [3.4.4](https://github.com/labor-digital/lab-cli/compare/v3.4.3...v3.4.4) (2020-09-10)
+
+
+### Bug Fixes
+
+* multiple spaces are not recognized inside project name wizard ([528cc2b](https://github.com/labor-digital/lab-cli/commit/528cc2bd6b39d2f346ed746ba033f7ad56ab35f3))
+
 ### [3.4.3](https://github.com/labor-digital/lab-cli/compare/v3.4.2...v3.4.3) (2020-09-03)
 
 ### [3.4.2](https://github.com/labor-digital/lab-cli/compare/v3.4.1...v3.4.2) (2020-07-15)

@@ -49,6 +49,7 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('up', '../../Command/DockerComposeUpCommand', {
             alias: 'start',
+            platforms: {windows: true, darwin: true, linux: true},
             description: 'starts and restarts the current project composition (docker-compose up)',
             options: [
                 {
@@ -73,6 +74,7 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('stop', '../../Command/DockerComposeStopCommand', {
             description: 'stops the current application (docker-compose stop)',
+            platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
                     definition: '-f, --force',
@@ -84,6 +86,7 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('logs', '../../Command/DockerComposeLogsCommand', {
             description: 'displays the tail of your app container\'s log (docker-compose logs)',
+            platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
                     definition: '-l, --lines <lines>',
@@ -101,6 +104,7 @@ export class DefaultCommands
         context.commandRegistry.registerCommand('shell', '../../Command/DockerComposeShellCommand', {
             alias: 'sh',
             description: 'attaches you to the shell of the current apps master container, or one of the running child containers',
+            platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
                     definition: '--shell <shell>',
@@ -116,15 +120,18 @@ export class DefaultCommands
         });
         
         context.commandRegistry.registerCommand('restart', '../../Command/DockerComposeRestartCommand', {
-            description: 'performs a hard restart of the current project composition (docker-compose stop && docker-compose up)'
+            description: 'performs a hard restart of the current project composition (docker-compose stop && docker-compose up)',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('down', '../../Command/DockerComposeDownCommand', {
-            description: 'destroys the current app\'s containers and removes their images if required (docker-compose down)'
+            description: 'destroys the current app\'s containers and removes their images if required (docker-compose down)',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('sync', '../../Command/DockerComposeUnisonCommand', {
             description: 'runs a unison sync into your application. Useful if the volume-mount is to slow!',
+            platforms: {windows: true, darwin: true, linux: false},
             options: [
                 {
                     definition: '--force',
@@ -135,15 +142,18 @@ export class DefaultCommands
         });
         
         context.commandRegistry.registerCommand('open', '../../Command/DockerComposeOpenCommand', {
-            description: 'opens the current apps main container in your default browser window'
+            description: 'opens the current apps main container in your default browser window',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('stop-all', '../../Command/DockerStopAllContainersCommand', {
-            description: 'stops >ALL< currently running container instances'
+            description: 'stops >ALL< currently running container instances',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('start-engine', '../../Command/DockerEngineStartCommand', {
-            description: 'starts the docker engine, if it is currently not running'
+            description: 'starts the docker engine, if it is currently not running',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('restart-engine', '../../Command/DockerEngineRestartCommand', {
@@ -152,7 +162,8 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('status', '../../Command/DockerComposeStatusCommand', {
             alias: 'ps',
-            description: 'checks if the app is currently running or not'
+            description: 'checks if the app is currently running or not',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('stop-engine', '../../Command/DockerEngineStopCommand', {
@@ -167,15 +178,18 @@ export class DefaultCommands
         });
         
         context.commandRegistry.registerCommand('import', '../../Command/ProjectImportCommand', {
-            description: 'triggers the import process using the LABOR import/export container'
+            description: 'triggers the import process using the LABOR import/export container',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('export', '../../Command/ProjectExportCommand', {
-            description: 'triggers the export process using the LABOR import/export container'
+            description: 'triggers the export process using the LABOR import/export container',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('init', '../../Command/ProjectInitCommand', {
-            description: 'initializes a new application stub based on our boilerplate'
+            description: 'initializes a new application stub based on our boilerplate',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         return Promise.resolve(context);
     }
