@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.5.1](https://github.com/labor-digital/lab-cli/compare/v3.5.0...v3.5.1) (2020-09-28)
+
+
+### Bug Fixes
+
+* **CommandRegistry:** register defaults for platform definition ([6891c9f](https://github.com/labor-digital/lab-cli/commit/6891c9f9e562eebccc867a5a4e0ed79f240a8e53))
+* **Docker:** make sure to find the correct docker desktop path after latest docker update ([acebbe4](https://github.com/labor-digital/lab-cli/commit/acebbe492d36ff29869fad8135c6e75af9afd995))
+* rename "labor help" to "lab help" ([8bab380](https://github.com/labor-digital/lab-cli/commit/8bab38094cd00d8f84bf8f0c0312644f8c3818ee))
+
 ## [3.5.0](https://github.com/labor-digital/lab-cli/compare/v3.4.4...v3.5.0) (2020-09-11)
 
 
