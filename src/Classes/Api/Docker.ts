@@ -98,20 +98,20 @@ export class Docker
             this._context.platform.choose({
                 windows: () => {
                     // Find the docker root path
-                    const executableParts = childProcess.execSync('WHERE docker', {'stdio': 'pipe'})
-                                                        .toString('utf8')
-                                                        .split(/\r?\n/);
-                    const rootPath = path.dirname(path.dirname(path.dirname(executableParts[0].trim()))) + path.sep;
+                    const options: Array<string> = [];
+                    forEach(['docker', 'docker-compose'], function (executable: string) {
+                        const executableParts = childProcess.execSync('WHERE ' + executable, {'stdio': 'pipe'})
+                                                            .toString('utf8')
+                                                            .split(/\r?\n/);
+                        const rootPath = path.dirname(path.dirname(path.dirname(executableParts[0].trim()))) + path.sep;
+                        options.push(rootPath + 'Docker Desktop.exe');
+                        options.push(rootPath + 'Docker for Windows.exe');
+                    });
                     
                     // Check if we can find an executable
-                    const options = [
-                        rootPath + path.sep + 'Docker Desktop.exe',
-                        rootPath + path.sep + 'Docker for Windows.exe',
-                        executableParts[0].trim()
-                    ];
-                    let executablePath = null;
+                    let executablePath: string | null = null;
                     for (let i = 0; i < options.length; i++) {
-                        if (!fs.existsSync(options[i])) {
+                        if (!fs.existsSync(options[i]) || !fs.statSync(options[i]).isFile()) {
                             continue;
                         }
                         executablePath = options[i];
@@ -120,7 +120,6 @@ export class Docker
                     if (isNull(executablePath)) {
                         throw new Error('Could not find a matching docker executable!');
                     }
-                    
                     // Prepare command
                     childProcess.exec('start /b "" "' + executablePath + '"', () => {
                     });
