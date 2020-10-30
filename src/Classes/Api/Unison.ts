@@ -60,8 +60,8 @@ export class Unison
                             '-auto ' +
                             '-ui text ' +
                             '-links false ' +
-                            '-label "APP: ' + app.context.rootDirectory + ' " ' +
-                            (force ? '-ignorearchives true -ignorelocks true ' : '') +
+                            '-label "APP: ' + app.context.rootDirectory + '" ' +
+                            (force ? '-ignorearchives -ignorelocks' : '') +
                             ' ' + additionalArgs;
             console.log(command);
             try {
@@ -82,29 +82,35 @@ export class Unison
         return app.context.platform.choose({
             windows: () => path.join(app.context.cliDirectory, 'bin/unison/unison 2.48.4 text.exe'),
             darwin: () => {
-                function isUnisonRegisteredAsCliTool(): boolean{
+                function isUnisonRegisteredAsCliTool(): boolean
+                {
                     try {
                         return childProcess.execSync('which unison').toString('utf-8').indexOf('unison') !== -1
-                            && childProcess.execSync('which unison-fsmonitor').toString('utf-8').indexOf('unison-fsmonitor') !== -1;
+                               && childProcess.execSync('which unison-fsmonitor').toString('utf-8')
+                                              .indexOf('unison-fsmonitor') !== -1;
                     } catch (e) {
                         return false;
                     }
                 }
                 
-                if(isUnisonRegisteredAsCliTool()){
+                if (isUnisonRegisteredAsCliTool()) {
                     return '/usr/local/bin/unison';
                 }
                 
-                console.log(chalk.yellowBright('Unison is currently not installed as command line utility. You have to install it using the GUI. If it does not ask you to install the CLI utility click on: "Unison" -> "Install Command line tool". Close the GUI after you are done, in order to continue.'));
+                console.log(chalk.yellowBright(
+                    'Unison is currently not installed as command line utility. You have to install it using the GUI. If it does not ask you to install the CLI utility click on: "Unison" -> "Install Command line tool". Close the GUI after you are done, in order to continue.'));
                 console.log('Unison will start in 3 seconds');
-                const unisonGuiExecutable = path.join(app.context.cliDirectory, 'bin/unison/darwin/Unison.app/Contents/MacOS/cltool');
+                const unisonGuiExecutable = path.join(app.context.cliDirectory,
+                    'bin/unison/darwin/Unison.app/Contents/MacOS/cltool');
                 childProcess.execSync('sleep 3 && "' + unisonGuiExecutable + '"', {stdio: 'inherit'});
-    
-                console.log(chalk.yellowBright('Installing fs-monitor into /user/local/bin, this requires root privileges.'));
-                const fsMonitorExecutable = path.join(app.context.cliDirectory, 'bin/unison/darwin/unison-fsmonitor');
-                childProcess.execSync('sudo cp "' + fsMonitorExecutable + '" /usr/local/bin && chmod +x /usr/local/bin/unison-fsmonitor');
                 
-                if(isUnisonRegisteredAsCliTool()){
+                console.log(
+                    chalk.yellowBright('Installing fs-monitor into /user/local/bin, this requires root privileges.'));
+                const fsMonitorExecutable = path.join(app.context.cliDirectory, 'bin/unison/darwin/unison-fsmonitor');
+                childProcess.execSync(
+                    'sudo cp "' + fsMonitorExecutable + '" /usr/local/bin && chmod +x /usr/local/bin/unison-fsmonitor');
+                
+                if (isUnisonRegisteredAsCliTool()) {
                     return '/usr/local/bin/unison';
                 }
                 
