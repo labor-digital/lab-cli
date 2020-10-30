@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.5.2](https://github.com/labor-digital/lab-cli/compare/v3.5.1...v3.5.2) (2020-10-30)
+
+
+### Bug Fixes
+
+* **Unison:** fix --force option ([336913a](https://github.com/labor-digital/lab-cli/commit/336913a4769350029d8c85b4a8366593eb4c6aa9))
+
 ### [3.5.1](https://github.com/labor-digital/lab-cli/compare/v3.5.0...v3.5.1) (2020-09-28)
 
 
