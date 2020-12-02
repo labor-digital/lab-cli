@@ -35,7 +35,7 @@ export class Unison
     {
         return new Promise<void>((resolve, reject) => {
             // Prepare options
-            const additionalArgs: string = app.context.config.get('union.additionalArgs', '').trim();
+            const additionalArgs: string = app.context.config.get('unison.additionalArgs', '').trim();
             const allowNodeModules: boolean = app.context.config.get('unison.allowNodeModules', false);
             const targetPort = app.context.config.get('unison.target.port', 5000);
             const targetIp = app.context.config.get('unison.target.ip', app.env.get('APP_IP'));
@@ -60,8 +60,8 @@ export class Unison
                             '-auto ' +
                             '-ui text ' +
                             '-links false ' +
-                            '-label "APP: ' + app.context.rootDirectory + '" ' +
-                            (force ? '-ignorearchives -ignorelocks' : '') +
+                            '-label "APP: ' + app.context.rootDirectory.replace(/\\/g, '/') + '" ' +
+                            (force ? '-ignorearchives -ignorelocks ' : '') +
                             ' ' + additionalArgs;
             console.log(command);
             try {
