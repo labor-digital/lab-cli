@@ -143,7 +143,14 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('open', '../../Command/DockerComposeOpenCommand', {
             description: 'opens the current apps main container in your default browser window',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-p, --protocol <protocol>',
+                    description: 'used to define the protocol to use',
+                    default: 'https'
+                }
+            ]
         });
         
         context.commandRegistry.registerCommand('stop-all', '../../Command/DockerStopAllContainersCommand', {
