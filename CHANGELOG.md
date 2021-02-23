@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/labor-digital/lab-cli/compare/v3.6.0...v3.7.0) (2021-02-23)
+
+
+### Features
+
+* update dependencies ([c932259](https://github.com/labor-digital/lab-cli/commit/c932259b448f0231e76a6ea1e6a3081c2919fa82))
+
 ## [3.6.0](https://github.com/labor-digital/lab-cli/compare/v3.5.3...v3.6.0) (2021-02-23)
 
 
