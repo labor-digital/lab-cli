@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/labor-digital/lab-cli/compare/v3.5.3...v3.6.0) (2021-02-23)
+
+
+### Features
+
+* allow to set protocol on lab up ([66e85a5](https://github.com/labor-digital/lab-cli/commit/66e85a5e623dd3db0cc747a6f88c1b91b7afed3e))
+
+
+### Bug Fixes
+
+* add missing :// to protocol ([3557bfa](https://github.com/labor-digital/lab-cli/commit/3557bfabb8da8254d973cd82192005cb3e3fda9d))
+
 ### [3.5.3](https://github.com/labor-digital/lab-cli/compare/v3.5.2...v3.5.3) (2020-12-02)
 
 
