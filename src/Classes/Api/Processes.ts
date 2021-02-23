@@ -74,7 +74,7 @@ export class Processes
                 }));
             });
             return Promise.all(promises).then(() => Promise.resolve(result)).then(() => {
-                return new Promise(resolve => {
+                return new Promise<void>(resolve => {
                     setTimeout(() => resolve(), 500);
                 });
             });

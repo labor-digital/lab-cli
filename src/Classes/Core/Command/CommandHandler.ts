@@ -134,7 +134,7 @@ export class CommandHandler
         context.emitSequentialHook(AppEventList.BEFORE_ACTION, {
             cmd, args, command
         }).then(() => {
-            return new Promise((resolve1, reject1) => {
+            return new Promise<void>((resolve1, reject1) => {
                 // Execute the handler
                 let result = null;
                 try {
@@ -143,7 +143,7 @@ export class CommandHandler
                     if (isFunction(handler.default)) {
                         handler = handler.default;
                     } else if (getListKeys(handler).length === 1) {
-                        handler = handler[getListKeys(handler)[0]];
+                        handler = handler[getListKeys(handler)[0] as any];
                     } else {
                         return reject1(new Error('Invalid command handler class for command: ' + command.signature));
                     }

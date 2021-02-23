@@ -178,7 +178,7 @@ export class Docker
     public stopEngine(force?: boolean): Promise<void>
     {
         return this.timeoutHandler(() => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
                 this._context.platform.choose({
                     windows: () => {
                         if (force !== true && !this.isRunning) {
@@ -194,7 +194,7 @@ export class Docker
                         ];
                         (new ElevatedProcess(this._context)).execMultiple(commands);
                         console.log('Stopping docker processes...');
-                        Processes.killByFilter('ImageName eq docker*').then(() => resolve(true)).catch(reject);
+                        Processes.killByFilter('ImageName eq docker*').then(() => resolve()).catch(reject);
                     }
                 })();
             });
