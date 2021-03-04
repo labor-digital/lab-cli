@@ -34,7 +34,7 @@ export class DockerComposeOpenCommand
             }
             
             const domain = app.env.get('APP_DOMAIN', app.env.get('APP_IP'));
-            const protocol = app.env.get('APP_PROTOCOL', `${cmd.protocol}://`);
+            const protocol = app.env.get('APP_PROTOCOL', `${cmd.protocol ?? 'https'}://`);
             const url = protocol + domain;
             
             console.log('Opening website "' + url + '" in your default browser!');
