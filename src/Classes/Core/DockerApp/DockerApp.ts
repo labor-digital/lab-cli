@@ -47,7 +47,8 @@ export class DockerApp
     
     public static dockerConfigFiles = [
         ...DockerApp.dockerComposeOverrideFiles,
-        '.env'
+        '.env',
+        '.env.app'
     ];
     
     /**
