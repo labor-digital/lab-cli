@@ -198,6 +198,12 @@ export class DefaultCommands
             description: 'initializes a new application stub based on our boilerplate',
             platforms: {windows: true, darwin: true, linux: true}
         });
+        
+        context.commandRegistry.registerCommand('installCa', '../../Command/InstallCaCommand', {
+            description: 'installs our root ca (@labor-digital/ssl-certs) as trusted ssl root certificate',
+            platforms: {windows: true, darwin: true, linux: true}
+        });
+        
         return Promise.resolve(context);
     }
 }

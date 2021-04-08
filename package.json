@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"@labor-digital/helferlein": "^3.33.1",
+		"@labor-digital/ssl-certs": "^1.1.0",
 		"@types/glob": "^7.1.3",
 		"chalk": "4.1.0",
 		"commander": "5.1.0",
