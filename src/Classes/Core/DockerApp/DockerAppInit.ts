@@ -78,11 +78,13 @@ export class DockerAppInit
                       .then(() => this._context.emitSequentialHook(
                           AppEventList.DOCKER_APP_BEFORE_INIT, {app: this._app}))
                       .then(() => this.clearCachedValues())
-                      .then(() => this.makeSureEnvFileExists())
+                      .then(() => this.makeSureEnvFileExists('.env'))
+                      .then(() => this.makeSureEnvFileExists('.env.app'))
                       .then(() => this._context.emitSequentialHook(
                           AppEventList.DOCKER_APP_AFTER_ENV_FILE_CHECK, {app: this._app}))
                       .then(() => this.fillEmptyValuesInEnvFile())
-                      .then(() => this.generateEnvTemplateFile())
+                      .then(() => this.generateEnvTemplateFile('.env'))
+                      .then(() => this.generateEnvTemplateFile('.env.app'))
                       .then(() => this._context.emitSequentialHook(
                           AppEventList.DOCKER_APP_AFTER_ENV_INIT, {app: this._app}))
                       .then(() => this.registerDomainInHostsFile())
@@ -113,13 +115,14 @@ export class DockerAppInit
     /**
      * Makes sure that the .env file exists right beside the docker-compose file
      */
-    protected makeSureEnvFileExists(): Promise<void>
+    protected makeSureEnvFileExists(filename: string): Promise<void>
     {
-        const envFilePath = path.join(this._context.rootDirectory, '.env');
+        const envFilePath = path.join(this._context.rootDirectory, filename);
         if (fs.existsSync(envFilePath)) {
             return Promise.resolve();
         }
-        const envTemplateFilePath = path.join(this._context.rootDirectory, '.env.template');
+        
+        const envTemplateFilePath = path.join(this._context.rootDirectory, filename + '.template');
         if (fs.existsSync(envTemplateFilePath)) {
             fs.copyFileSync(envTemplateFilePath, envFilePath);
             return Promise.resolve();
@@ -235,10 +238,11 @@ export class DockerAppInit
     /**
      * Generates a new .env.template file based on the new .env file
      */
-    protected generateEnvTemplateFile(): Promise<void>
+    protected generateEnvTemplateFile(filename: string): Promise<void>
     {
-        const envTemplate = new DockerEnvTemplate(path.join(this._context.rootDirectory, '.env.template'));
-        envTemplate.writeTemplate(this._app.env);
+        const env = new DockerEnv(path.join(this._context.rootDirectory, filename));
+        const envTemplate = new DockerEnvTemplate(path.join(this._context.rootDirectory, filename + '.template'));
+        envTemplate.writeTemplate(env);
         return Promise.resolve();
     }
     
