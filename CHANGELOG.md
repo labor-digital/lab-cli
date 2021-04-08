@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.0](https://github.com/labor-digital/lab-cli/compare/v3.7.1...v3.8.0) (2021-04-08)
+
+
+### Features
+
+* support .env.app and .env.app.template files in a project ([20a3e8f](https://github.com/labor-digital/lab-cli/commit/20a3e8faced13fee6b335a8694b1eb4f5c217b59))
+
+
+### Bug Fixes
+
+* **DockerApp:** reinitialize app if .env.app changed ([c3c6d4c](https://github.com/labor-digital/lab-cli/commit/c3c6d4cf2b4da17ee06e23ba8c126d056b100e1b))
+* **DockerEnv:** remove all whitespaces at the top and bottom of .env files ([ee2c4bd](https://github.com/labor-digital/lab-cli/commit/ee2c4bd8df0aca036ceb7b40655033298704fba2))
+
 ### [3.7.1](https://github.com/labor-digital/lab-cli/compare/v3.7.0...v3.7.1) (2021-03-04)
 
 
