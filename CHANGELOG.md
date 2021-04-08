@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.9.0](https://github.com/labor-digital/lab-cli/compare/v3.8.0...v3.9.0) (2021-04-08)
+
+
+### Features
+
+* implement installCa command to install our root ca ([6905a32](https://github.com/labor-digital/lab-cli/commit/6905a32ae6e6199c63e9f50a66c063d12cd39af9))
+
 ## [3.8.0](https://github.com/labor-digital/lab-cli/compare/v3.7.1...v3.8.0) (2021-04-08)
 
 
