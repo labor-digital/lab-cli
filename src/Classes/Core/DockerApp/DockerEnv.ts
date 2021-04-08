@@ -171,6 +171,9 @@ export class DockerEnv
             });
         }
         
+        // Remove all spacing at the top and bottom of the file
+        contents = contents.replace(/^\s+|\s+$/g, '');
+        
         // Write the file
         fs.writeFileSync(this._filename, contents);
     }
