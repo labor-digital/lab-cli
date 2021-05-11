@@ -68,7 +68,7 @@ export class DockerCompose
                 throw new Error('There are no services in the docker-compose config!');
             }
         } catch (e) {
-            throw new Error('Error while reading docker-compose config:\r\n' + e.message);
+            throw new Error('Error while reading docker-compose config:\n' + e.message);
         }
         
         // Parse yaml

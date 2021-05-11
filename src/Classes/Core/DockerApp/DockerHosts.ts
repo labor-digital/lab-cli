@@ -188,7 +188,7 @@ export class DockerHosts
                 lines.push(line.replace(/{domain}/, domain + ' #lab-docker-app ' + this._directories.get(k)));
             }
         });
-        const content = lines.join('\r\n');
+        const content = lines.join('\n');
         const tmpFile = path.join(this._context.platform.tempDirectory, 'lab-tmp-hosts.txt');
         fs.writeFileSync(tmpFile, content);
         this._isDirty = false;

@@ -148,7 +148,7 @@ export class DockerEnv
         });
         
         // Store the data
-        this._tpl = tpl.join('\r\n');
+        this._tpl = tpl.join('\n');
         this._env = env;
     }
     
@@ -167,7 +167,7 @@ export class DockerEnv
         if (keys.length > 0) {
             forEach(keys, (key: string) => {
                 const value = this._env.get(key);
-                contents += '\r\n' + key + '=' + value;
+                contents += '\n' + key + '=' + value;
             });
         }
         

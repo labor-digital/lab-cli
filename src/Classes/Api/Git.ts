@@ -53,7 +53,7 @@ export class Git
                     windows: 'WHERE git',
                     linux: 'which git'
                 }), {'stdio': 'pipe'})
-                               .toString('utf8').replace(/[\r\n]+(.*)$/gm, '');
+                               .toString('utf8').replace(/(\r?\n)+(.*)$/gm, '');
         } catch (e) {
             return '';
         }
