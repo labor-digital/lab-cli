@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.9.1](https://github.com/labor-digital/lab-cli/compare/v3.9.0...v3.9.1) (2021-05-11)
+
+
+### Bug Fixes
+
+* only write linux line endings for .env and git files ([035083c](https://github.com/labor-digital/lab-cli/commit/035083c785e0eb368404965882538a778c9f6f1b))
+
 ## [3.9.0](https://github.com/labor-digital/lab-cli/compare/v3.8.0...v3.9.0) (2021-04-08)
 
 
