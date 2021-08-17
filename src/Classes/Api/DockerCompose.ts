@@ -18,6 +18,7 @@
 
 import {forEach, isNumeric, isString, isUndefined, PlainObject} from '@labor-digital/helferlein';
 import * as childProcess from 'child_process';
+import {clean, gte} from 'semver';
 // @ts-ignore
 import * as yaml from 'yamljs';
 import {DockerApp} from '../Core/DockerApp/DockerApp';
@@ -25,7 +26,6 @@ import {Network} from './Network';
 
 export class DockerCompose
 {
-    
     /**
      * The instance of the docker app to work with
      */
@@ -37,12 +37,32 @@ export class DockerCompose
     protected _config: PlainObject;
     
     /**
+     * Stores the resolved version of docker compose
+     * @protected
+     */
+    protected _version: string | undefined;
+    
+    /**
      * DockerCompose Constructor
      * @param dockerApp
      */
     public constructor(dockerApp: DockerApp)
     {
         this._app = dockerApp;
+    }
+    
+    /**
+     * Returns the version number of the currently installed docker-compose binary
+     */
+    public get version(): string
+    {
+        if (!this._version) {
+            const command = 'docker-compose version --short';
+            const result = childProcess.execSync(command).toString('utf8');
+            this._version = clean(result);
+        }
+        
+        return this._version;
     }
     
     /**
@@ -110,10 +130,14 @@ export class DockerCompose
             (new Network(this._app.context))
                 .registerLoopBackAliasIfRequired(this._app.env.get('APP_IP'));
             
+            const noAnsi = followOutput === true || !this._app.context.platform.isWindows;
+            const noAnsiCommand = gte(this.version, '1.29.0') ? '--ansi never ' : '--no-ansi ';
+            
             const command = this.baseDockerComposeCommand +
                             (pullImages === true ? 'pull && ' + this.baseDockerComposeCommand : '') +
-                            (followOutput === true || !this._app.context.platform.isWindows ? '' : '--no-ansi ') +
+                            (noAnsi ? '' : noAnsiCommand) +
                             'up --remove-orphans' + (followOutput === true ? '' : ' -d');
+            
             try {
                 childProcess.execSync(command, {stdio: 'inherit'});
                 resolve();
