@@ -21,8 +21,7 @@ import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
 import {isNull} from '@labor-digital/helferlein/lib/Types/isNull';
 import chalk from 'chalk';
 import * as childProcess from 'child_process';
-// @ts-ignore
-import DockerApi from 'dockerode';
+import Dockerode from 'dockerode';
 import * as fs from 'fs';
 import * as path from 'path';
 import {AppContext} from '../Core/AppContext';
@@ -40,7 +39,7 @@ export class Docker
     /**
      * The static api instance after it was created
      */
-    protected _api: DockerApi.Docker;
+    protected _api: Dockerode;
     
     /**
      * Docker Constructor
@@ -49,7 +48,7 @@ export class Docker
     public constructor(context: AppContext)
     {
         this._context = context;
-        this._api = new DockerApi({
+        this._api = new Dockerode({
             socketPath: context.config.get('docker.socketPath')
         });
     }
