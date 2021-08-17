@@ -17,9 +17,9 @@
  */
 
 import {forEach, isArray, isEmpty, isPlainObject, isString, PlainObject} from '@labor-digital/helferlein';
-import {copy} from '@labor-digital/helferlein/dist/Node/FileSystem/copySync';
 import {mkdirRecursiveSync} from '@labor-digital/helferlein/dist/Node/FileSystem/mkdirRecursiveSync';
 import {rmdirRecursiveSync} from '@labor-digital/helferlein/dist/Node/FileSystem/rmdirRecursiveSync';
+import {copy} from '@labor-digital/helferlein/node';
 import chalk from 'chalk';
 import {Command} from 'commander';
 import * as fs from 'fs';

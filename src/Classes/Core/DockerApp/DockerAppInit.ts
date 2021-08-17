@@ -17,7 +17,7 @@
  */
 
 import {forEach, isString, md5} from '@labor-digital/helferlein';
-import {mkdirRecursiveSync} from '@labor-digital/helferlein/dist/Node/FileSystem/mkdirRecursiveSync';
+import {mkdirRecursiveSync} from '@labor-digital/helferlein/node';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
