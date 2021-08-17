@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.10.0](https://github.com/labor-digital/lab-cli/compare/v3.9.1...v3.10.0) (2021-08-17)
+
+
+### Features
+
+* install dockerode types ([8af8177](https://github.com/labor-digital/lab-cli/commit/8af8177450ed5056e9a70787ba64ff325cd17c0e))
+* update dependencies ([b8aa7f9](https://github.com/labor-digital/lab-cli/commit/b8aa7f97b04007092c51025bdebf41b9c0a4e45d))
+
+
+### Bug Fixes
+
+* use new node package of helferlein ([04c53ae](https://github.com/labor-digital/lab-cli/commit/04c53aecfc73882e7492cb9a1b93eb19c1aeb452))
+* **DockerCompose:** use new --ansi never flag instead of deprecated --no-ansi when possible ([50b8514](https://github.com/labor-digital/lab-cli/commit/50b8514a8ae82385591b02d9be8a9c83af59c188))
+
 ### [3.9.1](https://github.com/labor-digital/lab-cli/compare/v3.9.0...v3.9.1) (2021-05-11)
 
 
