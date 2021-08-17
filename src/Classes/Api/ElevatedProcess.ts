@@ -16,8 +16,7 @@
  * Last modified: 2020.04.05 at 19:34
  */
 
-import {asArray} from '@labor-digital/helferlein/lib/FormatAndConvert/asArray';
-import {List} from '@labor-digital/helferlein/lib/Interfaces/List';
+import {asArray, List} from '@labor-digital/helferlein';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';

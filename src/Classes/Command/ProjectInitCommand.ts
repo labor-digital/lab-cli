@@ -16,15 +16,10 @@
  * Last modified: 2020.07.09 at 18:26
  */
 
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {copy} from '@labor-digital/helferlein/lib/Node/FileSystem/copySync';
-import {mkdirRecursiveSync} from '@labor-digital/helferlein/lib/Node/FileSystem/mkdirRecursiveSync';
-import {rmdirRecursiveSync} from '@labor-digital/helferlein/lib/Node/FileSystem/rmdirRecursiveSync';
-import {isArray} from '@labor-digital/helferlein/lib/Types/isArray';
-import {isEmpty} from '@labor-digital/helferlein/lib/Types/isEmpty';
-import {isPlainObject} from '@labor-digital/helferlein/lib/Types/isPlainObject';
-import {isString} from '@labor-digital/helferlein/lib/Types/isString';
+import {forEach, isArray, isEmpty, isPlainObject, isString, PlainObject} from '@labor-digital/helferlein';
+import {copy} from '@labor-digital/helferlein/dist/Node/FileSystem/copySync';
+import {mkdirRecursiveSync} from '@labor-digital/helferlein/dist/Node/FileSystem/mkdirRecursiveSync';
+import {rmdirRecursiveSync} from '@labor-digital/helferlein/dist/Node/FileSystem/rmdirRecursiveSync';
 import chalk from 'chalk';
 import {Command} from 'commander';
 import * as fs from 'fs';
@@ -82,8 +77,8 @@ export class ProjectInitCommand
                 resolve(true);
             }
         })
-        
-        // Create an app directory and go there
+            
+            // Create an app directory and go there
             .then(execute => {
                 if (!execute) {
                     return Promise.reject(false);

@@ -16,9 +16,7 @@
  * Last modified: 2020.04.04 at 20:40
  */
 
-import {GenericStorage} from '@labor-digital/helferlein/lib/Entities/GenericStorage';
-import {GenericStorageInterface} from '@labor-digital/helferlein/lib/Entities/GenericStorageInterface';
-import {isEmpty} from '@labor-digital/helferlein/lib/Types/isEmpty';
+import {GenericStorage, GenericStorageInterface, isEmpty} from '@labor-digital/helferlein';
 import * as fs from 'fs';
 import * as path from 'path';
 import {AppContext} from './AppContext';

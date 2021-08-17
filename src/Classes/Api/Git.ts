@@ -16,7 +16,7 @@
  * Last modified: 2020.07.09 at 18:26
  */
 
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
+import {PlainObject} from '@labor-digital/helferlein';
 import * as childProcess from 'child_process';
 import {AppContext} from '../Core/AppContext';
 

@@ -16,12 +16,7 @@
  * Last modified: 2020.04.03 at 19:43
  */
 
-import {ListPath} from '@labor-digital/helferlein/lib/Interfaces/List';
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {merge} from '@labor-digital/helferlein/lib/Lists/merge';
-import {getPath} from '@labor-digital/helferlein/lib/Lists/Paths/getPath';
-import {hasPath} from '@labor-digital/helferlein/lib/Lists/Paths/hasPath';
-import {isPlainObject} from '@labor-digital/helferlein/lib/Types/isPlainObject';
+import {getPath, hasPath, isPlainObject, ListPath, merge, PlainObject} from '@labor-digital/helferlein';
 
 
 export class Config

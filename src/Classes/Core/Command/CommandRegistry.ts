@@ -16,9 +16,7 @@
  * Last modified: 2020.04.05 at 13:48
  */
 
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import makeOptions from '@labor-digital/helferlein/lib/Misc/makeOptions';
-import {isUndefined} from '@labor-digital/helferlein/lib/Types/isUndefined';
+import {forEach, isUndefined, makeOptions} from '@labor-digital/helferlein';
 import {AppContext} from '../AppContext';
 
 export interface CommandOptionDefinition

@@ -16,12 +16,7 @@
  * Last modified: 2020.04.05 at 22:05
  */
 
-import {asObject} from '@labor-digital/helferlein/lib/FormatAndConvert/asObject';
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {getListKeys} from '@labor-digital/helferlein/lib/Lists/listAccess';
-import {isEmpty} from '@labor-digital/helferlein/lib/Types/isEmpty';
-import {isString} from '@labor-digital/helferlein/lib/Types/isString';
+import {asObject, forEach, getListKeys, isEmpty, isString, PlainObject} from '@labor-digital/helferlein';
 import * as fs from 'fs';
 
 export class DockerEnv

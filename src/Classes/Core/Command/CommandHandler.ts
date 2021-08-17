@@ -16,10 +16,7 @@
  * Last modified: 2020.04.05 at 14:00
  */
 
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {getListKeys} from '@labor-digital/helferlein/lib/Lists/listAccess';
-import {isEmpty} from '@labor-digital/helferlein/lib/Types/isEmpty';
-import {isFunction} from '@labor-digital/helferlein/lib/Types/isFunction';
+import {forEach, getListKeys, isEmpty, isFunction} from '@labor-digital/helferlein';
 import chalk from 'chalk';
 import {Command} from 'commander';
 import {AppContext} from '../AppContext';

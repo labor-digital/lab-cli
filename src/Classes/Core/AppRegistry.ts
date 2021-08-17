@@ -16,9 +16,7 @@
  * Last modified: 2020.04.05 at 14:36
  */
 
-import {GenericStorage} from '@labor-digital/helferlein/lib/Entities/GenericStorage';
-import {GenericStorageInterface} from '@labor-digital/helferlein/lib/Entities/GenericStorageInterface';
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
+import {GenericStorage, GenericStorageInterface, PlainObject} from '@labor-digital/helferlein';
 import {AppContext} from './AppContext';
 import {Registry} from './Registry';
 

@@ -16,7 +16,7 @@
  * Last modified: 2020.04.06 at 13:35
  */
 
-import {isString} from '@labor-digital/helferlein/lib/Types/isString';
+import {isString} from '@labor-digital/helferlein';
 import {Command} from 'commander';
 import {AppContext} from '../Core/AppContext';
 import {DockerApp} from '../Core/DockerApp/DockerApp';

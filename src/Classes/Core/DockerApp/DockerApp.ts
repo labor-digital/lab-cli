@@ -16,12 +16,7 @@
  * Last modified: 2020.04.05 at 16:05
  */
 
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {md5} from '@labor-digital/helferlein/lib/Misc/md5';
-import {isEmpty} from '@labor-digital/helferlein/lib/Types/isEmpty';
-import {isString} from '@labor-digital/helferlein/lib/Types/isString';
-import {isUndefined} from '@labor-digital/helferlein/lib/Types/isUndefined';
+import {forEach, isEmpty, isString, isUndefined, md5, PlainObject} from '@labor-digital/helferlein';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
 import * as path from 'path';

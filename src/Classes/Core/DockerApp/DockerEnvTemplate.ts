@@ -16,7 +16,7 @@
  * Last modified: 2020.04.07 at 13:33
  */
 
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
+import {forEach} from '@labor-digital/helferlein';
 import {DockerEnv} from './DockerEnv';
 
 export class DockerEnvTemplate extends DockerEnv

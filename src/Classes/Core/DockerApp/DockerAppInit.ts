@@ -16,10 +16,8 @@
  * Last modified: 2020.04.05 at 21:46
  */
 
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {md5} from '@labor-digital/helferlein/lib/Misc/md5';
-import {mkdirRecursiveSync} from '@labor-digital/helferlein/lib/Node/FileSystem/mkdirRecursiveSync';
-import {isString} from '@labor-digital/helferlein/lib/Types/isString';
+import {forEach, isString, md5} from '@labor-digital/helferlein';
+import {mkdirRecursiveSync} from '@labor-digital/helferlein/dist/Node/FileSystem/mkdirRecursiveSync';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import inquirer from 'inquirer';

@@ -16,11 +16,7 @@
  * Last modified: 2020.04.06 at 09:44
  */
 
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {isNumeric} from '@labor-digital/helferlein/lib/Types/isNumeric';
-import {isString} from '@labor-digital/helferlein/lib/Types/isString';
-import {isUndefined} from '@labor-digital/helferlein/lib/Types/isUndefined';
+import {forEach, isNumeric, isString, isUndefined, PlainObject} from '@labor-digital/helferlein';
 import * as childProcess from 'child_process';
 // @ts-ignore
 import * as yaml from 'yamljs';

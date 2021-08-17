@@ -16,9 +16,7 @@
  * Last modified: 2020.04.03 at 18:59
  */
 
-import {EventEmitter} from '@labor-digital/helferlein/lib/Events/EventEmitter';
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {isPlainObject} from '@labor-digital/helferlein/lib/Types/isPlainObject';
+import {EventEmitter, isPlainObject, PlainObject} from '@labor-digital/helferlein';
 import commander from 'commander';
 import * as path from 'path';
 import {Platform} from '../Api/Platform';

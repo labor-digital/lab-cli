@@ -16,11 +16,7 @@
  * Last modified: 2020.04.06 at 09:55
  */
 
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {getPath} from '@labor-digital/helferlein/lib/Lists/Paths/getPath';
-import {isString} from '@labor-digital/helferlein/lib/Types/isString';
-import {isUndefined} from '@labor-digital/helferlein/lib/Types/isUndefined';
+import {forEach, getPath, isString, isUndefined, PlainObject} from '@labor-digital/helferlein';
 import inquirer from 'inquirer';
 import {DockerCompose} from '../../Api/DockerCompose';
 import {Bugfixes} from '../Bugfixes';
@@ -105,7 +101,7 @@ export class DockerComposeServiceSelectWizard
     protected static checkIfSuggestionExists(dockerCompose: DockerCompose, suggestedServiceKey: string): boolean
     {
         const services = dockerCompose.getServiceList();
-        const serviceKeys = getPath(services, '*.key');
+        const serviceKeys = getPath(services, '*.key', []) as any as Array<any>;
         return serviceKeys.indexOf(suggestedServiceKey) !== -1;
     }
     

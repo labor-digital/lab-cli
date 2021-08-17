@@ -15,8 +15,7 @@
  *
  * Last modified: 2020.04.04 at 12:48
  */
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {isNull} from '@labor-digital/helferlein/lib/Types/isNull';
+import {forEach, isNull} from '@labor-digital/helferlein';
 import * as fs from 'fs';
 import * as path from 'path';
 import {AppContext} from './AppContext';

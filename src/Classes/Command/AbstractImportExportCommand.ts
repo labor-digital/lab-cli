@@ -16,7 +16,7 @@
  * Last modified: 2020.05.08 at 12:28
  */
 
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
+import {forEach} from '@labor-digital/helferlein';
 import {Command} from 'commander';
 import * as fs from 'fs';
 import inquirer from 'inquirer';

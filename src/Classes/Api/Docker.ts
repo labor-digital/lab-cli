@@ -16,9 +16,7 @@
  * Last modified: 2020.04.05 at 18:51
  */
 
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {isNull} from '@labor-digital/helferlein/lib/Types/isNull';
+import {forEach, isNull, PlainObject} from '@labor-digital/helferlein';
 import chalk from 'chalk';
 import * as childProcess from 'child_process';
 import Dockerode from 'dockerode';

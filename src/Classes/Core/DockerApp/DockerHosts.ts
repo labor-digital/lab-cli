@@ -16,8 +16,7 @@
  * Last modified: 2020.04.06 at 09:06
  */
 
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {isUndefined} from '@labor-digital/helferlein/lib/Types/isUndefined';
+import {forEach, isUndefined} from '@labor-digital/helferlein';
 import * as fs from 'fs';
 import * as path from 'path';
 import {ElevatedProcess} from '../../Api/ElevatedProcess';

@@ -16,9 +16,7 @@
  * Last modified: 2020.04.03 at 19:42
  */
 
-import {PlainObject} from '@labor-digital/helferlein/lib/Interfaces/PlainObject';
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {merge} from '@labor-digital/helferlein/lib/Lists/merge';
+import {forEach, merge, PlainObject} from '@labor-digital/helferlein';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';

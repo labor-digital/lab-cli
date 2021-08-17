@@ -15,15 +15,16 @@
  *
  * Last modified: 2020.09.11 at 14:28
  */
-import {escapeRegex} from '@labor-digital/helferlein/lib/Strings/escapeRegex';
-import {AppContext} from '../Core/AppContext';
+import {escapeRegex} from '@labor-digital/helferlein';
 import * as childProcess from 'child_process';
+import {AppContext} from '../Core/AppContext';
 
 export class Network
 {
     protected _context: AppContext;
     
-    constructor(context: AppContext) {
+    constructor(context: AppContext)
+    {
         this._context = context;
     }
     
@@ -32,17 +33,18 @@ export class Network
      * given ip address, or has to be registered in order for the app to work correctly
      * @param ip
      */
-    public registerLoopBackAliasIfRequired(ip: string): void {
-        if(this._context.platform.isDarwin){
+    public registerLoopBackAliasIfRequired(ip: string): void
+    {
+        if (this._context.platform.isDarwin) {
             console.log('Check if loopback adapter is set up correctly to handle ip: ' + ip);
             const pattern = new RegExp(escapeRegex(ip) + ' netmask', 'm');
-            if(childProcess.execSync('ifconfig lo0').toString('utf-8').match(pattern)){
+            if (childProcess.execSync('ifconfig lo0').toString('utf-8').match(pattern)) {
                 console.log('Loopback for: ' + ip + ' is set up correctly!');
                 return;
             }
             console.log('A loopback must be registered to handle ip:' + ip + ', this requires root permissions!');
             childProcess.execSync('sudo ifconfig lo0 alias ' + ip);
-            if(childProcess.execSync('ifconfig lo0').toString('utf-8').match(pattern)){
+            if (childProcess.execSync('ifconfig lo0').toString('utf-8').match(pattern)) {
                 console.log('Loopback setup successful!');
                 return;
             }

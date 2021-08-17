@@ -16,15 +16,17 @@
  * Last modified: 2020.04.03 at 18:57
  */
 
-import {EventBus} from '@labor-digital/helferlein/lib/Events/EventBus';
-import {forEach} from '@labor-digital/helferlein/lib/Lists/forEach';
-import {isArray} from '@labor-digital/helferlein/lib/Types/isArray';
-import {isEmpty} from '@labor-digital/helferlein/lib/Types/isEmpty';
-import {isFunction} from '@labor-digital/helferlein/lib/Types/isFunction';
-import {isObject} from '@labor-digital/helferlein/lib/Types/isObject';
-import {isPlainObject} from '@labor-digital/helferlein/lib/Types/isPlainObject';
-import {isString} from '@labor-digital/helferlein/lib/Types/isString';
-import {isUndefined} from '@labor-digital/helferlein/lib/Types/isUndefined';
+import {
+    EventBus,
+    forEach,
+    isArray,
+    isEmpty,
+    isFunction,
+    isObject,
+    isPlainObject,
+    isString,
+    isUndefined
+} from '@labor-digital/helferlein';
 import chalk from 'chalk';
 import {Command} from 'commander';
 // @ts-ignore

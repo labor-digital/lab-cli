@@ -16,7 +16,7 @@
  * Last modified: 2020.04.06 at 14:38
  */
 
-import {getPath} from '@labor-digital/helferlein/lib/Lists/Paths/getPath';
+import {getPath} from '@labor-digital/helferlein';
 import chalk from 'chalk';
 import {Command} from 'commander';
 // @ts-ignore
@@ -32,7 +32,7 @@ export class DockerComposeUnisonCommand
     {
         return (new DockerApp(context)).initialize().then(app => {
             const services = app.dockerCompose.getServiceList();
-            const serviceKeys = getPath(services, '*.key');
+            const serviceKeys = getPath(services, '*.key') as any as Array<any>;
             if (serviceKeys.indexOf('docker-unison') == -1) {
                 return this.migrateDockerCompose(app);
             }
