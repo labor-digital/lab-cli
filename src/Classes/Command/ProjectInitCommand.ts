@@ -17,9 +17,7 @@
  */
 
 import {forEach, isArray, isEmpty, isPlainObject, isString, PlainObject} from '@labor-digital/helferlein';
-import {mkdirRecursiveSync} from '@labor-digital/helferlein/dist/Node/FileSystem/mkdirRecursiveSync';
-import {rmdirRecursiveSync} from '@labor-digital/helferlein/dist/Node/FileSystem/rmdirRecursiveSync';
-import {copy} from '@labor-digital/helferlein/node';
+import {copy, mkdirRecursiveSync, rmdirRecursiveSync} from '@labor-digital/helferlein/node';
 import chalk from 'chalk';
 import {Command} from 'commander';
 import * as fs from 'fs';
@@ -91,8 +89,8 @@ export class ProjectInitCommand
             // Ask for the project name
             .then(() => {
                 return ProjectNameInputWizard.run(
-                    'Your new project needs a name, we use as "COMPOSE_PROJECT_NAME". ' +
-                    'Define the name of the project based on the following options:', context)
+                                                 'Your new project needs a name, we use as "COMPOSE_PROJECT_NAME". ' +
+                                                 'Define the name of the project based on the following options:', context)
                                              .then(name => {
                                                  projectName = name;
                                              });
