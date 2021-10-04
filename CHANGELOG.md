@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.10.1](https://github.com/labor-digital/lab-cli/compare/v3.10.0...v3.10.1) (2021-10-04)
+
+
+### Bug Fixes
+
+* **init:** ensure mkdirRecursiveSync and rmdirRecursiveSync are imported from the correct directory ([9d0a464](https://github.com/labor-digital/lab-cli/commit/9d0a4642356e1b75cccbf78d716ea1a07daa86ee))
+
 ## [3.10.0](https://github.com/labor-digital/lab-cli/compare/v3.9.1...v3.10.0) (2021-08-17)
 
 
