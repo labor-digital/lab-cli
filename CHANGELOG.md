@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.11.0](https://github.com/labor-digital/lab-cli/compare/v3.10.1...v3.11.0) (2023-11-30)
+
+
+### Features
+
+* change docker-base-image repository to docker-base-image-v2 ([3280beb](https://github.com/labor-digital/lab-cli/commit/3280bebae9012f1e3cee03d4e7625417ba9ab96a))
+
 ### [3.10.1](https://github.com/labor-digital/lab-cli/compare/v3.10.0...v3.10.1) (2021-10-04)
 
 
