@@ -109,7 +109,7 @@ export class DefaultConfig
             // Project init
             projectInit: {
                 // The git repository to clone and find boilerplates in
-                boilerplateRepository: 'https://github.com/labor-digital/docker-base-images.git'
+                boilerplateRepository: 'https://github.com/labor-digital/docker-base-images-v2.git'
             }
         };
     }
