@@ -167,7 +167,7 @@ const config = {
         // Project init
         projectInit: {
             // The git repository to clone and find boilerplates in
-            boilerplateRepository: 'https://github.com/labor-digital/docker-base-images.git'
+            boilerplateRepository: 'https://github.com/labor-digital/docker-base-images-v2.git'
         }
     }
 };
@@ -179,7 +179,7 @@ To create your first project with lab cli you can open your command line tool in
 first ask you for a "name" for your app using a (hopefully) self-explanatory wizard.
 
 After you have provided an app name the script will clone the configured "boilerplateRepository"
-and search all boilerplates in it. By default the script uses our [Docker Base Image repository](https://github.com/labor-digital/docker-base-images).
+and search all boilerplates in it. By default the script uses our [Docker Base Image repository](https://github.com/labor-digital/docker-base-images-v2).
 
 You can now select one of the possible boilerplates using the wizard, which will be prepared and ready to run in the current working directory.
 
