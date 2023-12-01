@@ -116,7 +116,7 @@ const config = {
         // configuration for the domain creation
         domain: {
             // The base domain for the generated project domains
-            base: ".localmachine.space"
+            base: ".labor.systems"
         },
         
         // Defines the path of the hosts file on your platform
@@ -197,7 +197,7 @@ yet:
 - COMPOSE_PROJECT_NAME: (Shows a wizard) A unique name for your App/Project
 - PROJECT_ENV: (default: dev) Defines the environment of the project
 - APP_IP: (default: 127.088.xxx.xxx) Defines the local IP in the 127.088.xxx.xxx range that should be mapped for this app
-- APP_DOMAIN: ($COMPOSE_PROJECT_NAME.localmachine.space) Defines a unique domain that will be mapped for this project in your hosts file. You can use this
+- APP_DOMAIN: ($COMPOSE_PROJECT_NAME.labor.systems) Defines a unique domain that will be mapped for this project in your hosts file. You can use this
   domain to access your project in the browser.
 
 The following variables will be filled if their key exist and are empty:

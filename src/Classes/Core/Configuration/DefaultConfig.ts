@@ -56,7 +56,7 @@ export class DefaultConfig
                 // Configuration for the domain creation
                 domain: {
                     // The base domain for the generated project domains
-                    base: '.localmachine.space'
+                    base: '.labor.systems'
                 },
                 
                 // Defines the path of the hosts file on your platform
