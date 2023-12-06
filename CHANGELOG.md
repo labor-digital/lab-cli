@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.12.0](https://github.com/labor-digital/lab-cli/compare/v3.11.1...v3.12.0) (2023-12-06)
+
+
+### Features
+
+* add new base domain ([09ce9b7](https://github.com/labor-digital/lab-cli/commit/09ce9b726dd8fc8a57c50af95a6c5fa5cec0ec60))
+
 ### [3.11.1](https://github.com/labor-digital/lab-cli/compare/v3.11.0...v3.11.1) (2023-11-30)
 
 ## [3.11.0](https://github.com/labor-digital/lab-cli/compare/v3.10.1...v3.11.0) (2023-11-30)
