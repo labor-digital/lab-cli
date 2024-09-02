@@ -101,7 +101,7 @@ export class DockerApp
     }
     
     /**
-     * Returns the main docker-compose file path
+     * Returns the main docker compose file path
      */
     public get dockerComposeFile(): string | undefined
     {
@@ -246,7 +246,7 @@ export class DockerApp
         
         // Check if we have docker files
         if (!this.hasDockerFiles()) {
-            return Promise.reject(new Error('There are no docker-compose files in the directory: "' +
+            return Promise.reject(new Error('There are no docker compose files in the directory: "' +
                                             this._context.rootDirectory + '\!'));
         }
         

@@ -45,7 +45,7 @@ export abstract class AbstractImportExportCommand
             });
             if (!hasImportContainer) {
                 return Promise.reject(Error(
-                    'It seems like your composition does not have an "import" container. Make sure your docker-compose override file defines a service with key: "import" which uses the LABOR import container!'));
+                    'It seems like your composition does not have an "import" container. Make sure your docker compose override file defines a service with key: "import" which uses the LABOR import container!'));
             }
             
             // Perform the import if the user consented

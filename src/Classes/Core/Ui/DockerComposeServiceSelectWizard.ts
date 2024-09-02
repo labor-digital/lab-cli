@@ -77,7 +77,7 @@ export class DockerComposeServiceSelectWizard
     }
     
     /**
-     * Converts the list of docker-compose services in a option array for inquirer
+     * Converts the list of docker compose services in a option array for inquirer
      * @param dockerCompose
      */
     protected static buildServiceOptions(dockerCompose: DockerCompose): Array<PlainObject>

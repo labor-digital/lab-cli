@@ -52,12 +52,12 @@ export class DockerCompose
     }
     
     /**
-     * Returns the version number of the currently installed docker-compose binary
+     * Returns the version number of the currently installed docker compose binary
      */
     public get version(): string
     {
         if (!this._version) {
-            const command = 'docker-compose version --short';
+            const command = 'docker compose version --short';
             const result = childProcess.execSync(command).toString('utf8');
             this._version = clean(result);
         }
@@ -66,7 +66,7 @@ export class DockerCompose
     }
     
     /**
-     * Returns the project's docker-compose configuration
+     * Returns the project's docker compose configuration
      * @param forceReload Set to true to reload the config instead of serving it from cache
      */
     public getConfig(forceReload?: boolean): PlainObject
@@ -81,10 +81,10 @@ export class DockerCompose
             result = childProcess.execSync(command).toString('utf8');
             if (result.indexOf('services') === -1) {
                 // noinspection ExceptionCaughtLocallyJS
-                throw new Error('There are no services in the docker-compose config!');
+                throw new Error('There are no services in the docker compose config!');
             }
         } catch (e) {
-            throw new Error('Error while reading docker-compose config:\n' + e.message);
+            throw new Error('Error while reading docker compose config:\n' + e.message);
         }
         
         // Parse yaml
@@ -92,7 +92,7 @@ export class DockerCompose
     }
     
     /**
-     * Gathers a list of all services in the current docker-compose configuration
+     * Gathers a list of all services in the current docker compose configuration
      */
     public getServiceList(forceReload?: boolean): Array<{ key: string, containerName: string }>
     {
@@ -166,7 +166,7 @@ export class DockerCompose
     }
     
     /**
-     * Executes a "docker-compose down" on the current application
+     * Executes a "docker compose down" on the current application
      * @param removeImages True to remove all images as well
      */
     public down(removeImages?: boolean): Promise<void>
@@ -208,7 +208,7 @@ export class DockerCompose
     }
     
     /**
-     * Checks if at least one of the containers in the docker-compose app is running
+     * Checks if at least one of the containers in the docker compose app is running
      */
     public get isRunning(): boolean
     {
@@ -245,7 +245,7 @@ export class DockerCompose
     {
         return this._app.context.platform.choose({windows: 'cd /d ', linux: 'cd '}) +
                '"' + this._app.context.rootDirectory + '" && ' +
-               'docker-compose ' +
+               'docker compose ' +
                (!isUndefined(this._app.dockerComposeFile) ?
                ' -f "' + this._app.dockerComposeFile + '"' : '') +
                (!isUndefined(this._app.dockerComposeOverrideFile) ?

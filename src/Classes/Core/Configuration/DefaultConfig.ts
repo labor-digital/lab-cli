@@ -33,7 +33,7 @@ export class DefaultConfig
                 // The shell to use when attaching to a container
                 shell: 'bash',
                 
-                // The docker-compose service key to attach to.
+                // The docker compose service key to attach to.
                 // Can be used to overwrite the default container name set by the docker app
                 // NOTE: This overrides "containerName"!
                 serviceKey: undefined,

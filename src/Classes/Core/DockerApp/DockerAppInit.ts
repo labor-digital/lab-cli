@@ -42,7 +42,7 @@ export class DockerAppInit
     protected _dockerComposeFile: string;
     
     /**
-     * The context to start the docker-compose command with
+     * The context to start the docker compose command with
      */
     protected _context: AppContext;
     
@@ -111,7 +111,7 @@ export class DockerAppInit
     }
     
     /**
-     * Makes sure that the .env file exists right beside the docker-compose file
+     * Makes sure that the .env file exists right beside the docker compose file
      */
     protected makeSureEnvFileExists(filename: string): Promise<void>
     {

@@ -96,7 +96,7 @@ export class Docker
                 windows: () => {
                     // Find the docker root path
                     const options: Array<string> = [];
-                    forEach(['docker', 'docker-compose'], function (executable: string) {
+                    forEach(['docker', 'docker compose'], function (executable: string) {
                         const executableParts = childProcess.execSync('WHERE ' + executable, {'stdio': 'pipe'})
                                                             .toString('utf8')
                                                             .split(/\r?\n/);

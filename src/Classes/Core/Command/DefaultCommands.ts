@@ -50,16 +50,16 @@ export class DefaultCommands
         context.commandRegistry.registerCommand('up', '../../Command/DockerComposeUpCommand', {
             alias: 'start',
             platforms: {windows: true, darwin: true, linux: true},
-            description: 'starts and restarts the current project composition (docker-compose up)',
+            description: 'starts and restarts the current project composition (docker compose up)',
             options: [
                 {
                     definition: '-f, --follow',
-                    description: 'follows the output of your app like docker-compose does',
+                    description: 'follows the output of your app like docker compose does',
                     default: false
                 },
                 {
                     definition: '-p, --pull',
-                    description: 'forces docker-compose to pull the newest image versions before starting the application',
+                    description: 'forces docker compose to pull the newest image versions before starting the application',
                     default: false
                 },
                 ...(context.platform.isWindows ? [
@@ -73,7 +73,7 @@ export class DefaultCommands
         });
         
         context.commandRegistry.registerCommand('stop', '../../Command/DockerComposeStopCommand', {
-            description: 'stops the current application (docker-compose stop)',
+            description: 'stops the current application (docker compose stop)',
             platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
@@ -85,7 +85,7 @@ export class DefaultCommands
         });
         
         context.commandRegistry.registerCommand('logs', '../../Command/DockerComposeLogsCommand', {
-            description: 'displays the tail of your app container\'s log (docker-compose logs)',
+            description: 'displays the tail of your app container\'s log (docker compose logs)',
             platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
@@ -120,12 +120,12 @@ export class DefaultCommands
         });
         
         context.commandRegistry.registerCommand('restart', '../../Command/DockerComposeRestartCommand', {
-            description: 'performs a hard restart of the current project composition (docker-compose stop && docker-compose up)',
+            description: 'performs a hard restart of the current project composition (docker compose stop && docker compose up)',
             platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('down', '../../Command/DockerComposeDownCommand', {
-            description: 'destroys the current app\'s containers and removes their images if required (docker-compose down)',
+            description: 'destroys the current app\'s containers and removes their images if required (docker compose down)',
             platforms: {windows: true, darwin: true, linux: true}
         });
         

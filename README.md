@@ -23,12 +23,12 @@ Options:
 
 Commands:
   npm|run <npmRunCommand> [otherArgs...]  works like "npm run" would, but is aware of the current app's directory structure. It also works with period prefix, like: "lab .watch"
-  up|start [options]                      starts and restarts the current project composition (docker-compose up)
-  stop [options]                          stops the current application (docker-compose stop)
-  logs [options]                          displays the tail of your app container's log (docker-compose logs)
+  up|start [options]                      starts and restarts the current project composition (docker compose up)
+  stop [options]                          stops the current application (docker compose stop)
+  logs [options]                          displays the tail of your app container's log (docker compose logs)
   shell|sh [options]                      attaches you to the shell of the current apps master container, or one of the running child containers
-  restart                                 performs a hard restart of the current project composition (docker-compose stop && docker-compose up)
-  down                                    destroys the current app's containers and removes their images if required (docker-compose down)
+  restart                                 performs a hard restart of the current project composition (docker compose stop && docker compose up)
+  down                                    destroys the current app's containers and removes their images if required (docker compose down)
   sync [options]                          runs a unison sync into your application. Useful if the volume-mount is to slow!
   open                                    opens the current apps main container in your default browser window
   stop-all                                stops >ALL< currently running container instances
@@ -48,7 +48,7 @@ possible values.
 
 ## Apps and Projects
 
-The basic concept we use for our projects is to work with "apps". Each app has it's own docker-compose file that defines the local development environment.
+The basic concept we use for our projects is to work with "apps". Each app has it's own docker compose file that defines the local development environment.
 
 Each app follows a particular convention that start's with a directory structure:
 
@@ -69,7 +69,7 @@ This is the main structure, now every app has it's own sub-structure:
 
 Those directories are used in our (currently not public - working on it) boilerplates.
 
-By default, each of those apps receives a unique IP and a domain that is mapped to the services using the docker-compose port mappings.
+By default, each of those apps receives a unique IP and a domain that is mapped to the services using the docker compose port mappings.
 
 ## Configuration
 
@@ -93,7 +93,7 @@ const config = {
         // The shell to use when attaching to a container
         shell: "bash",
         
-        // The docker-compose service key to attach to.
+        // The docker compose service key to attach to.
         // Can be used to overwrite the default container name set by the docker app
         // NOTE: This overrides "containerName"!
         serviceKey: undefined,
@@ -241,7 +241,7 @@ file changes you probably want another solution for your development.
 The ```sync``` command can be used if you deal with those projects. It utilizes unison under the hood to sync the files from your host machine into your
 container.
 
-When your project is not yet set up to work with unison, the ```sync``` command will show you the instructions on how to modify your docker-compose file.
+When your project is not yet set up to work with unison, the ```sync``` command will show you the instructions on how to modify your docker compose file.
 
 You can configure how unison works using the configuration
 
