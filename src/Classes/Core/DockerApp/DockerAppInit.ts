@@ -27,6 +27,7 @@ import {AppContext} from '../AppContext';
 import {AppEventList} from '../AppEventList';
 import {Bugfixes} from '../Bugfixes';
 import {DockerComposeServiceSelectWizard} from '../Ui/DockerComposeServiceSelectWizard';
+import {DopplerTokenInputWizard} from '../Ui/DopplerTokenInputWizard';
 import {ProjectNameInputWizard} from '../Ui/ProjectNameInputWizard';
 import {DockerApp} from './DockerApp';
 import {DockerEnv} from './DockerEnv';
@@ -171,7 +172,12 @@ export class DockerAppInit
                 return name;
             }) : () => Promise.resolve(env.get('COMPOSE_PROJECT_NAME'))
         )()
-            .then((projectName: string) => {
+            .then(async (projectName: string) => {
+                const dopplerToken = await DopplerTokenInputWizard.run('Your .env file does not contain a: "DOPPLER_TOKEN" parameter.');
+                
+                return Promise.resolve({projectName: projectName, dopplerToken: dopplerToken});
+            })
+            .then(({projectName, dopplerToken}: {projectName: string, dopplerToken: string}) => {
                 const projectShortName = projectName
                     .trim()
                     .split('-')
@@ -202,6 +208,11 @@ export class DockerAppInit
                 
                 // Set empty variables
                 setValueIfEmpty('PROJECT_ENV', 'dev');
+                
+                // Set empty doppler varriables
+                setValueIfKeyExistsAndEmpty('DOPPLER_CONFIG', 'dev');
+                setValueIfKeyExistsAndEmpty('DOPPLER_PROJECT', projectShortName);
+                setValueIfKeyExistsAndEmpty('DOPPLER_TOKEN', dopplerToken);
                 
                 // Set optional directories
                 setValueIfKeyExistsAndEmpty('APP_ROOT_DIR', this._context.rootDirectory);
