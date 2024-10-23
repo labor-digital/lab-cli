@@ -28,6 +28,7 @@ import {
     isUndefined
 } from '@labor-digital/helferlein';
 import chalk from 'chalk';
+import childProcess from 'child_process';
 import {Command} from 'commander';
 // @ts-ignore
 import requireg from 'requireg';
@@ -87,7 +88,8 @@ export class Application
             new Registry(),
             new AppRegistry(),
             new ConfigLoader(),
-            new CommandRegistry()
+            new CommandRegistry(),
+            this.getHostname()
         ));
     }
     
@@ -201,5 +203,10 @@ export class Application
     protected handleCommand(context: AppContext): Promise<AppContext>
     {
         return (new CommandHandler()).handle(context);
+    }
+    
+    protected getHostname(): string
+    {
+        return childProcess.execSync('hostname').toString('utf8').trim();
     }
 }

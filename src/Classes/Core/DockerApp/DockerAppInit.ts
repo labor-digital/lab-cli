@@ -27,7 +27,6 @@ import {AppContext} from '../AppContext';
 import {AppEventList} from '../AppEventList';
 import {Bugfixes} from '../Bugfixes';
 import {DockerComposeServiceSelectWizard} from '../Ui/DockerComposeServiceSelectWizard';
-import {DopplerTokenInputWizard} from '../Ui/DopplerTokenInputWizard';
 import {ProjectNameInputWizard} from '../Ui/ProjectNameInputWizard';
 import {DockerApp} from './DockerApp';
 import {DockerEnv} from './DockerEnv';
@@ -71,7 +70,7 @@ export class DockerAppInit
      */
     public run(): Promise<void>
     {
-        console.log('Found changes on your docker app files! Checking your setup...');
+        console.log('Found changes on your docker app files or doppler service token has expired! Checking your setup...');
         
         return Promise.resolve()
                       .then(() => this._context.emitSequentialHook(
@@ -135,7 +134,6 @@ export class DockerAppInit
      */
     protected fillEmptyValuesInEnvFile(): Promise<void>
     {
-        
         // Load the env
         const envFilePath = path.join(this._context.rootDirectory, '.env');
         const env = new DockerEnv(envFilePath);
@@ -172,12 +170,7 @@ export class DockerAppInit
                 return name;
             }) : () => Promise.resolve(env.get('COMPOSE_PROJECT_NAME'))
         )()
-            .then(async (projectName: string) => {
-                const dopplerToken = await DopplerTokenInputWizard.run('Your .env file does not contain a: "DOPPLER_TOKEN" parameter.');
-                
-                return Promise.resolve({projectName: projectName, dopplerToken: dopplerToken});
-            })
-            .then(({projectName, dopplerToken}: {projectName: string, dopplerToken: string}) => {
+            .then((projectName: string) => {
                 const projectShortName = projectName
                     .trim()
                     .split('-')
@@ -201,24 +194,31 @@ export class DockerAppInit
                 
                 // Generate domain if required
                 if (isValueEmpty('APP_DOMAIN')) {
-                    const domain = encodeURI(projectShortName).replace(/_/g, '-')
-                                   + this._context.config.get('network.domain.base');
+                    const domain =
+                        encodeURI(projectShortName).replace(/_/g, '-')
+                        + this._context.config.get('network.domain.base');
                     env.set('APP_DOMAIN', domain);
                 }
                 
                 // Set empty variables
                 setValueIfEmpty('PROJECT_ENV', 'dev');
                 
-                // Set empty doppler varriables
-                setValueIfKeyExistsAndEmpty('DOPPLER_CONFIG', 'dev');
+                // Set empty doppler variables
                 setValueIfKeyExistsAndEmpty('DOPPLER_PROJECT', projectShortName);
-                setValueIfKeyExistsAndEmpty('DOPPLER_TOKEN', dopplerToken);
+                setValueIfKeyExistsAndEmpty('DOPPLER_CONFIG', 'dev');
+                // Generate doppler token if required
+                if (
+                    isValueEmpty('DOPPLER_TOKEN') ||
+                    !this._app.doppler.checkIfValidServiceTokenExists(env.get('DOPPLER_PROJECT'), env.get('DOPPLER_CONFIG'))
+                ) {
+                    const dopplerToken = this._app.doppler.generateServiceToken(env.get('DOPPLER_PROJECT'), env.get('DOPPLER_CONFIG'));
+                    env.set('DOPPLER_TOKEN', dopplerToken);
+                }
                 
                 // Set optional directories
                 setValueIfKeyExistsAndEmpty('APP_ROOT_DIR', this._context.rootDirectory);
                 setValueIfKeyExistsAndEmpty('APP_PARENT_DIR', baseDir + path.sep);
-                setValueIfKeyExistsAndEmpty('APP_WORKING_DIR',
-                    path.join(this._context.rootDirectory, 'src') + path.sep);
+                setValueIfKeyExistsAndEmpty('APP_WORKING_DIR', path.join(this._context.rootDirectory, 'src') + path.sep);
                 setValueIfKeyExistsAndEmpty('APP_DATA_DIR', path.join(baseDir, 'data') + path.sep);
                 setValueIfKeyExistsAndEmpty('APP_LOG_DIR', path.join(baseDir, 'logs') + path.sep);
                 setValueIfKeyExistsAndEmpty('APP_IMPORT_DIR', path.join(baseDir, 'import') + path.sep);

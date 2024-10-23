@@ -61,6 +61,11 @@ export class AppContext
     private _platform: Platform;
     
     /**
+     * Local hostname as identifier
+     */
+    private _hostname: string;
+    
+    /**
      * The gathered configuration for the current context
      */
     private _config: Config;
@@ -98,10 +103,11 @@ export class AppContext
      * @param appRegistry
      * @param configLoader
      * @param commandRegistry
+     * @param hostname
      */
     public constructor(program: commander.Command, version: string, eventEmitter: EventEmitter,
         platform: Platform, fileFinder: FileFinder, registry: Registry, appRegistry: AppRegistry,
-        configLoader: ConfigLoader, commandRegistry: CommandRegistry
+        configLoader: ConfigLoader, commandRegistry: CommandRegistry, hostname: string
     )
     {
         this._version = version;
@@ -115,6 +121,7 @@ export class AppContext
         this._appRegistry = appRegistry.initialize(registry, this);
         this._fileFinder = fileFinder;
         this._commandRegistry = commandRegistry;
+        this._hostname = hostname;
     }
     
     /**
@@ -171,6 +178,14 @@ export class AppContext
     public get platform(): Platform
     {
         return this._platform;
+    }
+    
+    /**
+     * Returns the local hostname
+     */
+    public get hostname(): string
+    {
+        return this._hostname;
     }
     
     /**

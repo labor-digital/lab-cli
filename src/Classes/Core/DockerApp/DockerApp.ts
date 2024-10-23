@@ -22,6 +22,7 @@ import inquirer from 'inquirer';
 import * as path from 'path';
 import {Docker} from '../../Api/Docker';
 import {DockerCompose} from '../../Api/DockerCompose';
+import {Doppler} from '../../Api/Doppler';
 import {AppContext} from '../AppContext';
 import {Bugfixes} from '../Bugfixes';
 import {DockerAppInit} from './DockerAppInit';
@@ -52,6 +53,11 @@ export class DockerApp
     protected _api: Docker;
     
     /**
+     * The doppler api instance to perform actions
+     */
+    protected _doppler: Doppler;
+    
+    /**
      * The docker compose api instance
      */
     protected _dockerCompose: DockerCompose;
@@ -80,6 +86,7 @@ export class DockerApp
     {
         this._context = context;
         this._api = new Docker(context);
+        this._doppler = new Doppler(context);
         this._dockerCompose = new DockerCompose(this);
     }
     
@@ -165,6 +172,14 @@ export class DockerApp
     }
     
     /**
+     * Returns the instance of the doppler api
+     */
+    public get doppler(): Doppler
+    {
+        return this._doppler;
+    }
+    
+    /**
      * Returns the context instance for this app
      */
     public get context(): AppContext
@@ -246,8 +261,7 @@ export class DockerApp
         
         // Check if we have docker files
         if (!this.hasDockerFiles()) {
-            return Promise.reject(new Error('There are no docker compose files in the directory: "' +
-                                            this._context.rootDirectory + '\!'));
+            return Promise.reject(new Error('There are no docker compose files in the directory: "' + this._context.rootDirectory + '\!'));
         }
         
         // Check if docker is running
@@ -255,26 +269,40 @@ export class DockerApp
             return Promise.reject(new Error('It seems like docker is currently not installed on your system!'));
         }
         
-        // Check if docker is running
-        return this.startDockerIfRequired().then(() => {
-            
-            // Check if we have a config
-            const config = this._context.appRegistry.get('dockerApp', {});
-            if (isEmpty(config)) {
-                return this.runInit();
-            }
-            
-            // Check if we have a change in the docker files
-            if (config.hash !== this.calculateDockerFileHash()) {
-                return this.runInit();
-            }
-            
-            // Initialize the env
-            this._env = new DockerEnv(path.join(this._context.rootDirectory, '.env'));
-            
-            // Nothing to do
-            return Promise.resolve(this);
-        });
+        // Check if doppler is installed
+        if (!this._doppler.isInstalled()) {
+            return Promise.reject(new Error('It seems like doppler is currently not installed on your system!'));
+        }
+        
+        return this
+            // Check if docker is running and start it if necessary
+            .startDockerIfRequired()
+            .then(() => {
+                return this.loginToDopplerIfRequired();
+            })
+            .then(() => {
+                // Check if we have a config
+                const config = this._context.appRegistry.get('dockerApp', {});
+                if (isEmpty(config)) {
+                    return this.runInit();
+                }
+                
+                // Check if we have a change in the docker files
+                if (config.hash !== this.calculateDockerFileHash()) {
+                    return this.runInit();
+                }
+                
+                // Initialize the env
+                this._env = new DockerEnv(path.join(this._context.rootDirectory, '.env'));
+                
+                // Check if there still is a valid service token in doppler
+                if (!this.doppler.checkIfValidServiceTokenExists(this._env.get('DOPPLER_PROJECT'), this._env.get('DOPPLER_CONFIG'))) {
+                    return this.runInit();
+                }
+                
+                // Nothing to do
+                return Promise.resolve(this);
+            });
         
     }
     
@@ -326,6 +354,31 @@ export class DockerApp
             }
             console.log('Starting docker engine...');
             return this._api.startEngine();
+        });
+    }
+    
+    /**
+     * Checks if doppler is loggedIn.
+     * If not it will ask the user if he now wants to login
+     */
+    protected async loginToDopplerIfRequired(): Promise<void>
+    {
+        if (this._doppler.isLoggedIn) {
+            return Promise.resolve();
+        }
+        
+        // Ask user
+        return inquirer.prompt({
+            name: 'loginDoppler',
+            type: 'confirm',
+            message: 'You´re not logged into doppler. Should I log you in?'
+        }).then(answers => {
+            Bugfixes.inquirerChildProcessReadLineFix();
+            if (!answers.loginDoppler) {
+                return Promise.reject(new Error('Sorry, this can\'t be done without logging into doppler!'));
+            }
+            console.log('Starting doppler login...');
+            return this._doppler.login() ? Promise.resolve() : Promise.reject(new Error('Sorry, something went wrong while logging you into doppler!'));
         });
     }
     
