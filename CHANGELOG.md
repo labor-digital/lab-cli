@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.14.0](https://github.com/labor-digital/lab-cli/compare/v3.13.0...v3.14.0) (2024-10-23)
+
+
+### Features
+
+* the lab-cli will now pre-fill DOPPLER_CONFIG, DOPPLER_PROJECT correctly and will also pull DOPPLER_TOKEN from doppler cli automatically ([ae2c213](https://github.com/labor-digital/lab-cli/commit/ae2c213161c58c9b9015128835e843cbceca411d))
+
 ## [3.13.0](https://github.com/labor-digital/lab-cli/compare/v3.12.1...v3.13.0) (2024-10-22)
 
 
