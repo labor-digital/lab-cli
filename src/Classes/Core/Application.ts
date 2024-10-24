@@ -42,6 +42,7 @@ import {DefaultCommands} from './Command/DefaultCommands';
 import {ConfigLoader} from './Configuration/ConfigLoader';
 import {FileFinder} from './FileFinder';
 import {Registry} from './Registry';
+import {UserError} from './Error/UserError';
 
 export class Application
 {
@@ -62,7 +63,7 @@ export class Application
                    .then(c => this.handleCommand(c))
                    .then(() => process.exit())
                    .catch(err => {
-                       if (isObject(err) && !isUndefined(err.stack)) {
+                       if (isObject(err) && !isUndefined(err.stack) && !(err instanceof UserError)) {
                            err = err.stack;
                        }
                        console.error('');

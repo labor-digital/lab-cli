@@ -25,6 +25,7 @@ import {DockerCompose} from '../../Api/DockerCompose';
 import {Doppler} from '../../Api/Doppler';
 import {AppContext} from '../AppContext';
 import {Bugfixes} from '../Bugfixes';
+import {UserError} from '../Error/UserError';
 import {DockerAppInit} from './DockerAppInit';
 import {DockerEnv} from './DockerEnv';
 
@@ -296,7 +297,10 @@ export class DockerApp
                 this._env = new DockerEnv(path.join(this._context.rootDirectory, '.env'));
                 
                 // Check if there still is a valid service token in doppler
-                if (!this.doppler.checkIfValidServiceTokenExists(this._env.get('DOPPLER_PROJECT'), this._env.get('DOPPLER_CONFIG'))) {
+                if (
+                    this._env.has('DOPPLER_PROJECT') && this._env.has('DOPPLER_CONFIG') &&
+                    !this.doppler.checkIfValidServiceTokenExists(this._env.get('DOPPLER_PROJECT'), this._env.get('DOPPLER_CONFIG'))
+                ) {
                     return this.runInit();
                 }
                 
@@ -350,7 +354,7 @@ export class DockerApp
             Bugfixes.inquirerChildProcessReadLineFix();
             if (!answers.startDocker) {
                 return Promise.reject(
-                    new Error('Sorry, this can\'t be done without docker running!'));
+                    new UserError('Sorry, this can\'t be done without docker running!'));
             }
             console.log('Starting docker engine...');
             return this._api.startEngine();
@@ -361,7 +365,7 @@ export class DockerApp
      * Checks if doppler is loggedIn.
      * If not it will ask the user if he now wants to login
      */
-    protected async loginToDopplerIfRequired(): Promise<void>
+    protected async loginToDopplerIfRequired(reloginDueToTimeout: boolean = false): Promise<void>
     {
         if (this._doppler.isLoggedIn) {
             return Promise.resolve();
@@ -371,14 +375,25 @@ export class DockerApp
         return inquirer.prompt({
             name: 'loginDoppler',
             type: 'confirm',
-            message: 'You´re not logged into doppler. Should I log you in?'
+            message: reloginDueToTimeout ?
+                'Looks like your login timed out. This could happen if you had to log into doppler in your browser. Should we just restart the login attempt here?' :
+                'You´re not logged into doppler. Should I log you in?',
         }).then(answers => {
             Bugfixes.inquirerChildProcessReadLineFix();
             if (!answers.loginDoppler) {
-                return Promise.reject(new Error('Sorry, this can\'t be done without logging into doppler!'));
+                return Promise.reject(new UserError('Sorry, this can\'t be done without logging into doppler!'));
             }
-            console.log('Starting doppler login...');
-            return this._doppler.login() ? Promise.resolve() : Promise.reject(new Error('Sorry, something went wrong while logging you into doppler!'));
+            
+            const loginCode = this._doppler.login(15);
+            switch (loginCode) {
+                case -1:
+                    return this.loginToDopplerIfRequired(true);
+                case 1:
+                    return Promise.resolve();
+                default:
+                case 0:
+                    return Promise.reject(new Error('Sorry, something went wrong while logging you into doppler!'));
+            }
         });
     }
     

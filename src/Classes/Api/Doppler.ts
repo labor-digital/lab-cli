@@ -66,7 +66,7 @@ export class Doppler
         if (this._isInstalled === true) {
             return true;
         }
-        const executableMarker: string = this._context.platform.choose({windows: 'doppler.exe', linux: '/git'});
+        const executableMarker: string = this._context.platform.choose({windows: 'doppler.exe', linux: '/doppler'});
         if (this.getLocation().indexOf(executableMarker) !== -1) {
             return this._isInstalled = true;
         }
@@ -81,7 +81,7 @@ export class Doppler
         try {
             // Check if email is configured
             const test = childProcess
-                .execSync('doppler projects')
+                .execSync('doppler projects', {stdio: 'pipe'})
                 .toString('utf8').trim();
             
             return test !== "Doppler Error: you must provide a token";
@@ -92,11 +92,22 @@ export class Doppler
     
     /**
      * Login the user into doppler
+     *
+     * @arg timeout Timeout in seconds to keep the doppler login alive
+     *
+     * @return number Returns 1 if successfully logged in, 0 if not and -1 if a timeout did occur
      */
-    public login(): boolean
+    public login(timeout: number): number
     {
-        childProcess.execSync('doppler login --scope "/" --overwrite --yes');
-        return this.isLoggedIn;
+        try {
+            childProcess
+                .execSync('doppler login --scope "/" --overwrite --yes', {timeout: timeout*1000});
+        } catch (e) {
+            if (e.code && e.code === "ETIMEDOUT") {
+                return -1;
+            }
+        }
+        return this.isLoggedIn ? 1 : 0;
     }
     
     public checkIfValidServiceTokenExists(dopplerProject: string, dopplerConfig: string): boolean
@@ -127,8 +138,7 @@ export class Doppler
     {
         const tokens = JSON.parse(
             childProcess
-                .execSync('doppler configs tokens -p "' + dopplerProject + '" -c "' + dopplerConfig + '" --json',
-                    {stdio: 'pipe'})
+                .execSync('doppler configs tokens -p "' + dopplerProject + '" -c "' + dopplerConfig + '" --json', {stdio: 'pipe'})
                 .toString('utf8')
                 .trim()
         );

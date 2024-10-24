@@ -146,6 +146,16 @@ export class DockerAppInit
                    env.get(key).trim().charAt(0) === '§';
         }
         
+        function hasKey(key: string): boolean
+        {
+            return env.has(key);
+        }
+        
+        function hasKeyAndIsValueEmpty(key: string): boolean
+        {
+            return hasKey(key) && isValueEmpty(key);
+        }
+        
         function setValueIfEmpty(key: string, value: string)
         {
             if (isValueEmpty(key)) {
@@ -155,7 +165,7 @@ export class DockerAppInit
         
         function setValueIfKeyExistsAndEmpty(key: string, value: string)
         {
-            if (env.has(key) && isValueEmpty(key)) {
+            if (hasKeyAndIsValueEmpty(key)) {
                 env.set(key, value);
             }
         }
@@ -208,8 +218,10 @@ export class DockerAppInit
                 setValueIfKeyExistsAndEmpty('DOPPLER_CONFIG', 'dev');
                 // Generate doppler token if required
                 if (
-                    isValueEmpty('DOPPLER_TOKEN') ||
-                    !this._app.doppler.checkIfValidServiceTokenExists(env.get('DOPPLER_PROJECT'), env.get('DOPPLER_CONFIG'))
+                    hasKey('DOPPLER_TOKEN') && (
+                        isValueEmpty('DOPPLER_TOKEN') ||
+                        !this._app.doppler.checkIfValidServiceTokenExists(env.get('DOPPLER_PROJECT'), env.get('DOPPLER_CONFIG'))
+                    )
                 ) {
                     const dopplerToken = this._app.doppler.generateServiceToken(env.get('DOPPLER_PROJECT'), env.get('DOPPLER_CONFIG'));
                     env.set('DOPPLER_TOKEN', dopplerToken);
