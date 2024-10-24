@@ -123,7 +123,7 @@ export class Doppler
         this._revokeServiceTokensIfRquired(dopplerProject, dopplerConfig);
         
         const serviceToken = childProcess
-            .execSync('doppler configs tokens create "' + (this._context.hostname + '.dev') + '" -p "' + dopplerProject + '" -c "' + dopplerConfig + '" --plain --max-age 1m')
+            .execSync('doppler configs tokens create "' + (this._context.hostname + '.dev') + '" -p "' + dopplerProject + '" -c "' + dopplerConfig + '" --plain --max-age 96h')
             .toString('utf8')
             .trim();
         
