@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.15.0](https://github.com/labor-digital/lab-cli/compare/v3.14.2...v3.15.0) (2024-11-29)
+
+
+### Features
+
+* refactoring the hostname-retrieval and adding the DEFAULT_OWNER env var to the .env.app from the system ([23ed3bb](https://github.com/labor-digital/lab-cli/commit/23ed3bbc26b6910a9e130388a48ade43135d8e44))
+
+
+### Bug Fixes
+
+* adding nvmrc and updating some packages ([52b194b](https://github.com/labor-digital/lab-cli/commit/52b194bba06514bee3366109f4745b84a2370b26))
+
 ### [3.14.2](https://github.com/labor-digital/lab-cli/compare/v3.14.1...v3.14.2) (2024-10-24)
 
 
