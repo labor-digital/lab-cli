@@ -15,6 +15,7 @@
  *
  * Last modified: 2020.04.03 at 20:08
  */
+import childProcess from 'child_process';
 import * as os from 'os';
 import * as path from 'path';
 import {CommandPlatformDefinition} from '../Core/Command/CommandRegistry';
@@ -134,4 +135,24 @@ export class Platform
     {
         return os.arch() === 'x64';
     }
+    
+    /**
+     * Returns the machines hostname
+     * We do need this if we want to identify the running machine in some API-context (like doppler)
+     */
+    public hostname(): string
+    {
+        return os.hostname();
+    }
+    
+    public defaultFileOwner(): string|null
+    {
+        let defaultFileOwner = childProcess.execSync("echo $LAB_CLI_DEFAULT_OWNER").toString('utf8').trim();
+        if (!defaultFileOwner) {
+            return null;
+        }
+        
+        return defaultFileOwner;
+    }
+    
 }

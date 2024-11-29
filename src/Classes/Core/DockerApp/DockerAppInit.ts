@@ -81,6 +81,7 @@ export class DockerAppInit
                       .then(() => this._context.emitSequentialHook(
                           AppEventList.DOCKER_APP_AFTER_ENV_FILE_CHECK, {app: this._app}))
                       .then(() => this.fillEmptyValuesInEnvFile())
+                      .then(() => this.fillEmptyValuesInEnvAppFile())
                       .then(() => this.generateEnvTemplateFile('.env'))
                       .then(() => this.generateEnvTemplateFile('.env.app'))
                       .then(() => this._context.emitSequentialHook(
@@ -126,6 +127,38 @@ export class DockerAppInit
             return Promise.resolve();
         }
         fs.writeFileSync(envFilePath, '');
+        return Promise.resolve();
+    }
+    
+    /**
+     * Parses the .env.app file of the docker app and fills empty values with automatically generated defaults
+     */
+    protected fillEmptyValuesInEnvAppFile(): Promise<void>
+    {
+        // Load the env
+        const envFilePath = path.join(this._context.rootDirectory, '.env.app');
+        const env = new DockerEnv(envFilePath);
+        
+        const defaultFileOwner = this._context.platform.defaultFileOwner();
+        if (defaultFileOwner === null) {
+            return Promise.resolve();
+        }
+        
+        function isValueEmpty(key: string): boolean
+        {
+            return !env.has(key) || !isString(env.get(key)) ||
+                   env.get(key).trim() === 'null' ||
+                   env.get(key).trim().charAt(0) === '§';
+        }
+        
+        function setValueIfEmpty(key: string, value: string)
+        {
+            if (isValueEmpty(key)) {
+                env.set(key, value);
+            }
+        }
+        
+        setValueIfEmpty('DEFAULT_OWNER', defaultFileOwner);
         return Promise.resolve();
     }
     

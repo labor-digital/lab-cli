@@ -113,7 +113,7 @@ export class Doppler
     public checkIfValidServiceTokenExists(dopplerProject: string, dopplerConfig: string): boolean
     {
         const ownTokens = this._getServiceTokens(dopplerProject, dopplerConfig)
-            .filter(token => token.name === (this._context.hostname + ".dev"));
+            .filter(token => token.name === (this._context.platform.hostname() + ".dev"));
         
         return ownTokens !== null && ownTokens.length > 0;
     }
@@ -123,7 +123,7 @@ export class Doppler
         this._revokeServiceTokensIfRquired(dopplerProject, dopplerConfig);
         
         const serviceToken = childProcess
-            .execSync('doppler configs tokens create "' + (this._context.hostname + '.dev') + '" -p "' + dopplerProject + '" -c "' + dopplerConfig + '" --plain --max-age 96h')
+            .execSync('doppler configs tokens create "' + (this._context.platform.hostname() + '.dev') + '" -p "' + dopplerProject + '" -c "' + dopplerConfig + '" --plain --max-age 96h')
             .toString('utf8')
             .trim();
         
@@ -152,7 +152,7 @@ export class Doppler
     protected _revokeServiceTokensIfRquired(dopplerProject: string, dopplerConfig: string)
     {
         this._getServiceTokens(dopplerProject, dopplerConfig)
-            .filter(token => token.name === (this._context.hostname + ".dev"))
+            .filter(token => token.name === (this._context.platform.hostname() + ".dev"))
             .map(token => {
                 childProcess
                     .execSync('doppler configs tokens revoke "' + token.slug + '" -p "' + dopplerProject + '" -c "' + dopplerConfig + '"', {stdio: 'pipe'});
