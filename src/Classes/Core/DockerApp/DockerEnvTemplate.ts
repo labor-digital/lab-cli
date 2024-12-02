@@ -32,10 +32,6 @@ export class DockerEnvTemplate extends DockerEnv
         keepValuesFor.push('LAB_CLI_KEEP');
         const cleaned: Map<string, string> = new Map();
         forEach(env.getAll(), (v: string, k: string) => {
-            if (k == "DEFAULT_OWNER") {
-                return;
-            }
-            
             if (keepValuesFor.indexOf(k) === -1) {
                 v = '';
             }
@@ -44,7 +40,7 @@ export class DockerEnvTemplate extends DockerEnv
         });
         this._tpl = env.tpl;
         this._env = cleaned;
-        this.write();
+        this.write(true);
     }
     
     /**

@@ -150,19 +150,27 @@ export class DockerEnv
     /**
      * Writes the current env data to the disc
      */
-    protected write(): void
+    protected write(removeDefaultOwner:boolean = false): void
     {
         // Build the content based on the template and the current storage
         const keys: Array<string> = getListKeys(this._env) as any;
         let contents = this._tpl.replace(/{{pair}}/g, () => {
             const key = keys.shift();
             const value = this._env.get(key);
-            return key + '=' + value;
-        });
+            
+            if (!removeDefaultOwner || key !== 'DEFAULT_OWNER') {
+                return key + '=' + value;
+            }
+            
+            return '_DELETE_';
+        }).replace('_DELETE_\n', '').replace('\n_DELETE_', '');
+        
         if (keys.length > 0) {
             forEach(keys, (key: string) => {
                 const value = this._env.get(key);
-                contents += '\n' + key + '=' + value;
+                if (!removeDefaultOwner || key !== 'DEFAULT_OWNER') {
+                    contents += '\n' + key + '=' + value;
+                }
             });
         }
         
