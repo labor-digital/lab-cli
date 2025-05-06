@@ -204,6 +204,18 @@ export class DefaultCommands
             platforms: {windows: true, darwin: true, linux: true}
         });
         
+        context.commandRegistry.registerCommand('test', '../../Command/ProjectTestCommand', {
+            description: 'triggers the test process using the LABOR jest-puppeteer container',
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-u, --update',
+                    description: 'will call the "test-update" command instead of the "test" command (normally this will update all reference snapshots)',
+                    default: false
+                }
+            ]
+        });
+        
         return Promise.resolve(context);
     }
 }

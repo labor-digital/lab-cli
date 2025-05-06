@@ -116,6 +116,20 @@ export class DockerCompose
         return services;
     }
     
+    public test(forceUpdate?: boolean)
+    {
+        return new Promise<void>((resolve, reject) => {
+            console.log('Starting the test container...');
+            const command = this.baseDockerComposeCommand + 'run test npm run ' + (forceUpdate ? "test-update" : "test");
+            try {
+                childProcess.execSync(command, {stdio: 'inherit'});
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+    
     /**
      * Performs the "up" command for the current app
      *
