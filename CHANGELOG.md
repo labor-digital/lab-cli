@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.16.0](https://github.com/labor-digital/lab-cli/compare/v3.15.1...v3.16.0) (2025-05-06)
+
+
+### Features
+
+* adding a new test command to run our test container ([d4abe06](https://github.com/labor-digital/lab-cli/commit/d4abe06458b28c6d7267d1f880b1e0753c938b8f))
+
 ### [3.15.1](https://github.com/labor-digital/lab-cli/compare/v3.15.0...v3.15.1) (2024-12-02)
 
 
