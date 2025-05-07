@@ -120,7 +120,7 @@ export class DockerCompose
     {
         return new Promise<void>((resolve, reject) => {
             console.log('Starting the test container...');
-            const command = this.baseDockerComposeCommand + 'run test npm run ' + (forceUpdate ? "test-update" : "test");
+            const command = this.baseDockerComposeCommand + 'run --rm test npm run ' + (forceUpdate ? "test-update" : "test");
             try {
                 childProcess.execSync(command, {stdio: 'inherit'});
                 resolve();
