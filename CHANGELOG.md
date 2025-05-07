@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.16.1](https://github.com/labor-digital/lab-cli/compare/v3.16.0...v3.16.1) (2025-05-07)
+
+
+### Bug Fixes
+
+* we need to make sure to remove the orphan containers upon our new test call ([161ed2c](https://github.com/labor-digital/lab-cli/commit/161ed2c623a42e8c6dd22db106f23d9d91df49a2))
+
 ## [3.16.0](https://github.com/labor-digital/lab-cli/compare/v3.15.1...v3.16.0) (2025-05-06)
 
 
