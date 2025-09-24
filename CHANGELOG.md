@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.16.2](https://github.com/labor-digital/lab-cli/compare/v3.16.1...v3.16.2) (2025-09-24)
+
+
+### Bug Fixes
+
+* adding some more logic to the test command to make things a bit easier ([f9fe602](https://github.com/labor-digital/lab-cli/commit/f9fe60251b3576a6529cde7788544568cb75b3fa))
+
 ### [3.16.1](https://github.com/labor-digital/lab-cli/compare/v3.16.0...v3.16.1) (2025-05-07)
 
 
