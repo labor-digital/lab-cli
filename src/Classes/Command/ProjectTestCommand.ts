@@ -19,8 +19,10 @@
 import {forEach} from '@labor-digital/helferlein';
 import {Command} from 'commander';
 import fs from 'fs';
+import inquirer from 'inquirer';
 import path from 'path';
 import {AppContext} from '../Core/AppContext';
+import {Bugfixes} from '../Core/Bugfixes';
 import {CommandStack} from '../Core/Command/CommandStack';
 import {DockerApp} from '../Core/DockerApp/DockerApp';
 
@@ -46,7 +48,53 @@ export class ProjectImportCommand
                     'It seems like your composition is not running. Please make sure to start your composition via "lab up" first.'));
             }
             
-            return app.dockerCompose.test(cmd.update === true);
+            return this.askForConsent(context).then(execute => {
+                if (!execute) {
+                    return Promise.resolve();
+                }
+                
+                return app.dockerCompose.stop()
+                    .then(() => {
+                        console.log("Writing env var PROJECT_DEV_TEST and restart the project...");
+                        app.env.set('PROJECT_DEV_TEST', 'yes');
+                        return app.dockerCompose.up();
+                    })
+                    .then(() => {
+                        console.log("Waiting after the restart for all containers to be ready...");
+                        return new Promise(resolve => setTimeout(resolve, 10000));
+                    })
+                    .then(() => {
+                        return app.dockerCompose.test(cmd.update === true);
+                    })
+                    .then(() => {
+                        return app.dockerCompose.stop();
+                    })
+                    .then(() => {
+                        console.log("Removing env var PROJECT_DEV_TEST again and restart the project...");
+                        app.env.set('PROJECT_DEV_TEST', 'no');
+                        return app.dockerCompose.up();
+                    });
+            });
+        });
+    }
+    
+    /**
+     * Asks the user for consent to stop all containers
+     */
+    protected askForConsent(context: AppContext): Promise<boolean>
+    {
+        return new Promise((resolve) => {
+            inquirer.prompt({
+                name: 'ok',
+                type: 'confirm',
+                message: "Do you have everything in place to run the tests (Assets built, ...)? This will restart the current project. Do you want to proceed?"
+            }).then((answers) => {
+                Bugfixes.inquirerChildProcessReadLineFix();
+                if (!answers.ok) {
+                    return resolve(false);
+                }
+                resolve(true);
+            });
         });
     }
     

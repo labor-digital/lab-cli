@@ -158,11 +158,15 @@ export class DockerEnv
             const key = keys.shift();
             const value = this._env.get(key);
             
-            if (!removeDefaultOwner || key !== 'DEFAULT_OWNER') {
-                return key + '=' + value;
+            if (removeDefaultOwner && key === 'DEFAULT_OWNER') {
+                return '_DELETE_';
             }
             
-            return '_DELETE_';
+            if (key === 'PROJECT_DEV_TEST' && value === 'no') {
+                return '_DELETE_';
+            }
+            
+            return key + '=' + value;
         }).replace('_DELETE_\n', '').replace('\n_DELETE_', '');
         
         if (keys.length > 0) {
