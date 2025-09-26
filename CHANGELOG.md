@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.16.3](https://github.com/labor-digital/lab-cli/compare/v3.16.2...v3.16.3) (2025-09-26)
+
+
+### Bug Fixes
+
+* removing the wait timeout in the test command as we expect that the project owner will do that with healthchecks in the docker-compose file ([549f957](https://github.com/labor-digital/lab-cli/commit/549f957d9910cb3b9929d317e10556313d03f221))
+
 ### [3.16.2](https://github.com/labor-digital/lab-cli/compare/v3.16.1...v3.16.2) (2025-09-24)
 
 
