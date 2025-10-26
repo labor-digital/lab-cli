@@ -165,6 +165,18 @@ export class DockerApp
     }
     
     /**
+     * Returns the path to the test directory
+     */
+    public get testDirectory(): string
+    {
+        let testDir = this.env.get('APP_ROOT_DIR');
+        if (isString(testDir)) {
+            return path.join(testDir, 'tests');
+        }
+        return path.join(this._context.rootDirectory, 'app', 'tests');
+    }
+    
+    /**
      * Returns the instance of the docker api
      */
     public get docker(): Docker

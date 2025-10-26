@@ -17,9 +17,11 @@
  */
 
 import {forEach} from '@labor-digital/helferlein';
-import {Command} from 'commander';
+import childProcess from 'child_process';
+import {command, Command} from 'commander';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
+import * as child_process from 'node:child_process';
 import * as path from 'path';
 import {AppContext} from '../Core/AppContext';
 import {Bugfixes} from '../Core/Bugfixes';
@@ -49,17 +51,73 @@ export abstract class AbstractImportExportCommand
             }
             
             // Perform the import if the user consented
-            return this.askForConsent(context).then(execute => {
-                if (!execute) {
+            return this
+                .askForConsent(context)
+                .then(execute => {
+                    if (!execute) {
+                        return Promise.reject();
+                    }
+                    
                     return Promise.resolve();
-                }
-                if (!fs.existsSync(app.importExportDirectory)) {
-                    fs.mkdirSync(app.importExportDirectory);
-                }
-                fs.writeFileSync(path.join(app.importExportDirectory, this._actionFileName), '');
-                stack.push(['up']);
-                return;
-            });
+                })
+                .then(() => {
+                    return app.dockerCompose.stop();
+                })
+                .then(() => {
+                    if (cmd.copyFromTest !== true) {
+                        return Promise.resolve();
+                    }
+                    
+                    console.log('Copying the test-data directory to the import directory...');
+                    
+                    if (fs.existsSync(app.importExportDirectory)) {
+                        childProcess.execSync('rm -rf ' + path.join(app.importExportDirectory, '*'));
+                    }
+                    
+                    if (!fs.existsSync(app.importExportDirectory)) {
+                        fs.mkdirSync(app.importExportDirectory);
+                    }
+                    
+                    fs.cpSync(path.join(app.testDirectory, 'test-data'), app.importExportDirectory, {recursive: true});
+                    
+                    return Promise.resolve();
+                })
+                .then(() => {
+                    if (!fs.existsSync(app.importExportDirectory)) {
+                        fs.mkdirSync(app.importExportDirectory);
+                    }
+                    
+                    return Promise.resolve();
+                })
+                .then(() => {
+                    fs.writeFileSync(path.join(app.importExportDirectory, this._actionFileName), '');
+                    
+                    return Promise.resolve();
+                })
+                .then(() => {
+                    return app.dockerCompose.up();
+                })
+                .then(() => {
+                    if (cmd.copyToTest !== true) {
+                        return Promise.resolve();
+                    }
+                    
+                    console.log('Copying the exported files to the test-data directory...');
+                    
+                    if (fs.existsSync(path.join(app.testDirectory, 'test-data'))) {
+                        childProcess.execSync('rm -rf ' + path.join(app.testDirectory, 'test-data', '*'));
+                    }
+                    
+                    if (!fs.existsSync(path.join(app.testDirectory, 'test-data'))) {
+                        fs.mkdirSync(path.join(app.testDirectory, 'test-data'));
+                    }
+                    
+                    fs.cpSync(app.importExportDirectory, path.join(app.testDirectory, 'test-data'), {recursive: true});
+                    fs.writeFileSync(path.join(app.testDirectory, 'test-data', 'do_import'), '');
+                    
+                    return Promise.resolve();
+                })
+                .catch(() => {});
         });
     }
     

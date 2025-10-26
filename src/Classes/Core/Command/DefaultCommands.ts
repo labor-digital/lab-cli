@@ -186,12 +186,26 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('import', '../../Command/ProjectImportCommand', {
             description: 'triggers the import process using the LABOR import/export container',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-ct, --copyFromTest',
+                    description: 'will copy import data from the test-data directory (if it exists) first before importing (Caution: This will overwrite existing files!)',
+                    default: false
+                }
+            ]
         });
         
         context.commandRegistry.registerCommand('export', '../../Command/ProjectExportCommand', {
             description: 'triggers the export process using the LABOR import/export container',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-ct, --copyToTest',
+                    description: 'will copy the exported files to the test-data directory if it exists (Caution: This will overwrite existing files!)',
+                    default: false
+                }
+            ]
         });
         
         context.commandRegistry.registerCommand('init', '../../Command/ProjectInitCommand', {
