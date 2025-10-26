@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.16.4](https://github.com/labor-digital/lab-cli/compare/v3.16.3...v3.16.4) (2025-10-26)
+
+
+### Bug Fixes
+
+* adding a new option for import/export to directly import/export from/to test-data directory ([2e359b6](https://github.com/labor-digital/lab-cli/commit/2e359b66b6137d583412454c4d17f2388e7a7e26))
+
 ### [3.16.3](https://github.com/labor-digital/lab-cli/compare/v3.16.2...v3.16.3) (2025-09-26)
 
 
