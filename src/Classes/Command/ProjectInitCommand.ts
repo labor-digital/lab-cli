@@ -51,6 +51,7 @@ export class ProjectInitCommand
         let target = context.cwd.replace(/[\\\/]+$/, '');
         let checkoutTarget = target;
         let projectName: string | null = null;
+        let projectShortName: string | null = null;
         let boilerplate: BoilerplateDefinition | null = null;
         
         // Check if the directory is empty
@@ -93,6 +94,12 @@ export class ProjectInitCommand
                                                  'Define the name of the project based on the following options:', context)
                                              .then(name => {
                                                  projectName = name;
+                                                 projectShortName = projectName
+                                                     .trim()
+                                                     .split('-')
+                                                     .map(v => v.replace(/_/, '').trim().substr(0, 3))
+                                                     .join('_')
+                                                     .toLowerCase();
                                              });
             })
             // Clone the repository
@@ -180,6 +187,7 @@ export class ProjectInitCommand
                 function replaceProjectNameIn(filename: string)
                 {
                     replacePlaceholderIn(filename, /§PROJECT_NAME§|{{PROJECT_NAME}}/g, projectName + '');
+                    replacePlaceholderIn(filename, /§PROJECT_SHORT_NAME§|{{PROJECT_SHORT_NAME}}/g, projectShortName + '');
                 }
                 
                 // Check if we have stuff to replace
