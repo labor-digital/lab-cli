@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.16.5](https://github.com/labor-digital/lab-cli/compare/v3.16.4...v3.16.5) (2025-11-18)
+
+
+### Bug Fixes
+
+* adding the option to also replace the short project name, when starting a new project from boilerplate ([5b7efe0](https://github.com/labor-digital/lab-cli/commit/5b7efe0ca2123993f32817e6639e798eb76e89d2))
+
 ### [3.16.4](https://github.com/labor-digital/lab-cli/compare/v3.16.3...v3.16.4) (2025-10-26)
 
 
