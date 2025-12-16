@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.16.6](https://github.com/labor-digital/lab-cli/compare/v3.16.5...v3.16.6) (2025-12-16)
+
+
+### Bug Fixes
+
+* making sure that failing tests will not break the ProjectTestCommand flow ([47950d5](https://github.com/labor-digital/lab-cli/commit/47950d55a3ad5e46930add358b59231147d69ada))
+
 ### [3.16.5](https://github.com/labor-digital/lab-cli/compare/v3.16.4...v3.16.5) (2025-11-18)
 
 
