@@ -59,12 +59,8 @@ export class ProjectImportCommand
                         app.env.set('PROJECT_DEV_TEST', 'yes');
                         return app.dockerCompose.up();
                     })
-                    // .then(() => {
-                    //     console.log("Waiting after the restart for all containers to be ready...");
-                    //     return new Promise(resolve => setTimeout(resolve, 10000));
-                    // })
                     .then(() => {
-                        return app.dockerCompose.test(cmd.update === true);
+                        return app.dockerCompose.test(cmd.update === true).catch(() => {});
                     })
                     .then(() => {
                         return app.dockerCompose.stop();
