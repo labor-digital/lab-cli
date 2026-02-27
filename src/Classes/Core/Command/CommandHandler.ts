@@ -16,11 +16,13 @@
  * Last modified: 2020.04.05 at 14:00
  */
 
-import {forEach, getListKeys, isEmpty, isFunction} from '@labor-digital/helferlein';
+import {isArray, isEmpty, isFunction} from 'radashi';
+
 import chalk from 'chalk';
 import {Command} from 'commander';
 import {AppContext} from '../AppContext';
 import {AppEventList} from '../AppEventList';
+import {forEach} from '../Utils/ForEachHelper';
 import {CommandDefinition, CommandOptionDefinition} from './CommandRegistry';
 import {CommandStack} from './CommandStack';
 
@@ -88,7 +90,6 @@ export class CommandHandler
     {
         // Iterate all commands
         forEach(context.commandRegistry.getCommands(context), (command: CommandDefinition) => {
-            
             // Register the basic command information
             const c = context.program.command(command.signature);
             c.description(command.options.description);
@@ -107,7 +108,7 @@ export class CommandHandler
             // Register the command action
             c.action((cmd: Command, ...args) => {
                 this._commandWasExecuted = true;
-                this.handleCommandAction(cmd, args, context, command, resolve, reject);
+                this.handleCommandAction(args[0], args, context, command, resolve, reject);
             });
             
         });
@@ -139,8 +140,8 @@ export class CommandHandler
                     let handler = require(command.filename);
                     if (isFunction(handler.default)) {
                         handler = handler.default;
-                    } else if (getListKeys(handler).length === 1) {
-                        handler = handler[getListKeys(handler)[0] as any];
+                    } else if (Object.keys(handler).length === 1) {
+                        handler = handler[Object.keys(handler)[0] as any];
                     } else {
                         return reject1(new Error('Invalid command handler class for command: ' + command.signature));
                     }

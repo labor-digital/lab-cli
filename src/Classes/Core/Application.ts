@@ -1,3 +1,4 @@
+import {forEach} from './Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,17 +17,9 @@
  * Last modified: 2020.04.03 at 18:57
  */
 
-import {
-    EventBus,
-    forEach,
-    isArray,
-    isEmpty,
-    isFunction,
-    isObject,
-    isPlainObject,
-    isString,
-    isUndefined
-} from '@labor-digital/helferlein';
+import {EventEmitter} from './EventEmitter';
+import { isArray, isEmpty, isFunction, isObject as isPlainObject, isString } from 'radashi';
+
 import chalk from 'chalk';
 import {Command} from 'commander';
 // @ts-ignore
@@ -62,7 +55,7 @@ export class Application
                    .then(c => this.handleCommand(c))
                    .then(() => process.exit())
                    .catch(err => {
-                       if (isObject(err) && !isUndefined(err.stack) && !(err instanceof UserError)) {
+                       if (typeof err === 'object' && err !== null && !(err.stack === undefined) && !(err instanceof UserError)) {
                            err = err.stack;
                        }
                        console.error('');
@@ -82,7 +75,7 @@ export class Application
         return Promise.resolve(new AppContext(
             new Command(),
             require('../../../package.json').version,
-            EventBus.getEmitter(),
+            new EventEmitter(),
             new Platform(),
             new FileFinder(),
             new Registry(),
@@ -140,7 +133,7 @@ export class Application
             }
             
             // Gather the required extensions
-            context.eventEmitter.unbindAll(AppEventList.EXTENSION_LOADING);
+            (context.eventEmitter as any).unbindAll(AppEventList.EXTENSION_LOADING);
             forEach(extensionsNames, (extensionName: string) => {
                 try {
                     if (!isString(extensionName)) {
@@ -148,17 +141,17 @@ export class Application
                     }
                     let extension = requireg(extensionName);
                     if (!isFunction(extension)) {
-                        if (isPlainObject(extension) && isFunction(extension.default)) {
-                            extension = extension.default;
+                        if (isPlainObject(extension) && isFunction((extension as any).default)) {
+                            extension = (extension as any).default;
                         } else {
                             throw new Error('The extension did not export a function!');
                         }
                     }
-                    context.eventEmitter.bind(AppEventList.EXTENSION_LOADING, () => {
+                    (context.eventEmitter as any).bind(AppEventList.EXTENSION_LOADING, () => {
                         return extension(context);
                     });
                 } catch (e) {
-                    if (isUndefined(e)) {
+                    if ((e === undefined)) {
                         e = new Error(e);
                     }
                     console.log(chalk.redBright('Error while loading extension: ' + extensionName + '! ' + e.message));
@@ -166,7 +159,7 @@ export class Application
             });
             
             // Trigger the extension import
-            return context.eventEmitter.emitHook(AppEventList.EXTENSION_LOADING, {})
+            return (context.eventEmitter as any).emitHook(AppEventList.EXTENSION_LOADING, {})
                           .then(() => context);
             
         });

@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,7 @@
  * Last modified: 2020.04.07 at 13:33
  */
 
-import {forEach} from '@labor-digital/helferlein';
+
 import {DockerEnv} from './DockerEnv';
 
 export class DockerEnvTemplate extends DockerEnv

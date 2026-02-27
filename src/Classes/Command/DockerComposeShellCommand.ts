@@ -16,7 +16,8 @@
  * Last modified: 2020.04.06 at 13:35
  */
 
-import {isString} from '@labor-digital/helferlein';
+import { isString } from 'radashi';
+
 import {Command} from 'commander';
 import {AppContext} from '../Core/AppContext';
 import {DockerApp} from '../Core/DockerApp/DockerApp';
@@ -33,11 +34,11 @@ export class DockerComposeShellCommand
                     new Error('You can only attach to running apps. But the app is currently not running.'));
             }
             return (
-                cmd.select ? DockerComposeServiceSelectWizard.run(app.dockerCompose, 'open a shell in') :
+                cmd.opts().select ? DockerComposeServiceSelectWizard.run(app.dockerCompose, 'open a shell in') :
                     Promise.resolve(app.containerName)
             ).then((containerName: string) => {
                 return app.docker.attachToContainerShell(containerName,
-                    isString(cmd.shell) ? cmd.shell : context.config.get('docker.shell', 'bash'));
+                    isString(cmd.opts().shell) ? cmd.opts().shell : context.config.get('docker.shell', 'bash'));
             });
         });
     }

@@ -1,3 +1,4 @@
+import {forEach} from '../Core/Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,12 +17,13 @@
  * Last modified: 2020.07.09 at 18:26
  */
 
-import {forEach, isArray, isEmpty, isPlainObject, isString, PlainObject} from '@labor-digital/helferlein';
-import {copy, mkdirRecursiveSync, rmdirRecursiveSync} from '@labor-digital/helferlein/node';
+import { isArray, isEmpty, isObject as isPlainObject, isString } from 'radashi';
+import {PlainObject} from '../Core/Utils/ForEachHelper';
+
 import chalk from 'chalk';
 import {Command} from 'commander';
 import * as fs from 'fs';
-import glob from 'glob';
+import {globSync} from 'glob';
 import inquirer from 'inquirer';
 import * as path from 'path';
 import {Git} from '../Api/Git';
@@ -57,6 +59,12 @@ export class ProjectInitCommand
         // Check if the directory is empty
         return new Promise(resolve => {
             if (fs.readdirSync(target).length !== 0) {
+                if (cmd.opts().force) {
+                    console.log('Flushing the contents of the target directory...');
+                    fs.rmSync(target, { recursive: true, force: true });
+                    return resolve(true);
+                }
+                
                 inquirer.prompt({
                     name: 'flushDirectory',
                     type: 'confirm',
@@ -69,7 +77,7 @@ export class ProjectInitCommand
                         return resolve(false);
                     }
                     console.log('Flushing the contents of the target directory...');
-                    rmdirRecursiveSync(target, false);
+                    fs.rmSync(target, { recursive: true, force: true });
                     resolve(true);
                 });
             } else {
@@ -83,7 +91,7 @@ export class ProjectInitCommand
                     return Promise.reject(false);
                 }
                 target = path.join(target, 'app');
-                mkdirRecursiveSync(target);
+                fs.mkdirSync(target, { recursive: true });
                 process.chdir(target);
             })
             
@@ -91,13 +99,13 @@ export class ProjectInitCommand
             .then(() => {
                 return ProjectNameInputWizard.run(
                                                  'Your new project needs a name, we use as "COMPOSE_PROJECT_NAME". ' +
-                                                 'Define the name of the project based on the following options:', context)
+                                                 'Define the name of the project based on the following options:', context, cmd.opts().name)
                                              .then(name => {
                                                  projectName = name;
                                                  projectShortName = projectName
                                                      .trim()
                                                      .split('-')
-                                                     .map(v => v.replace(/_/, '').trim().substr(0, 3))
+                                                     .map(v => v.replace(/_/, '').trim().substring(0, 3))
                                                      .join('_')
                                                      .toLowerCase();
                                              });
@@ -108,50 +116,75 @@ export class ProjectInitCommand
                 console.log('Cloning the repository: ' + repository);
                 checkoutTarget = path.join(checkoutTarget, '.clone');
                 git.clone(repository, checkoutTarget);
+                console.log('Cloning done.');
             })
             // Find boilerplates
             .then(() => {
                 // Find the possible locations
+                console.log('Searching for boilerplates...');
                 const boilerplates: Map<string, BoilerplateDefinition> = new Map();
-                const boilerplateFiles = glob.sync('**/lab.boilerplate.json', {absolute: true, cwd: checkoutTarget});
-                forEach(boilerplateFiles, (boilerplateFile: string) => {
-                    const content = fs.readFileSync(boilerplateFile).toString('utf-8');
-                    const definition: BoilerplateDefinition = JSON.parse(content);
-                    if (!isPlainObject(definition)) {
-                        console.error('Invalid boiler plate at: ' + boilerplateFile);
-                        return;
+                try {
+                    const boilerplateFiles = globSync('**/lab.boilerplate.json', {absolute: true, cwd: checkoutTarget});
+                    forEach(boilerplateFiles, (boilerplateFile: string) => {
+                        const content = fs.readFileSync(boilerplateFile).toString('utf-8');
+                        const definition: BoilerplateDefinition = JSON.parse(content);
+                        if (!isPlainObject(definition)) {
+                            console.error('Invalid boiler plate at: ' + boilerplateFile);
+                            return;
+                        }
+                        if (!isString(definition.name) || isEmpty(definition.name)) {
+                            console.error('Invalid boiler plate at: ' + boilerplateFile + ', "name" is a required field!');
+                            return;
+                        }
+                        definition.path = path.dirname(boilerplateFile);
+                        boilerplates.set(boilerplateFile, definition);
+                    });
+                    
+                    // Skip if there are no boilerplates
+                    if (boilerplates.size === 0) {
+                        console.error('There are no boilerplates in the cloned repository!');
+                        return Promise.reject(false);
                     }
-                    if (!isString(definition.name) || isEmpty(definition.name)) {
-                        console.error('Invalid boiler plate at: ' + boilerplateFile + ', "name" is a required field!');
-                        return;
-                    }
-                    definition.path = path.dirname(boilerplateFile);
-                    boilerplates.set(boilerplateFile, definition);
-                });
-                
-                // Skip if there are no boilerplates
-                if (boilerplates.size === 0) {
-                    console.error('There are no boilerplates in the cloned repository!');
-                    return Promise.reject(false);
+                    return boilerplates;
+                } catch (error) {
+                    console.error('Failed to find boilerplates:', error);
+                    throw error;
                 }
-                return boilerplates;
+                
             })
             // Ask the user for the boilerplate to use
             .then((boilerplates) => {
+                if (cmd.opts().boilerplate) {
+                    let found = false;
+                    for (const bp of boilerplates.values()) {
+                        if (bp.name === cmd.opts().boilerplate) {
+                            boilerplate = bp;
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (found) {
+                        return Promise.resolve();
+                    }
+                    
+                    console.log(chalk.yellow('Could not find boilerplate with name: "' + cmd.opts().boilerplate + '". Falling back to selection.'));
+                }
+                
                 return inquirer.prompt([
                         {
                             name: 'boilerplate',
-                            type: 'list',
+                            type: 'select',
                             message: 'Which template (Branch) should I use to create your project with?',
                             when: () => boilerplates.size > 1,
                             choices: () => {
                                 const choices: Array<PlainObject> = [];
-                                forEach(boilerplates, (boilerplate: BoilerplateDefinition) => {
+                                for (const boilerplate of boilerplates.values()) {
                                     choices.push({
                                         name: boilerplate.name,
                                         value: boilerplate
                                     });
-                                });
+                                }
                                 return choices;
                             }
                         }
@@ -162,13 +195,13 @@ export class ProjectInitCommand
                     if (!isPlainObject(answers.boilerplate)) {
                         boilerplate = boilerplates.values().next().value;
                     } else {
-                        boilerplate = answers.boilerplate;
+                        boilerplate = answers.boilerplate as any;
                     }
                 });
             })
             // Copy the boilerplate code to the app directory
             .then(() => {
-                copy(boilerplate.path, target);
+                fs.cpSync(boilerplate.path, target, { recursive: true });
                 // Remove the boilerplate definition
                 fs.unlinkSync(path.join(target, 'lab.boilerplate.json'));
             })
@@ -200,7 +233,7 @@ export class ProjectInitCommand
             })
             // Remove the checkout directory
             .then(() => {
-                rmdirRecursiveSync(checkoutTarget);
+                fs.rmSync(checkoutTarget, { recursive: true, force: true });
             })
             // Create local git repository
             .then(() => {

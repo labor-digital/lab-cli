@@ -1,3 +1,4 @@
+import {forEach} from './Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -15,7 +16,7 @@
  *
  * Last modified: 2020.04.04 at 12:48
  */
-import {forEach, isNull} from '@labor-digital/helferlein';
+
 import * as fs from 'fs';
 import * as path from 'path';
 import {AppContext} from './AppContext';
@@ -35,24 +36,24 @@ export class FileFinder
         // Build the lookup list for all docker related files
         forEach(DockerApp.dockerComposeRootFiles, (file: string) => {
             rootDirectory = this.findFileInCwd(context, file);
-            if (isNull(rootDirectory)) {
+            if ((rootDirectory === null)) {
                 return;
             }
             return false;
         });
         
         // Try to find package.json if we did not find a docker file
-        if (isNull(rootDirectory)) {
+        if ((rootDirectory === null)) {
             rootDirectory = this.findFileInCwd(context, 'package.json');
         }
         
         // Try to find a app config file if we still have nothing
-        if (isNull(rootDirectory)) {
+        if ((rootDirectory === null)) {
             rootDirectory = this.findFileInCwd(context, 'lab.config.json');
         }
         
         // Return the current working directory if we did not find a root directory
-        if (isNull(rootDirectory)) {
+        if ((rootDirectory === null)) {
             return context.cwd;
         }
         return rootDirectory + path.sep;

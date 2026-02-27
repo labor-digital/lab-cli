@@ -1,3 +1,6 @@
+import {isNullish} from 'radashi';
+import {forEach} from '../Utils/ForEachHelper';
+import {makeOptions} from '../Utils/makeOptions';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +19,6 @@
  * Last modified: 2020.04.05 at 13:48
  */
 
-import {forEach, isUndefined, makeOptions} from '@labor-digital/helferlein';
 import {AppContext} from '../AppContext';
 
 export interface CommandOptionDefinition
@@ -126,7 +128,7 @@ export class CommandRegistry
      */
     public registerCommand(signature: string, filename: string, options?: CommandOptions): CommandRegistry
     {
-        if (isUndefined(options)) {
+        if (isNullish(options)) {
             // @ts-ignore
             options = {};
         }

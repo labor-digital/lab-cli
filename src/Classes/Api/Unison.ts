@@ -16,7 +16,8 @@
  * Last modified: 2020.04.06 at 15:05
  */
 
-import {isString} from '@labor-digital/helferlein';
+import { isString } from 'radashi';
+
 import chalk from 'chalk';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';

@@ -1,3 +1,4 @@
+import {forEach} from './Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,10 @@
  * Last modified: 2020.04.05 at 14:36
  */
 
-import {GenericStorage, GenericStorageInterface, PlainObject} from '@labor-digital/helferlein';
+import { GenericStorage } from './GenericStorage';
+import { GenericStorageInterface } from './GenericStorage';
+import {PlainObject} from './Utils/ForEachHelper';
+
 import {AppContext} from './AppContext';
 import {Registry} from './Registry';
 

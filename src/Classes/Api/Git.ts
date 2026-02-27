@@ -1,3 +1,4 @@
+import {forEach} from '../Core/Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,6 @@
  * Last modified: 2020.07.09 at 18:26
  */
 
-import {PlainObject} from '@labor-digital/helferlein';
 import * as childProcess from 'child_process';
 import {AppContext} from '../Core/AppContext';
 
@@ -122,7 +122,7 @@ export class Git
      * @param target The local path of the repository to read the branches from
      * @param skipPullRequests If true all branches starting with "pr-" will be ignored
      */
-    public getRemoteBranches(target: string, skipPullRequests?: boolean): PlainObject<string>
+    public getRemoteBranches(target: string, skipPullRequests?: boolean): Record<string, string>
     {
         const command = this._context.platform.choose({
             windows: 'cd /d "' + target + '" && git branch -a --color=never',
@@ -130,7 +130,7 @@ export class Git
         });
         
         const branchesRaw = childProcess.execSync(command, {'stdio': 'pipe'}).toString('utf-8');
-        const branches: PlainObject<string> = {};
+        const branches: Record<string, string> = {};
         branchesRaw.split(/\r?\n/g).forEach(line => {
             line = line.trim();
             if (line.indexOf('remotes/origin') !== 0) {

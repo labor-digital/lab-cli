@@ -27,11 +27,11 @@ export class DockerComposeUpCommand
     
     public execute(cmd: Command, context: AppContext): Promise<void>
     {
-        if (cmd.separateWindow === true) {
+        if (cmd.opts().separateWindow === true) {
             return this.runInSeparateWindow(cmd, context);
         }
         return (new DockerApp(context)).initialize().then(app => {
-            return app.dockerCompose.up(cmd.follow === true, cmd.pull === true);
+            return app.dockerCompose.up(cmd.opts().follow === true, cmd.opts().pull === true);
         });
     }
     
@@ -48,7 +48,7 @@ export class DockerComposeUpCommand
             return new Promise(resolve => {
                 const command = '"' + process.argv[0] + '" ' +
                                 '"' + process.argv[1] + '" ' +
-                                (cmd.pull === true ? ' -p' : '') +
+                                (cmd.opts().pull === true ? ' -p' : '') +
                                 ' ' + cmd.name() +
                                 ' -f && timeout 10';
                 childProcess.exec('start "' + windowTitle + '" ' + command);

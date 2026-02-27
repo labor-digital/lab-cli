@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,9 @@
  * Last modified: 2020.04.05 at 22:05
  */
 
-import {asObject, forEach, getListKeys, isEmpty, isString, PlainObject} from '@labor-digital/helferlein';
+import { isEmpty, isString } from 'radashi';
+import {PlainObject} from '../Utils/ForEachHelper';
+
 import * as fs from 'fs';
 
 export class DockerEnv
@@ -48,7 +51,7 @@ export class DockerEnv
      */
     public getAll(): PlainObject
     {
-        return asObject(this._env);
+        return Object.assign({}, this._env);
     }
     
     /**
@@ -153,7 +156,7 @@ export class DockerEnv
     protected write(removeDefaultOwner:boolean = false): void
     {
         // Build the content based on the template and the current storage
-        const keys: Array<string> = getListKeys(this._env) as any;
+        const keys: Array<string> = Object.keys(this._env) as any;
         let contents = this._tpl.replace(/{{pair}}/g, () => {
             const key = keys.shift();
             const value = this._env.get(key);

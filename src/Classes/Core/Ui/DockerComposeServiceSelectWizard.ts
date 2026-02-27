@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,9 @@
  * Last modified: 2020.04.06 at 09:55
  */
 
-import {forEach, getPath, isString, isUndefined, PlainObject} from '@labor-digital/helferlein';
+import { get as getPath, isString } from 'radashi';
+import {PlainObject} from '../Utils/ForEachHelper';
+
 import inquirer from 'inquirer';
 import {DockerCompose} from '../../Api/DockerCompose';
 import {Bugfixes} from '../Bugfixes';
@@ -60,8 +63,8 @@ export class DockerComposeServiceSelectWizard
             {
                 name: 'target',
                 message: 'Which service should I use to ' + forWhat + '?',
-                when: answers => !answers.ok || isUndefined(answers.ok),
-                type: 'list',
+                when: answers => !answers.ok || (answers.ok === undefined),
+                type: 'select',
                 choices: DockerComposeServiceSelectWizard.buildServiceOptions(dockerCompose)
             }
         ]).then(answers => {

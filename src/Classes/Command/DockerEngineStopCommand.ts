@@ -26,10 +26,10 @@ export class DockerEngineStopCommand
     public execute(cmd: Command, context: AppContext): Promise<void>
     {
         const api = new Docker(context);
-        if (!api.isRunning && cmd.force !== true) {
+        if (!api.isRunning && cmd.opts().force !== true) {
             console.log(chalk.yellowBright('The docker engine is currently not running!'));
             return Promise.resolve();
         }
-        return api.stopEngine(cmd.force);
+        return api.stopEngine(cmd.opts().force);
     }
 }

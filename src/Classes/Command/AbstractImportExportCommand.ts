@@ -1,3 +1,4 @@
+import {forEach} from '../Core/Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,9 +17,9 @@
  * Last modified: 2020.05.08 at 12:28
  */
 
-import {forEach} from '@labor-digital/helferlein';
+
 import childProcess from 'child_process';
-import {command, Command} from 'commander';
+import { Command } from 'commander';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
 import * as child_process from 'node:child_process';
@@ -64,7 +65,7 @@ export abstract class AbstractImportExportCommand
                     return app.dockerCompose.stop();
                 })
                 .then(() => {
-                    if (cmd.copyFromTest !== true) {
+                    if (cmd.opts().copyFromTest !== true) {
                         return Promise.resolve();
                     }
                     
@@ -98,7 +99,7 @@ export abstract class AbstractImportExportCommand
                     return app.dockerCompose.up();
                 })
                 .then(() => {
-                    if (cmd.copyToTest !== true) {
+                    if (cmd.opts().copyToTest !== true) {
                         return Promise.resolve();
                     }
                     

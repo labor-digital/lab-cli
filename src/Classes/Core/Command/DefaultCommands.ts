@@ -189,7 +189,7 @@ export class DefaultCommands
             platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
-                    definition: '-ct, --copyFromTest',
+                    definition: '-c, --copyFromTest',
                     description: 'will copy import data from the test-data directory (if it exists) first before importing (Caution: This will overwrite existing files!)',
                     default: false
                 }
@@ -201,7 +201,7 @@ export class DefaultCommands
             platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
-                    definition: '-ct, --copyToTest',
+                    definition: '-c, --copyToTest',
                     description: 'will copy the exported files to the test-data directory if it exists (Caution: This will overwrite existing files!)',
                     default: false
                 }
@@ -210,7 +210,22 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('init', '../../Command/ProjectInitCommand', {
             description: 'initializes a new application stub based on our boilerplate',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-n, --name <name>',
+                    description: 'The name of the project to initialize (e.g. customer-project-app)'
+                },
+                {
+                    definition: '-b, --boilerplate <boilerplate>',
+                    description: 'The name of the boilerplate to use'
+                },
+                {
+                    definition: '-f, --force',
+                    description: 'Force initialization even if the directory is not empty',
+                    default: false
+                }
+            ]
         });
         
         context.commandRegistry.registerCommand('installCa', '../../Command/InstallCaCommand', {

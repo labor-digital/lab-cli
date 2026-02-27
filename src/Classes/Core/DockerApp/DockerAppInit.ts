@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,8 +17,9 @@
  * Last modified: 2020.04.05 at 21:46
  */
 
-import {forEach, isString, md5} from '@labor-digital/helferlein';
-import {mkdirRecursiveSync} from '@labor-digital/helferlein/node';
+import { isString } from 'radashi';
+import * as crypto from "crypto";
+
 import chalk from 'chalk';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
@@ -272,7 +274,7 @@ export class DockerAppInit
                 
                 // Set optional values
                 const passwordGenerator = function (): string {
-                    return (md5(projectName + Math.random()) + 'ABCDEJKLOXYZ-_!#')
+                    return (crypto.createHash("md5").update(projectName + Math.random().toString()).digest("hex") + 'ABCDEJKLOXYZ-_!#')
                         .split('').sort(function () {
                             return 0.5 - Math.random();
                         }).join('');
@@ -381,7 +383,7 @@ export class DockerAppInit
                     return;
                 }
                 forEach(missingDirectories, (dir: string) => {
-                    mkdirRecursiveSync(dir);
+                    fs.mkdirSync(dir, { recursive: true });
                 });
             });
     }

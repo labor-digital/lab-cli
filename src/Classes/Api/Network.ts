@@ -15,7 +15,7 @@
  *
  * Last modified: 2020.09.11 at 14:28
  */
-import {escapeRegex} from '@labor-digital/helferlein';
+
 import * as childProcess from 'child_process';
 import {AppContext} from '../Core/AppContext';
 
@@ -37,7 +37,7 @@ export class Network
     {
         if (this._context.platform.isDarwin) {
             console.log('Check if loopback adapter is set up correctly to handle ip: ' + ip);
-            const pattern = new RegExp(escapeRegex(ip) + ' netmask', 'm');
+            const pattern = new RegExp(ip.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + ' netmask', 'm');
             if (childProcess.execSync('ifconfig lo0').toString('utf-8').match(pattern)) {
                 console.log('Loopback for: ' + ip + ' is set up correctly!');
                 return;
