@@ -20,8 +20,7 @@
 	"scripts": {
 		"build": "node flushLib.js && tsc",
 		"watch": "node flushLib.js && tsc --watch",
-		"test": "jest",
-		"prepare": "npm run build"
+		"test": "jest"
 	},
 	"dependencies": {
 		"@labor-digital/ssl-certs": "^1.4.0",
