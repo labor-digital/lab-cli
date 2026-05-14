@@ -2,7 +2,6 @@ node_modules
 npm-debug.log
 !elevate.exe
 !unison*.exe
-lib
 
 
 # IDEA Code Style
