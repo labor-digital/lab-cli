@@ -39,8 +39,6 @@ Commands:
   import                                  triggers the import process using the LABOR import/export container
   export                                  triggers the export process using the LABOR import/export container
   init [options]                          initializes a new application stub based on our boilerplate
-  add-component <name>                    adds a factory component to the local factory.json configuration
-  upgrade [options]                       upgrades the local factory core dependencies and runs TYPO3 schema migrations
   installCa                               installs our root ca (@labor-digital/ssl-certs) as trusted ssl root certificate
   help [command]                          display help for command
 ```
@@ -196,56 +194,6 @@ and search all boilerplates in it. By default the script uses our [Docker Base I
 You can now select one of the possible boilerplates using the wizard, which will be prepared and ready to run in the current working directory.
 
 Simply call "lab up" and start coding :)
-
-## Add a factory component
-
-> **Deprecated.** The `factory:*` commands (`add-component`, `upgrade`, and project scaffolding) are moving out of lab-cli and into the Factory `pipeline-app`. They still work here for now, but new development should use `pipeline-app` and they will be removed in a future major release.
-
-Use this command in a project root that contains a `factory.json` file to enable an additional factory component.
-
-```
-lab add-component hero
-lab add-component news --json
-```
-
-Behavior:
-
-- Validates the local `factory.json` file and reads `core_version` plus `active_components`
-- Fetches the factory component manifest and checks if the requested component exists
-- Adds the component to `active_components` when the local core version is compatible
-- Returns a machine-readable JSON response when `--json` is used
-
-If a component requires a newer factory core version than the version configured in `factory.json`, the command will not update the file and instead tells you to run `lab upgrade` first.
-
-Options:
-
-- `--json`: Outputs exactly one JSON object to stdout and suppresses non-machine-readable output
-
-## Upgrade factory core
-
-> **Deprecated.** See the note on the `add-component` command above — `lab upgrade` is moving to the Factory `pipeline-app` and will be removed from lab-cli in a future major release.
-
-Use this command in a factory project root that contains `factory.json`, `backend/`, and `frontend/`.
-
-```
-lab upgrade
-lab upgrade --target 1.6.0
-lab upgrade --json
-```
-
-Behavior:
-
-- Reads the current `core_version` from `factory.json`
-- Resolves the target version from `--target <version>` or the latest available factory core version
-- Updates the TYPO3 backend dependency in `backend/`
-- Updates the Nuxt factory layer dependency in `frontend/` using the detected package manager
-- Runs TYPO3 database schema updates after dependency installation succeeds
-- Writes the new `core_version` to `factory.json` only after all upgrade steps finish successfully
-
-Options:
-
-- `--target <version>`: Defines the target factory core version to upgrade to
-- `--json`: Outputs exactly one JSON object to stdout and suppresses non-machine-readable output
 
 ## Initialize an existing app
 

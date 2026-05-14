@@ -245,38 +245,6 @@ export class DefaultCommands
             ]
         });
 
-        context.commandRegistry.registerCommand('factory:add <name>', '../../Command/FactoryAddCommand', {
-            description: 'adds a factory component to the local factory.json configuration',
-            platforms: {windows: true, darwin: true, linux: true},
-            options: [
-                {
-                    definition: '--json',
-                    description: 'outputs strict JSON and suppresses non-machine-readable output',
-                    default: false
-                },
-                {
-                    definition: '-f, --factory <path>',
-                    description: 'explicitly pass the path to factory.json'
-                }
-            ]
-        });
-
-        context.commandRegistry.registerCommand('upgrade', '../../Command/UpgradeCommand', {
-            description: 'upgrades the local factory core dependencies and runs TYPO3 schema migrations',
-            platforms: {windows: true, darwin: true, linux: true},
-            options: [
-                {
-                    definition: '--target <version>',
-                    description: 'defines the target factory core version to upgrade to'
-                },
-                {
-                    definition: '--json',
-                    description: 'outputs strict JSON and suppresses non-machine-readable output',
-                    default: false
-                }
-            ]
-        });
-
         context.commandRegistry.registerCommand('installCa', '../../Command/InstallCaCommand', {
             description: 'installs our root ca (@labor-digital/ssl-certs) as trusted ssl root certificate',
             platforms: {windows: true, darwin: true, linux: true}
@@ -289,54 +257,6 @@ export class DefaultCommands
                 {
                     definition: '-u, --update',
                     description: 'will call the "test-update" command instead of the "test" command (normally this will update all reference snapshots)',
-                    default: false
-                }
-            ]
-        });
-        
-        context.commandRegistry.registerCommand('factory:create <project-name>', '../../Command/FactoryCreateCommand', {
-            description: 'bootstraps a new headless client project from the factory templates',
-            platforms: {windows: true, darwin: true, linux: true},
-            options: [
-                {
-                    definition: '--json',
-                    description: 'outputs strict JSON and suppresses non-machine-readable output',
-                    default: false
-                },
-                {
-                    definition: '--template-path <path>',
-                    description: 'path to the factory templates directory',
-                    default: '../factory-core/templates'
-                },
-                {
-                    definition: '--force',
-                    description: 'delete existing Doppler project and target directory before scaffolding',
-                    default: false
-                },
-                {
-                    definition: '--secret <key=value>',
-                    description: 'override a Doppler secret (repeatable, e.g. --secret APP_ENCRYPTION_KEY=abc --secret APP_INSTALL_TOOL_PASSWORD=xyz)',
-                    validation: (value: string, prev: string[]) => (prev || []).concat([value]),
-                    default: []
-                }
-            ]
-        });
-
-        context.commandRegistry.registerCommand('factory:upgrade', '../../Command/FactoryUpgradeCommand', {
-            description: 'upgrades the local factory core dependencies and runs TYPO3 schema migrations',
-            platforms: {windows: true, darwin: true, linux: true},
-            options: [
-                {
-                    definition: '--target <version>',
-                    description: 'defines the target factory core version to upgrade to'
-                },
-                {
-                    definition: '-f, --factory <path>',
-                    description: 'explicitly pass the path to factory.json'
-                },
-                {
-                    definition: '--json',
-                    description: 'outputs strict JSON and suppresses non-machine-readable output',
                     default: false
                 }
             ]
