@@ -2,22 +2,34 @@ import { ProjectInitCommand } from '../src/Classes/Command/ProjectInitCommand';
 import { AppContext } from '../src/Classes/Core/AppContext';
 import { Command } from 'commander';
 import * as fs from 'fs';
-import glob from 'glob';
+import {globSync} from 'glob';
 import inquirer from 'inquirer';
 import { Git } from '../src/Classes/Api/Git';
+import { Bugfixes } from '../src/Classes/Core/Bugfixes';
 import { ProjectNameInputWizard } from '../src/Classes/Core/Ui/ProjectNameInputWizard';
 
 jest.mock('fs');
 jest.mock('glob', () => ({
-    sync: jest.fn()
+    __esModule: true,
+    globSync: jest.fn()
 }));
-jest.mock('inquirer');
+jest.mock('inquirer', () => ({
+    __esModule: true,
+    default: {
+        prompt: jest.fn()
+    }
+}));
 jest.mock('chalk', () => ({
     redBright: jest.fn((str) => str),
     greenBright: jest.fn((str) => str),
     yellow: jest.fn((str) => str),
 }));
 jest.mock('../src/Classes/Api/Git');
+jest.mock('../src/Classes/Core/Bugfixes', () => ({
+    Bugfixes: {
+        inquirerChildProcessReadLineFix: jest.fn()
+    }
+}));
 jest.mock('../src/Classes/Core/Ui/ProjectNameInputWizard');
 
 describe('ProjectInitCommand', () => {
@@ -67,13 +79,13 @@ describe('ProjectInitCommand', () => {
         jest.spyOn(process, 'chdir').mockImplementation(() => {});
 
         // Mock glob
-        (glob.sync as unknown as jest.Mock).mockReturnValue(['/mock/cwd/.clone/lab.boilerplate.json']);
+        (globSync as jest.Mock).mockReturnValue(['/mock/cwd/.clone/lab.boilerplate.json']);
 
         // Mock ProjectNameInputWizard
         (ProjectNameInputWizard.run as jest.Mock).mockResolvedValue('mock-project-name');
 
         // Mock inquirer
-        (inquirer.prompt as unknown as jest.Mock).mockResolvedValue({
+        ((inquirer.prompt as unknown) as jest.Mock).mockResolvedValue({
             boilerplate: {
                 name: 'Mock Boilerplate',
                 path: '/mock/cwd/.clone',
@@ -100,9 +112,10 @@ describe('ProjectInitCommand', () => {
         expect(process.chdir).toHaveBeenCalledWith('/mock/cwd/app');
         expect(ProjectNameInputWizard.run).toHaveBeenCalled();
         expect(mockGitInstance.clone).toHaveBeenCalledWith('git@github.com:mock/repo.git', '/mock/cwd/.clone');
-        expect(glob.sync).toHaveBeenCalledWith('**/lab.boilerplate.json', { absolute: true, cwd: '/mock/cwd/.clone' });
+        expect(globSync).toHaveBeenCalledWith('**/lab.boilerplate.json', { absolute: true, cwd: '/mock/cwd/.clone' });
         expect(fs.cpSync).toHaveBeenCalled();
         expect(fs.unlinkSync).toHaveBeenCalled();
+        expect(Bugfixes.inquirerChildProcessReadLineFix).toHaveBeenCalled();
         expect(mockGitInstance.initializeRepo).toHaveBeenCalledWith('/mock/cwd/app');
     });
 

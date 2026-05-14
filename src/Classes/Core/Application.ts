@@ -47,6 +47,7 @@ export class Application
         let context: AppContext | null = null;
         return this.createNewAppContext()
                    .then(c => context = c)
+                   .then(c => this.prepareOutputMode(c))
                    .then(c => this.showFancyIntro(c))
                    .then(c => DefaultCommands.make(c))
                    .then(c => this.loadExtensions(c))
@@ -55,6 +56,17 @@ export class Application
                    .then(c => this.handleCommand(c))
                    .then(() => process.exit())
                    .catch(err => {
+                       if (context !== null && context.isMachineReadableOutput) {
+                           const message = typeof err?.message === 'string' && err.message.trim() !== ''
+                               ? err.message
+                               : 'Unexpected error.';
+                           process.stdout.write(JSON.stringify({
+                               status: 'error',
+                               message
+                           }) + '\n');
+                           process.exit(1);
+                           return context;
+                       }
                        if (typeof err === 'object' && err !== null && !(err.stack === undefined) && !(err instanceof UserError)) {
                            err = err.stack;
                        }
@@ -65,6 +77,19 @@ export class Application
                        process.exit(1);
                        return context;
                    });
+    }
+
+    /**
+     * Applies runtime output configuration before any output is emitted
+     * @param context
+     */
+    protected prepareOutputMode(context: AppContext): Promise<AppContext>
+    {
+        if (context.isMachineReadableOutput) {
+            chalk.level = 0;
+        }
+
+        return Promise.resolve(context);
     }
     
     /**
@@ -91,6 +116,9 @@ export class Application
      */
     protected showFancyIntro(context: AppContext): Promise<AppContext>
     {
+        if (context.isMachineReadableOutput) {
+            return Promise.resolve(context);
+        }
         const lang = [
             ['Guten Morgen', 'Guten Tag', 'Guten Abend'], // German
             ['Good morning', 'Good day', 'Good evening'], // English

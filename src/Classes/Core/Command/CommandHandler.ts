@@ -96,7 +96,7 @@ export class CommandHandler
             c.alias(command.options.alias);
             if (!isEmpty(command.options.options)) {
                 forEach(command.options.options, (option: CommandOptionDefinition) => {
-                    c.option(option.definition, option.description, option.validation, option.default);
+                    c.option(option.definition, option.description, option.validation as any, option.default);
                 });
             }
             

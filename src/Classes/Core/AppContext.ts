@@ -151,7 +151,15 @@ export class AppContext
     {
         return process.cwd().replace(/[\\\/\s]+$/, path.sep) + path.sep;
     }
-    
+
+    /**
+     * True if the current invocation should produce machine-readable output only
+     */
+    public get isMachineReadableOutput(): boolean
+    {
+        return process.argv.indexOf('--json') !== -1;
+    }
+
     /**
      * Returns the root directory of the cli package
      */

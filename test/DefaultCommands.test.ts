@@ -129,6 +129,36 @@ describe('DefaultCommands', () => {
         );
 
         expect(mockContext.commandRegistry.registerCommand).toHaveBeenCalledWith(
+            'factory:add <name>',
+            '../../Command/FactoryAddCommand',
+            expect.objectContaining({
+                options: expect.arrayContaining([
+                    expect.objectContaining({
+                        definition: '--json'
+                    }),
+                    expect.objectContaining({
+                        definition: '-f, --factory <path>'
+                    })
+                ])
+            })
+        );
+
+        expect(mockContext.commandRegistry.registerCommand).toHaveBeenCalledWith(
+            'upgrade',
+            '../../Command/UpgradeCommand',
+            expect.objectContaining({
+                options: expect.arrayContaining([
+                    expect.objectContaining({
+                        definition: '--target <version>'
+                    }),
+                    expect.objectContaining({
+                        definition: '--json'
+                    })
+                ])
+            })
+        );
+
+        expect(mockContext.commandRegistry.registerCommand).toHaveBeenCalledWith(
             'installCa',
             '../../Command/InstallCaCommand',
             expect.any(Object)

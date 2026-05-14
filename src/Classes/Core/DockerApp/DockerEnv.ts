@@ -51,7 +51,7 @@ export class DockerEnv
      */
     public getAll(): PlainObject
     {
-        return Object.assign({}, this._env);
+        return Object.fromEntries(this._env);
     }
     
     /**
@@ -156,7 +156,7 @@ export class DockerEnv
     protected write(removeDefaultOwner:boolean = false): void
     {
         // Build the content based on the template and the current storage
-        const keys: Array<string> = Object.keys(this._env) as any;
+        const keys: Array<string> = Array.from(this._env.keys());
         let contents = this._tpl.replace(/{{pair}}/g, () => {
             const key = keys.shift();
             const value = this._env.get(key);

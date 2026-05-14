@@ -18,6 +18,8 @@
 
 import * as childProcess from 'child_process';
 import {Command} from 'commander';
+import * as fs from 'fs';
+import * as path from 'path';
 import {Processes} from '../Api/Processes';
 import {AppContext} from '../Core/AppContext';
 import {DockerApp} from '../Core/DockerApp/DockerApp';
@@ -30,7 +32,17 @@ export class DockerComposeUpCommand
         if (cmd.opts().separateWindow === true) {
             return this.runInSeparateWindow(cmd, context);
         }
-        return (new DockerApp(context)).initialize().then(app => {
+        const dockerApp = new DockerApp(context);
+        dockerApp.acceptDefaults = cmd.opts().yes === true;
+        return dockerApp.initialize().then(app => {
+            if (cmd.opts().import === true) {
+                const importDir = app.importExportDirectory;
+                if (!fs.existsSync(importDir)) {
+                    fs.mkdirSync(importDir, {recursive: true});
+                }
+                fs.writeFileSync(path.join(importDir, 'do_import'), '');
+                console.log('Import marker created — import container will initialize the database.');
+            }
             return app.dockerCompose.up(cmd.opts().follow === true, cmd.opts().pull === true);
         });
     }

@@ -86,7 +86,12 @@ export class DockerApp
      * The environment config for the docker app
      */
     protected _env: DockerEnv;
-    
+
+    /**
+     * When true, all interactive prompts will be auto-accepted with defaults
+     */
+    public acceptDefaults: boolean = false;
+
     public constructor(context: AppContext)
     {
         this._context = context;
@@ -360,7 +365,12 @@ export class DockerApp
         if (this._api.isRunning) {
             return Promise.resolve();
         }
-        
+
+        if (this.acceptDefaults) {
+            console.log('Starting docker engine...');
+            return this._api.startEngine();
+        }
+
         // Ask user
         return inquirer.prompt({
             name: 'startDocker',
@@ -386,7 +396,20 @@ export class DockerApp
         if (this._doppler.isLoggedIn) {
             return Promise.resolve();
         }
-        
+
+        if (this.acceptDefaults) {
+            const loginCode = this._doppler.login(15);
+            switch (loginCode) {
+                case -1:
+                    return this.loginToDopplerIfRequired(true);
+                case 1:
+                    return Promise.resolve();
+                default:
+                case 0:
+                    return Promise.reject(new Error('Sorry, something went wrong while logging you into doppler!'));
+            }
+        }
+
         // Ask user
         return inquirer.prompt({
             name: 'loginDoppler',

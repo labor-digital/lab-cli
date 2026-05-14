@@ -34,9 +34,10 @@ export interface CommandOptionDefinition
     description?: string;
     
     /**
-     * A optional validation to validate the option value
+     * A optional validation to validate the option value.
+     * Can be a RegExp or a processing function (value, previous) => result for custom parsing (e.g. collecting repeatable options).
      */
-    validation?: RegExp
+    validation?: RegExp | ((value: string, previous: any) => any)
     
     /**
      * The default value for the option

@@ -140,27 +140,26 @@ export class DockerAppInit
         // Load the env
         const envFilePath = path.join(this._context.rootDirectory, '.env.app');
         const env = new DockerEnv(envFilePath);
-        
-        const defaultFileOwner = this._context.platform.defaultFileOwner();
-        if (defaultFileOwner === null) {
-            return Promise.resolve();
-        }
-        
+
         function isValueEmpty(key: string): boolean
         {
             return !env.has(key) || !isString(env.get(key)) ||
                    env.get(key).trim() === 'null' ||
                    env.get(key).trim().charAt(0) === '§';
         }
-        
+
         function setValueIfEmpty(key: string, value: string)
         {
             if (isValueEmpty(key)) {
                 env.set(key, value);
             }
         }
-        
-        setValueIfEmpty('DEFAULT_OWNER', defaultFileOwner);
+
+        const defaultFileOwner = this._context.platform.defaultFileOwner();
+        if (defaultFileOwner !== null) {
+            setValueIfEmpty('DEFAULT_OWNER', defaultFileOwner);
+        }
+
         return Promise.resolve();
     }
     
@@ -209,7 +208,9 @@ export class DockerAppInit
         return (
             isValueEmpty('COMPOSE_PROJECT_NAME') ? () => ProjectNameInputWizard.run(
                 'Your .env file does not contain a: "COMPOSE_PROJECT_NAME" parameter. Define the name of the project based on the following options:',
-                this._context
+                this._context,
+                undefined,
+                this._app.acceptDefaults
             ).then((name: string) => {
                 env.set('COMPOSE_PROJECT_NAME', name);
                 return name;
@@ -316,6 +317,15 @@ export class DockerAppInit
             if (e.message.indexOf('Hosts file conflict:') !== 0) {
                 throw e;
             }
+            if (this._app.acceptDefaults) {
+                console.log(chalk.yellowBright(e.message));
+                console.log('Overwriting hosts file entry for: ' + this._app.env.get('APP_DOMAIN'));
+                const hosts2 = new DockerHosts(this._context);
+                hosts2.removeDomain(this._app.env.get('APP_DOMAIN'));
+                hosts2.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));
+                hosts2.write();
+                return Promise.resolve();
+            }
             return new Promise<void>(resolve => {
                 console.log(chalk.yellowBright(e.message));
                 return inquirer.prompt(
@@ -366,6 +376,15 @@ export class DockerAppInit
             return Promise.resolve();
         }
         
+        // Auto-create directories if acceptDefaults is set
+        if (this._app.acceptDefaults) {
+            console.log('Creating directories:\n - ' + missingDirectories.join('\n - '));
+            forEach(missingDirectories, (dir: string) => {
+                fs.mkdirSync(dir, { recursive: true });
+            });
+            return Promise.resolve();
+        }
+
         // Ask if we should create the directories
         return inquirer.prompt(
             [
@@ -397,7 +416,8 @@ export class DockerAppInit
             this._app.dockerCompose,
             'use as default service key (shell, open,...)',
             'app',
-            this._context.appRegistry.get('defaultServiceContainer')
+            this._context.appRegistry.get('defaultServiceContainer'),
+            this._app.acceptDefaults
         ).then(
             (key: string) => {
                 this._context.appRegistry.set('defaultServiceContainer', key);

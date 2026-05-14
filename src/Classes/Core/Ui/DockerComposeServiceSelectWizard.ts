@@ -38,7 +38,8 @@ export class DockerComposeServiceSelectWizard
         dockerCompose: DockerCompose,
         forWhat: string,
         suggestedServiceKey?: string,
-        currentContainerName?: string
+        currentContainerName?: string,
+        acceptDefaults: boolean = false
     ): Promise<string>
     {
         // Make sure to update the suggested service key when we got a container name
@@ -49,7 +50,26 @@ export class DockerComposeServiceSelectWizard
                 suggestedServiceKey = newSuggestedServiceKey;
             }
         }
-        
+
+        // Auto-accept the suggested service key if acceptDefaults is set
+        if (acceptDefaults && isString(suggestedServiceKey) &&
+            DockerComposeServiceSelectWizard.checkIfSuggestionExists(dockerCompose, suggestedServiceKey)) {
+            console.log('Using default service: "' + suggestedServiceKey + '"');
+            return Promise.resolve(
+                DockerComposeServiceSelectWizard.convertServiceKeyToContainerName(dockerCompose, suggestedServiceKey)
+            );
+        }
+
+        // If acceptDefaults but no valid suggestion, pick the first service
+        if (acceptDefaults) {
+            const services = dockerCompose.getServiceList();
+            if (services.length > 0) {
+                const first = (services[0] as PlainObject);
+                console.log('Using first available service: "' + first.key + '"');
+                return Promise.resolve(first.containerName);
+            }
+        }
+
         // Ask
         return inquirer.prompt([
             {
