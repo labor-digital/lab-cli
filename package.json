@@ -17,6 +17,11 @@
 	"bin": {
 		"lab": "lib/index.js"
 	},
+	"files": [
+		"lib/",
+		"bin/",
+		"flushLib.js"
+	],
 	"scripts": {
 		"build": "node flushLib.js && tsc",
 		"watch": "node flushLib.js && tsc --watch",
