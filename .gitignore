@@ -10,3 +10,6 @@ npm-debug.log
 !.idea/copyright/*
 !.idea/codeStyles/
 !.idea/codeStyles/*
+
+# Local Claude Code settings (per-developer, never commit)
+.claude/settings.local.json
