@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 3.16.7 (2026-06-08)
+
+
+### Bug Fixes
+
+* pipeline update ([9693e4a](https://github.com/labor-digital/lab-cli/commit/9693e4a65eee9d7fc52daf6b54f6909d2217b16d))
+
 ### [3.16.6](https://github.com/labor-digital/lab-cli/compare/v3.16.5...v3.16.6) (2025-12-16)
 
 
