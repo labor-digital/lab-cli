@@ -5,16 +5,20 @@ on:
     branches:
       - master
 
+permissions:
+  id-token: write
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       -
-        uses: actions/checkout@v1
+        uses: actions/checkout@v6
       -
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v6
         with:
-          node-version: 10
+          node-version: 24
           registry-url: https://registry.npmjs.org/
       -
         name: Installing npm modules
@@ -29,7 +33,4 @@ jobs:
           github-token: ${{ secrets.github_token }}
       -
         name: Publish library on npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
-
+        run: npm publish --provenance --access public
