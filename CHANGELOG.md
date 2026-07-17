@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 4.0.1 (2026-07-17)
+
+
+### Bug Fixes
+
+* **worktree:** auto-manage APP_DOMAIN so it never needs manual editing ([704c95f](https://github.com/labor-digital/lab-cli/commit/704c95fab7c16df1d127b829ead9226d6a3be074))
+
 ## 4.0.0 (2026-07-17)
 
 
