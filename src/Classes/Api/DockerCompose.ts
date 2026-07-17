@@ -81,7 +81,7 @@ export class DockerCompose
         var result = null;
         try {
             const command = this.baseDockerComposeCommand + ' config';
-            result = childProcess.execSync(command).toString('utf8');
+            result = childProcess.execSync(command, {env: this.execEnv}).toString('utf8');
             if (result.indexOf('services') === -1) {
                 // noinspection ExceptionCaughtLocallyJS
                 throw new Error('There are no services in the docker compose config!');
@@ -125,7 +125,7 @@ export class DockerCompose
             console.log('Starting the test container...');
             const command = this.baseDockerComposeCommand + 'run --rm test npm run ' + (forceUpdate ? "test-update" : "test");
             try {
-                childProcess.execSync(command, {stdio: 'inherit'});
+                childProcess.execSync(command, {stdio: 'inherit', env: this.execEnv});
                 resolve();
             } catch (e) {
                 reject(e);
@@ -145,7 +145,7 @@ export class DockerCompose
             console.log('Starting application...');
             
             (new Network(this._app.context))
-                .registerLoopBackAliasIfRequired(this._app.env.get('APP_IP'));
+                .registerLoopBackAliasIfRequired(this._app.identity.appIp);
             
             const noAnsi = followOutput === true || !this._app.context.platform.isWindows;
             const noAnsiCommand = gte(this.version, '1.29.0') ? '--ansi never ' : '--no-ansi ';
@@ -156,7 +156,7 @@ export class DockerCompose
                             'up --remove-orphans' + (followOutput === true ? '' : ' -d');
             
             try {
-                childProcess.execSync(command, {stdio: 'inherit'});
+                childProcess.execSync(command, {stdio: 'inherit', env: this.execEnv});
                 resolve();
             } catch (e) {
                 reject(e);
@@ -174,7 +174,7 @@ export class DockerCompose
             console.log('Stopping application...');
             const command = this.baseDockerComposeCommand + (kill ? 'kill' : 'stop');
             try {
-                childProcess.execSync(command, {stdio: 'inherit'});
+                childProcess.execSync(command, {stdio: 'inherit', env: this.execEnv});
                 resolve();
             } catch (e) {
                 reject(e);
@@ -193,7 +193,7 @@ export class DockerCompose
             const command = this.baseDockerComposeCommand + ' down ' +
                             (removeImages === true ? ' --rmi all' : '');
             try {
-                childProcess.execSync(command, {stdio: 'inherit'});
+                childProcess.execSync(command, {stdio: 'inherit', env: this.execEnv});
                 resolve();
             } catch (e) {
                 reject(e);
@@ -215,7 +215,7 @@ export class DockerCompose
             const command = this.baseDockerComposeCommand + 'logs --timestamps ' +
                             '--tail="' + lines + '" ' + (follow === true ? '--follow ' : '');
             try {
-                childProcess.execSync(command, {stdio: 'inherit'});
+                childProcess.execSync(command, {stdio: 'inherit', env: this.execEnv});
                 resolve();
             } catch (e) {
                 reject(e);
@@ -229,7 +229,7 @@ export class DockerCompose
     public get isRunning(): boolean
     {
         const command = this.baseDockerComposeCommand + 'ps';
-        const content = childProcess.execSync(command, {stdio: 'pipe'}).toString('utf-8');
+        const content = childProcess.execSync(command, {stdio: 'pipe', env: this.execEnv}).toString('utf-8');
         const lines = content.split(/\r?\n/);
         let isRunning = false;
         forEach(lines, (line: string) => {
@@ -254,6 +254,27 @@ export class DockerCompose
         return isRunning;
     }
     
+    /**
+     * The environment to run docker compose with. When the app has an isolated
+     * identity (git worktree or --domain/--ip overrides) the effective compose
+     * project / domain / ip are injected here so they OVERRIDE the .env file
+     * values (shell env wins over .env in compose) without rewriting .env.
+     * Returns undefined for a plain run, so the process env is inherited as-is.
+     */
+    protected get execEnv(): NodeJS.ProcessEnv | undefined
+    {
+        const identity = this._app.identity;
+        if (!identity.isOverlay) {
+            return undefined;
+        }
+        return {
+            ...process.env,
+            COMPOSE_PROJECT_NAME: identity.composeProjectName,
+            APP_DOMAIN: identity.appDomain,
+            APP_IP: identity.appIp
+        };
+    }
+
     /**
      * Returns the prepared docker compose base command
      */
