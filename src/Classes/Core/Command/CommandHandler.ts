@@ -16,11 +16,13 @@
  * Last modified: 2020.04.05 at 14:00
  */
 
-import {forEach, getListKeys, isEmpty, isFunction} from '@labor-digital/helferlein';
+import {isArray, isEmpty, isFunction} from 'radashi';
+
 import chalk from 'chalk';
 import {Command} from 'commander';
 import {AppContext} from '../AppContext';
 import {AppEventList} from '../AppEventList';
+import {forEach} from '../Utils/ForEachHelper';
 import {CommandDefinition, CommandOptionDefinition} from './CommandRegistry';
 import {CommandStack} from './CommandStack';
 
@@ -52,7 +54,16 @@ export class CommandHandler
             
             // Register the version command
             context.program.version(context.version + '', '-v, --version');
-            
+
+            // Disable commander's built-in "help" command so we can register our own,
+            // richer "help" command (grouped overview + machine-readable --json output).
+            context.program.helpCommand(false);
+
+            // Point users and AI agents towards the full overview from the default help output.
+            context.program.addHelpText('after', () =>
+                '\nRun "lab help" for a grouped overview of every command.' +
+                '\nRun "lab help --json" for machine-readable output (scripts & AI agents).\n');
+
             // Build the command definitions
             this.buildDefinitions(context, resolve, reject);
             
@@ -88,14 +99,13 @@ export class CommandHandler
     {
         // Iterate all commands
         forEach(context.commandRegistry.getCommands(context), (command: CommandDefinition) => {
-            
             // Register the basic command information
             const c = context.program.command(command.signature);
             c.description(command.options.description);
             c.alias(command.options.alias);
             if (!isEmpty(command.options.options)) {
                 forEach(command.options.options, (option: CommandOptionDefinition) => {
-                    c.option(option.definition, option.description, option.validation, option.default);
+                    c.option(option.definition, option.description, option.validation as any, option.default);
                 });
             }
             
@@ -107,7 +117,7 @@ export class CommandHandler
             // Register the command action
             c.action((cmd: Command, ...args) => {
                 this._commandWasExecuted = true;
-                this.handleCommandAction(cmd, args, context, command, resolve, reject);
+                this.handleCommandAction(args[0], args, context, command, resolve, reject);
             });
             
         });
@@ -139,8 +149,8 @@ export class CommandHandler
                     let handler = require(command.filename);
                     if (isFunction(handler.default)) {
                         handler = handler.default;
-                    } else if (getListKeys(handler).length === 1) {
-                        handler = handler[getListKeys(handler)[0] as any];
+                    } else if (Object.keys(handler).length === 1) {
+                        handler = handler[Object.keys(handler)[0] as any];
                     } else {
                         return reject1(new Error('Invalid command handler class for command: ' + command.signature));
                     }

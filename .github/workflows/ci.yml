@@ -1,0 +1,31 @@
+name: CI
+
+# Runs the build and the test suite on every pull request (and can be triggered
+# manually), so tests gate changes BEFORE they are merged into master. The
+# release workflow (main.yml) also runs the tests on master before publishing.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: actions/checkout@v6
+      -
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      -
+        name: Installing npm modules
+        run: npm install
+      -
+        name: Build library
+        run: npm run build
+      -
+        name: Run tests
+        run: npm run test

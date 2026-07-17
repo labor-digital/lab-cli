@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,8 +17,9 @@
  * Last modified: 2020.04.05 at 21:46
  */
 
-import {forEach, isString, md5} from '@labor-digital/helferlein';
-import {mkdirRecursiveSync} from '@labor-digital/helferlein/node';
+import { isString } from 'radashi';
+import * as crypto from "crypto";
+
 import chalk from 'chalk';
 import * as fs from 'fs';
 import inquirer from 'inquirer';
@@ -138,27 +140,26 @@ export class DockerAppInit
         // Load the env
         const envFilePath = path.join(this._context.rootDirectory, '.env.app');
         const env = new DockerEnv(envFilePath);
-        
-        const defaultFileOwner = this._context.platform.defaultFileOwner();
-        if (defaultFileOwner === null) {
-            return Promise.resolve();
-        }
-        
+
         function isValueEmpty(key: string): boolean
         {
             return !env.has(key) || !isString(env.get(key)) ||
                    env.get(key).trim() === 'null' ||
                    env.get(key).trim().charAt(0) === '§';
         }
-        
+
         function setValueIfEmpty(key: string, value: string)
         {
             if (isValueEmpty(key)) {
                 env.set(key, value);
             }
         }
-        
-        setValueIfEmpty('DEFAULT_OWNER', defaultFileOwner);
+
+        const defaultFileOwner = this._context.platform.defaultFileOwner();
+        if (defaultFileOwner !== null) {
+            setValueIfEmpty('DEFAULT_OWNER', defaultFileOwner);
+        }
+
         return Promise.resolve();
     }
     
@@ -207,20 +208,46 @@ export class DockerAppInit
         return (
             isValueEmpty('COMPOSE_PROJECT_NAME') ? () => ProjectNameInputWizard.run(
                 'Your .env file does not contain a: "COMPOSE_PROJECT_NAME" parameter. Define the name of the project based on the following options:',
-                this._context
+                this._context,
+                undefined,
+                this._app.acceptDefaults
             ).then((name: string) => {
                 env.set('COMPOSE_PROJECT_NAME', name);
                 return name;
             }) : () => Promise.resolve(env.get('COMPOSE_PROJECT_NAME'))
         )()
             .then((projectName: string) => {
-                const projectShortName = projectName
+                const makeShortName = (name: string): string => name
                     .trim()
                     .split('-')
                     .map(v => v.replace(/_/, '').trim().substr(0, 3))
                     .join('_')
                     .toLowerCase();
-                
+
+                // When running inside a linked git worktree the app gets its own
+                // isolated identity (compose project, domain, ip, hosts entry and
+                // database names) so it can run side by side with the main checkout.
+                // The doppler project intentionally stays on the base name below, so
+                // the worktree keeps sharing its secrets with the main checkout.
+                const worktree = this._context.worktree;
+                const baseProjectName = worktree.isWorktree
+                    ? this.stripWorktreeSuffix(projectName, worktree.name)
+                    : projectName;
+                const effectiveProjectName = worktree.isWorktree && worktree.name
+                    ? baseProjectName + '-' + worktree.name
+                    : projectName;
+
+                // Persist the worktree-effective compose project name. docker compose
+                // reads COMPOSE_PROJECT_NAME from the .env file, so this alone isolates
+                // all containers, networks and volumes of the worktree. Guarded so a
+                // re-run (value already suffixed) does not rewrite the file needlessly.
+                if (env.get('COMPOSE_PROJECT_NAME') !== effectiveProjectName) {
+                    env.set('COMPOSE_PROJECT_NAME', effectiveProjectName);
+                }
+
+                const projectShortName = makeShortName(effectiveProjectName);
+                const baseShortName = makeShortName(baseProjectName);
+
                 // Prepare the app base directory
                 const baseDir = path.join(this._context.rootDirectory, '..');
                 
@@ -246,8 +273,10 @@ export class DockerAppInit
                 // Set empty variables
                 setValueIfEmpty('PROJECT_ENV', 'dev');
                 
-                // Set empty doppler variables
-                setValueIfKeyExistsAndEmpty('DOPPLER_PROJECT', projectShortName);
+                // Set empty doppler variables.
+                // Note: the BASE short name is used on purpose so a worktree shares
+                // the doppler project (and therefore the secrets) with the main checkout.
+                setValueIfKeyExistsAndEmpty('DOPPLER_PROJECT', baseShortName);
                 setValueIfKeyExistsAndEmpty('DOPPLER_CONFIG', 'dev');
                 // Generate doppler token if required
                 if (
@@ -272,7 +301,7 @@ export class DockerAppInit
                 
                 // Set optional values
                 const passwordGenerator = function (): string {
-                    return (md5(projectName + Math.random()) + 'ABCDEJKLOXYZ-_!#')
+                    return (crypto.createHash("md5").update(projectName + Math.random().toString()).digest("hex") + 'ABCDEJKLOXYZ-_!#')
                         .split('').sort(function () {
                             return 0.5 - Math.random();
                         }).join('');
@@ -290,10 +319,32 @@ export class DockerAppInit
     }
     
     /**
+     * Removes a previously applied worktree suffix ("-<name>") from a compose
+     * project name so re-running the init does not stack suffixes on top of each other.
+     */
+    protected stripWorktreeSuffix(projectName: string, suffix: string | null): string
+    {
+        if (!suffix) {
+            return projectName;
+        }
+        const tail = '-' + suffix;
+        return projectName.toLowerCase().endsWith(tail.toLowerCase())
+            ? projectName.substr(0, projectName.length - tail.length)
+            : projectName;
+    }
+
+    /**
      * Generates a new .env.template file based on the new .env file
      */
     protected generateEnvTemplateFile(filename: string): Promise<void>
     {
+        // Never rewrite the committed .env.template from within a linked worktree:
+        // the template is a shared artifact owned by the main checkout and would
+        // otherwise be polluted with worktree specific values (e.g. the suffixed
+        // COMPOSE_PROJECT_NAME), showing up as an unexpected change in "git status".
+        if (this._context.worktree.isWorktree) {
+            return Promise.resolve();
+        }
         const env = new DockerEnv(path.join(this._context.rootDirectory, filename));
         const envTemplate = new DockerEnvTemplate(path.join(this._context.rootDirectory, filename + '.template'));
         envTemplate.writeTemplate(env);
@@ -313,6 +364,15 @@ export class DockerAppInit
             // Check if we can handle this error
             if (e.message.indexOf('Hosts file conflict:') !== 0) {
                 throw e;
+            }
+            if (this._app.acceptDefaults) {
+                console.log(chalk.yellowBright(e.message));
+                console.log('Overwriting hosts file entry for: ' + this._app.env.get('APP_DOMAIN'));
+                const hosts2 = new DockerHosts(this._context);
+                hosts2.removeDomain(this._app.env.get('APP_DOMAIN'));
+                hosts2.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));
+                hosts2.write();
+                return Promise.resolve();
             }
             return new Promise<void>(resolve => {
                 console.log(chalk.yellowBright(e.message));
@@ -364,6 +424,15 @@ export class DockerAppInit
             return Promise.resolve();
         }
         
+        // Auto-create directories if acceptDefaults is set
+        if (this._app.acceptDefaults) {
+            console.log('Creating directories:\n - ' + missingDirectories.join('\n - '));
+            forEach(missingDirectories, (dir: string) => {
+                fs.mkdirSync(dir, { recursive: true });
+            });
+            return Promise.resolve();
+        }
+
         // Ask if we should create the directories
         return inquirer.prompt(
             [
@@ -381,7 +450,7 @@ export class DockerAppInit
                     return;
                 }
                 forEach(missingDirectories, (dir: string) => {
-                    mkdirRecursiveSync(dir);
+                    fs.mkdirSync(dir, { recursive: true });
                 });
             });
     }
@@ -395,7 +464,8 @@ export class DockerAppInit
             this._app.dockerCompose,
             'use as default service key (shell, open,...)',
             'app',
-            this._context.appRegistry.get('defaultServiceContainer')
+            this._context.appRegistry.get('defaultServiceContainer'),
+            this._app.acceptDefaults
         ).then(
             (key: string) => {
                 this._context.appRegistry.set('defaultServiceContainer', key);

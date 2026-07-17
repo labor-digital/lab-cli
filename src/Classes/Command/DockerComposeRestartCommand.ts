@@ -24,7 +24,9 @@ export class DockerComposeRestartCommand
 {
     public execute(cmd: Command, context: AppContext): Promise<void>
     {
-        return (new DockerApp(context)).initialize().then(app => {
+        const dockerApp = new DockerApp(context);
+        dockerApp.acceptDefaults = cmd.opts().yes === true;
+        return dockerApp.initialize().then(app => {
             return (app.dockerCompose.isRunning ? app.dockerCompose.stop() : Promise.resolve())
                 .then(() => app.dockerCompose.up());
         });

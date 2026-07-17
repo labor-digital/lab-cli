@@ -25,13 +25,36 @@ export class ProjectNameInputWizard
     /**
      * Asks the user for the project name and generates it based on multiple options
      */
-    public static run(initialQuestion: string, context: AppContext): Promise<string>
+    public static run(initialQuestion: string, context: AppContext, defaultName?: string, acceptDefaults: boolean = false): Promise<string>
     {
+        if (defaultName) {
+            return Promise.resolve(defaultName);
+        }
+
+        if (acceptDefaults) {
+            // Auto-detect project name from folder structure (same as "folder" option)
+            const pathParts = context.rootDirectory.replace(/[\\\/]/g, '|').split('|');
+            const parts: string[] = [];
+            while (parts.length < 3) {
+                const part = pathParts.pop();
+                if (part === 'app' || part === '') {
+                    continue;
+                }
+                if (typeof part === 'undefined') {
+                    break;
+                }
+                parts.push(ProjectNameInputWizard.wizardInputFilter(part));
+            }
+            const projectName = parts.reverse().join('-');
+            console.log('Using auto-detected project name: "' + projectName + '"');
+            return Promise.resolve(projectName);
+        }
+
         return new Promise<string>((resolve, reject) => {
             inquirer.prompt([
                 {
                     name: 'projectNameInputType',
-                    type: 'list',
+                    type: 'select',
                     message: initialQuestion,
                     default: 'folder',
                     choices: [
@@ -62,7 +85,7 @@ export class ProjectNameInputWizard
                     type: 'input',
                     when: answers => answers.projectNameInputType === 'custom',
                     message: 'Project name, any kind of string (should be URL compatible!)',
-                    filter: input => input.trim().toLowerCase(),
+                    filter: (input: string) => input.trim().toLowerCase(),
                     validate: input => {
                         if (input.length === 0) {
                             return 'The input can\'t be empty!';
@@ -79,7 +102,7 @@ export class ProjectNameInputWizard
                     type: 'input',
                     when: answers => answers.projectNameInputType === 'manual',
                     message: 'Project name, like "customer_name-project_name-app_name"',
-                    filter: input => input.trim().toLowerCase(),
+                    filter: (input: string) => input.trim().toLowerCase(),
                     validate: input => {
                         if (input.length === 0) {
                             return 'The input can\'t be empty!';

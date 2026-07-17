@@ -16,7 +16,8 @@
  * Last modified: 2020.04.06 at 14:38
  */
 
-import {getPath} from '@labor-digital/helferlein';
+import { get as getPath } from 'radashi';
+
 import chalk from 'chalk';
 import {Command} from 'commander';
 // @ts-ignore
@@ -36,7 +37,7 @@ export class DockerComposeUnisonCommand
             if (serviceKeys.indexOf('docker-unison') == -1) {
                 return this.migrateDockerCompose(app);
             }
-            return Unison.startUnison(app, cmd.force);
+            return Unison.startUnison(app, cmd.opts().force);
         });
     }
     

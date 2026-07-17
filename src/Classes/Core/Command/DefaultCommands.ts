@@ -28,6 +28,7 @@ export class DefaultCommands
             path.normalize(path.join(__dirname, '../../Command/NpmCommand')),
             {
                 alias: 'run',
+                platforms: {windows: true, darwin: true, linux: true},
                 description: 'works like "npm run" would, but is aware of the current app\'s directory structure. Works also with period prefix, like: "lab .watch"',
                 onRegistration: () => {
                     // Make commander listen to our "." prefix for npm commands
@@ -60,6 +61,16 @@ export class DefaultCommands
                 {
                     definition: '-p, --pull',
                     description: 'forces docker compose to pull the newest image versions before starting the application',
+                    default: false
+                },
+                {
+                    definition: '-y, --yes',
+                    description: 'accepts all defaults without prompting (create directories, select default service, etc.)',
+                    default: false
+                },
+                {
+                    definition: '-i, --import',
+                    description: 'triggers the import process (database/user creation) during startup',
                     default: false
                 },
                 ...(context.platform.isWindows ? [
@@ -121,7 +132,14 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('restart', '../../Command/DockerComposeRestartCommand', {
             description: 'performs a hard restart of the current project composition (docker compose stop && docker compose up)',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-y, --yes',
+                    description: 'accepts all defaults without prompting',
+                    default: false
+                }
+            ]
         });
         
         context.commandRegistry.registerCommand('down', '../../Command/DockerComposeDownCommand', {
@@ -164,7 +182,8 @@ export class DefaultCommands
         });
         
         context.commandRegistry.registerCommand('restart-engine', '../../Command/DockerEngineRestartCommand', {
-            description: 'restarts the docker engine'
+            description: 'restarts the docker engine',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('status', '../../Command/DockerComposeStatusCommand', {
@@ -175,6 +194,7 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('stop-engine', '../../Command/DockerEngineStopCommand', {
             description: 'stops the docker engine, if it is currently running',
+            platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
                     definition: '--force',
@@ -189,7 +209,7 @@ export class DefaultCommands
             platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
-                    definition: '-ct, --copyFromTest',
+                    definition: '-c, --copyFromTest',
                     description: 'will copy import data from the test-data directory (if it exists) first before importing (Caution: This will overwrite existing files!)',
                     default: false
                 }
@@ -201,7 +221,7 @@ export class DefaultCommands
             platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
-                    definition: '-ct, --copyToTest',
+                    definition: '-c, --copyToTest',
                     description: 'will copy the exported files to the test-data directory if it exists (Caution: This will overwrite existing files!)',
                     default: false
                 }
@@ -210,9 +230,24 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('init', '../../Command/ProjectInitCommand', {
             description: 'initializes a new application stub based on our boilerplate',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-n, --name <name>',
+                    description: 'The name of the project to initialize (e.g. customer-project-app)'
+                },
+                {
+                    definition: '-b, --boilerplate <boilerplate>',
+                    description: 'The name of the boilerplate to use'
+                },
+                {
+                    definition: '-f, --force',
+                    description: 'Force initialization even if the directory is not empty',
+                    default: false
+                }
+            ]
         });
-        
+
         context.commandRegistry.registerCommand('installCa', '../../Command/InstallCaCommand', {
             description: 'installs our root ca (@labor-digital/ssl-certs) as trusted ssl root certificate',
             platforms: {windows: true, darwin: true, linux: true}
@@ -229,7 +264,19 @@ export class DefaultCommands
                 }
             ]
         });
-        
+
+        context.commandRegistry.registerCommand('help', '../../Command/HelpCommand', {
+            description: 'shows a grouped overview of all commands and how to use them (use --json for machine-readable output)',
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '--json',
+                    description: 'outputs the overview as JSON so scripts and AI agents can consume it',
+                    default: false
+                }
+            ]
+        });
+
         return Promise.resolve(context);
     }
 }

@@ -110,6 +110,70 @@ export class Doppler
         return this.isLoggedIn ? 1 : 0;
     }
     
+    /**
+     * Creates a new Doppler project
+     */
+    public createProject(projectName: string): void
+    {
+        childProcess.execSync(
+            'doppler projects create "' + projectName + '" --json',
+            {stdio: 'pipe'}
+        );
+    }
+
+    /**
+     * Creates a new environment in an existing Doppler project
+     */
+    /**
+     * Checks if a Doppler project exists
+     */
+    public projectExists(projectName: string): boolean
+    {
+        try {
+            childProcess.execSync(
+                'doppler projects get -p "' + projectName + '" --json',
+                {stdio: 'pipe'}
+            );
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * Deletes an existing Doppler project
+     */
+    public deleteProject(projectName: string): void
+    {
+        childProcess.execSync(
+            'doppler projects delete -p "' + projectName + '" --yes',
+            {stdio: 'pipe'}
+        );
+    }
+
+    public createEnvironment(projectName: string, envName: string, slug?: string): void
+    {
+        const envSlug = slug || envName;
+        childProcess.execSync(
+            'doppler environments create "' + envName + '" "' + envSlug + '" -p "' + projectName + '" --json',
+            {stdio: 'pipe'}
+        );
+    }
+
+    /**
+     * Sets one or more secrets in a Doppler project config
+     */
+    public setSecrets(projectName: string, configName: string, secrets: Record<string, string>): void
+    {
+        const pairs = Object.entries(secrets)
+            .map(([key, value]) => '"' + key + '=' + value + '"')
+            .join(' ');
+        childProcess.execSync(
+            'doppler secrets set ' + pairs + ' -p "' + projectName + '" -c "' + configName + '"',
+            {stdio: 'pipe'}
+        );
+    }
+
     public checkIfValidServiceTokenExists(dopplerProject: string, dopplerConfig: string): boolean
     {
         const ownTokens = this._getServiceTokens(dopplerProject, dopplerConfig)

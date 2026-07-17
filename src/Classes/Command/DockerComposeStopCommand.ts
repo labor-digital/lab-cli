@@ -30,7 +30,7 @@ export class DockerComposeStopCommand
                 console.log(chalk.yellowBright('The app is currently not running!'));
                 return;
             }
-            return app.dockerCompose.stop(cmd.force === true);
+            return app.dockerCompose.stop(cmd.opts().force === true);
         });
     }
 }

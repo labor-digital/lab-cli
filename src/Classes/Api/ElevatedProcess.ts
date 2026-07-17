@@ -16,7 +16,8 @@
  * Last modified: 2020.04.05 at 19:34
  */
 
-import {asArray, List} from '@labor-digital/helferlein';
+type List = Array<any> | Record<string, any>;
+
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -77,7 +78,7 @@ export class ElevatedProcess
         }
         
         // Build the bat file
-        var content = asArray(cmdList).join('\n');
+        var content = (Array.isArray(cmdList) ? cmdList : [cmdList]).join('\n');
         
         // Write the content
         const executionFile = this._context.platform.choose({

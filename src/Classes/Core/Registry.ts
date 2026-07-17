@@ -16,7 +16,10 @@
  * Last modified: 2020.04.04 at 20:40
  */
 
-import {GenericStorage, GenericStorageInterface, isEmpty} from '@labor-digital/helferlein';
+import { isEmpty } from 'radashi';
+import { GenericStorage } from './GenericStorage';
+import { GenericStorageInterface } from './GenericStorage';
+
 import * as fs from 'fs';
 import * as path from 'path';
 import {AppContext} from './AppContext';

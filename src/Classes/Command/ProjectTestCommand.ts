@@ -1,3 +1,4 @@
+import {forEach} from '../Core/Utils/ForEachHelper';
 /*
  * Copyright 2025 LABOR.digital
  *
@@ -16,7 +17,7 @@
  * Last modified: 2025.05.06 at 14:02
  */
 
-import {forEach} from '@labor-digital/helferlein';
+
 import {Command} from 'commander';
 import fs from 'fs';
 import inquirer from 'inquirer';
@@ -26,7 +27,7 @@ import {Bugfixes} from '../Core/Bugfixes';
 import {CommandStack} from '../Core/Command/CommandStack';
 import {DockerApp} from '../Core/DockerApp/DockerApp';
 
-export class ProjectImportCommand
+export class ProjectTestCommand
 {
     public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void>
     {
@@ -60,7 +61,7 @@ export class ProjectImportCommand
                         return app.dockerCompose.up();
                     })
                     .then(() => {
-                        return app.dockerCompose.test(cmd.update === true).catch(() => {});
+                        return app.dockerCompose.test(cmd.opts().update === true).catch(() => {});
                     })
                     .then(() => {
                         return app.dockerCompose.stop();

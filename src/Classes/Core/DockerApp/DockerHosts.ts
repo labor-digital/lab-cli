@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,7 @@
  * Last modified: 2020.04.06 at 09:06
  */
 
-import {forEach, isUndefined} from '@labor-digital/helferlein';
+
 import * as fs from 'fs';
 import * as path from 'path';
 import {ElevatedProcess} from '../../Api/ElevatedProcess';
@@ -87,7 +88,7 @@ export class DockerHosts
             if (d === domain) {
                 const dRootDirectory = this._directories.get(k);
                 if (dRootDirectory !== rootDirectory) {
-                    if (!isUndefined(dRootDirectory)) {
+                    if (!(dRootDirectory === undefined)) {
                         throw new Error('Hosts file conflict: The domain ' + domain +
                                         ' was already registered with another app at: ' + dRootDirectory + '!');
                     } else {

@@ -16,7 +16,8 @@
  * Last modified: 2020.04.03 at 20:30
  */
 
-import {PlainObject} from '@labor-digital/helferlein';
+import {PlainObject} from '../Utils/ForEachHelper';
+
 import {AppContext} from '../AppContext';
 
 export class DefaultConfig

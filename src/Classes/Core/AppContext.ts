@@ -16,16 +16,20 @@
  * Last modified: 2020.04.03 at 18:59
  */
 
-import {EventEmitter, isPlainObject, PlainObject} from '@labor-digital/helferlein';
+import { isObject as isPlainObject } from 'radashi';
+
 import commander from 'commander';
 import * as path from 'path';
+import {Git, WorktreeInfo} from '../Api/Git';
 import {Platform} from '../Api/Platform';
 import {AppRegistry} from './AppRegistry';
 import {CommandRegistry} from './Command/CommandRegistry';
 import {Config} from './Configuration/Config';
 import {ConfigLoader} from './Configuration/ConfigLoader';
+import {EventEmitter} from './EventEmitter';
 import {FileFinder} from './FileFinder';
 import {Registry} from './Registry';
+import {PlainObject} from './Utils/ForEachHelper';
 
 export class AppContext
 {
@@ -86,6 +90,11 @@ export class AppContext
      * Holds the command registry to register the commands on
      */
     private _commandRegistry: CommandRegistry;
+
+    /**
+     * Cached information about the git worktree the CLI runs in (lazily resolved)
+     */
+    private _worktree: WorktreeInfo | null = null;
     
     /**
      * AppContext constructor
@@ -148,7 +157,15 @@ export class AppContext
     {
         return process.cwd().replace(/[\\\/\s]+$/, path.sep) + path.sep;
     }
-    
+
+    /**
+     * True if the current invocation should produce machine-readable output only
+     */
+    public get isMachineReadableOutput(): boolean
+    {
+        return process.argv.indexOf('--json') !== -1;
+    }
+
     /**
      * Returns the root directory of the cli package
      */
@@ -171,6 +188,19 @@ export class AppContext
     public get platform(): Platform
     {
         return this._platform;
+    }
+
+    /**
+     * Returns information about the git worktree the CLI is executed in.
+     * The result is resolved once, lazily, and then cached for the process lifetime.
+     * When not inside a linked worktree (or git is unavailable) "isWorktree" is false.
+     */
+    public get worktree(): WorktreeInfo
+    {
+        if (this._worktree === null) {
+            this._worktree = new Git(this).getWorktreeInfo();
+        }
+        return this._worktree;
     }
     
     /**
