@@ -139,5 +139,11 @@ describe('DefaultCommands', () => {
             '../../Command/ProjectTestCommand',
             expect.any(Object)
         );
+
+        expect(mockContext.commandRegistry.registerCommand).toHaveBeenCalledWith(
+            'help',
+            '../../Command/HelpCommand',
+            expect.any(Object)
+        );
     });
 });

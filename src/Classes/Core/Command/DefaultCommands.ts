@@ -261,7 +261,19 @@ export class DefaultCommands
                 }
             ]
         });
-        
+
+        context.commandRegistry.registerCommand('help', '../../Command/HelpCommand', {
+            description: 'shows a grouped overview of all commands and how to use them (use --json for machine-readable output)',
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '--json',
+                    description: 'outputs the overview as JSON so scripts and AI agents can consume it',
+                    default: false
+                }
+            ]
+        });
+
         return Promise.resolve(context);
     }
 }

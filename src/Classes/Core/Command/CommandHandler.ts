@@ -54,7 +54,16 @@ export class CommandHandler
             
             // Register the version command
             context.program.version(context.version + '', '-v, --version');
-            
+
+            // Disable commander's built-in "help" command so we can register our own,
+            // richer "help" command (grouped overview + machine-readable --json output).
+            context.program.helpCommand(false);
+
+            // Point users and AI agents towards the full overview from the default help output.
+            context.program.addHelpText('after', () =>
+                '\nRun "lab help" for a grouped overview of every command.' +
+                '\nRun "lab help --json" for machine-readable output (scripts & AI agents).\n');
+
             // Build the command definitions
             this.buildDefinitions(context, resolve, reject);
             
