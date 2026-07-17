@@ -218,72 +218,49 @@ export class DockerAppInit
             }) : () => Promise.resolve(env.get('COMPOSE_PROJECT_NAME'))
         )()
             .then((projectName: string) => {
-                const makeShortName = (name: string): string => name
+                const projectShortName = projectName
                     .trim()
                     .split('-')
                     .map(v => v.replace(/_/, '').trim().substr(0, 3))
                     .join('_')
                     .toLowerCase();
 
-                // When running inside a linked git worktree the app gets its own
-                // isolated identity (compose project, domain, ip, hosts entry and
-                // database names) so it can run side by side with the main checkout.
-                // The doppler project intentionally stays on the base name below, so
-                // the worktree keeps sharing its secrets with the main checkout.
-                const worktree = this._context.worktree;
-                const baseProjectName = worktree.isWorktree
-                    ? this.stripWorktreeSuffix(projectName, worktree.name)
-                    : projectName;
-                const effectiveProjectName = worktree.isWorktree && worktree.name
-                    ? baseProjectName + '-' + worktree.name
-                    : projectName;
-
-                // Persist the worktree-effective compose project name. docker compose
-                // reads COMPOSE_PROJECT_NAME from the .env file, so this alone isolates
-                // all containers, networks and volumes of the worktree. Guarded so a
-                // re-run (value already suffixed) does not rewrite the file needlessly.
-                if (env.get('COMPOSE_PROJECT_NAME') !== effectiveProjectName) {
-                    env.set('COMPOSE_PROJECT_NAME', effectiveProjectName);
-                }
-
-                const projectShortName = makeShortName(effectiveProjectName);
-                const baseShortName = makeShortName(baseProjectName);
-
                 // Prepare the app base directory
                 const baseDir = path.join(this._context.rootDirectory, '..');
-                
-                // Generate IP if required
-                if (isValueEmpty('APP_IP')) {
-                    let nextIp = this._context.registry.get('nextIp', 2136473601);
-                    // Handle legacy IP value @todo remove in next major release
-                    if (nextIp >= 127088000001) {
-                        nextIp = Ip.ip2long(Ip.legacy2ip(nextIp));
+
+                // The network identity (compose project / domain / ip) is resolved at
+                // runtime as an OVERLAY (see AppIdentity) and deliberately NOT persisted
+                // here: inside a git worktree that keeps the (possibly committed or
+                // read-only) .env untouched and the git tree clean, while the worktree
+                // still runs under its own isolated compose project, domain and ip.
+                // We therefore only generate defaults for a real main checkout.
+                if (!this._context.worktree.isWorktree) {
+                    // Generate IP if required
+                    if (isValueEmpty('APP_IP')) {
+                        let nextIp = this._context.registry.get('nextIp', 2136473601);
+                        // Handle legacy IP value @todo remove in next major release
+                        if (nextIp >= 127088000001) {
+                            nextIp = Ip.ip2long(Ip.legacy2ip(nextIp));
+                        }
+                        env.set('APP_IP', Ip.long2ip(++nextIp) + '');
+                        this._context.registry.set('nextIp', nextIp);
                     }
-                    env.set('APP_IP', Ip.long2ip(++nextIp) + '');
-                    this._context.registry.set('nextIp', nextIp);
+
+                    // Generate domain if required
+                    if (isValueEmpty('APP_DOMAIN')) {
+                        const domain =
+                            encodeURI(projectShortName).replace(/_/g, '-')
+                            + this._context.config.get('network.domain.base');
+                        env.set('APP_DOMAIN', domain);
+                    }
                 }
-                
-                // Generate / maintain the domain.
-                // - Outside a worktree: only generate it when empty (unchanged behaviour).
-                // - Inside a worktree: also replace a domain that was inherited from the
-                //   main checkout (i.e. still the base-name domain), so the worktree is
-                //   reachable under its own domain WITHOUT the user having to edit
-                //   APP_DOMAIN by hand. A domain the user customised themselves (that
-                //   matches neither the base nor the worktree derivation) is left intact.
-                const domainBase = this._context.config.get('network.domain.base');
-                const toDomain = (shortName: string) => encodeURI(shortName).replace(/_/g, '-') + domainBase;
-                const inheritedBaseDomain = worktree.isWorktree && env.get('APP_DOMAIN') === toDomain(baseShortName);
-                if (isValueEmpty('APP_DOMAIN') || inheritedBaseDomain) {
-                    env.set('APP_DOMAIN', toDomain(projectShortName));
-                }
-                
+
                 // Set empty variables
                 setValueIfEmpty('PROJECT_ENV', 'dev');
                 
-                // Set empty doppler variables.
-                // Note: the BASE short name is used on purpose so a worktree shares
-                // the doppler project (and therefore the secrets) with the main checkout.
-                setValueIfKeyExistsAndEmpty('DOPPLER_PROJECT', baseShortName);
+                // Set empty doppler variables. A worktree never rewrites .env here, so
+                // it keeps the main checkout's DOPPLER_PROJECT and shares its secrets.
+                setValueIfKeyExistsAndEmpty('DOPPLER_PROJECT', projectShortName);
                 setValueIfKeyExistsAndEmpty('DOPPLER_CONFIG', 'dev');
                 // Generate doppler token if required
                 if (
@@ -326,21 +303,6 @@ export class DockerAppInit
     }
     
     /**
-     * Removes a previously applied worktree suffix ("-<name>") from a compose
-     * project name so re-running the init does not stack suffixes on top of each other.
-     */
-    protected stripWorktreeSuffix(projectName: string, suffix: string | null): string
-    {
-        if (!suffix) {
-            return projectName;
-        }
-        const tail = '-' + suffix;
-        return projectName.toLowerCase().endsWith(tail.toLowerCase())
-            ? projectName.substr(0, projectName.length - tail.length)
-            : projectName;
-    }
-
-    /**
      * Generates a new .env.template file based on the new .env file
      */
     protected generateEnvTemplateFile(filename: string): Promise<void>
@@ -363,9 +325,14 @@ export class DockerAppInit
      */
     protected registerDomainInHostsFile(): Promise<void>
     {
+        // Use the RESOLVED identity (worktree-isolated domain/ip when applicable),
+        // not the raw .env values, so a worktree registers its own hosts entry.
+        const appIp = this._app.identity.appIp;
+        const appDomain = this._app.identity.appDomain;
+
         const hosts = new DockerHosts(this._context);
         try {
-            hosts.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));
+            hosts.set(appIp, appDomain);
             hosts.write();
         } catch (e) {
             // Check if we can handle this error
@@ -374,10 +341,10 @@ export class DockerAppInit
             }
             if (this._app.acceptDefaults) {
                 console.log(chalk.yellowBright(e.message));
-                console.log('Overwriting hosts file entry for: ' + this._app.env.get('APP_DOMAIN'));
+                console.log('Overwriting hosts file entry for: ' + appDomain);
                 const hosts2 = new DockerHosts(this._context);
-                hosts2.removeDomain(this._app.env.get('APP_DOMAIN'));
-                hosts2.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));
+                hosts2.removeDomain(appDomain);
+                hosts2.set(appIp, appDomain);
                 hosts2.write();
                 return Promise.resolve();
             }
@@ -387,7 +354,7 @@ export class DockerAppInit
                     [
                         {
                             name: 'ok',
-                            message: 'It seems like the domain: ' + this._app.env.get('APP_DOMAIN') +
+                            message: 'It seems like the domain: ' + appDomain +
                                      ' is already in use in your hosts file, should I overwrite it with the config for this app?',
                             type: 'confirm',
                             default: true
@@ -399,11 +366,11 @@ export class DockerAppInit
                             // Reject with a real error instead of killing the process, so
                             // callers (and agents) get a diagnostic they can act on.
                             return reject(new UserError(
-                                'Aborted: the hosts file entry for "' + this._app.env.get('APP_DOMAIN') +
+                                'Aborted: the hosts file entry for "' + appDomain +
                                 '" conflicts with an existing one. Please fix your hosts file before continuing.'));
                         }
-                        hosts.removeDomain(this._app.env.get('APP_DOMAIN'));
-                        hosts.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));
+                        hosts.removeDomain(appDomain);
+                        hosts.set(appIp, appDomain);
                         hosts.write();
                         resolve();
                     });

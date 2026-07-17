@@ -30,6 +30,7 @@ import {Doppler} from '../../Api/Doppler';
 import {AppContext} from '../AppContext';
 import {Bugfixes} from '../Bugfixes';
 import {UserError} from '../Error/UserError';
+import {AppIdentity, AppIdentityValues} from './AppIdentity';
 import {DockerAppInit} from './DockerAppInit';
 import {DockerEnv} from './DockerEnv';
 
@@ -91,6 +92,17 @@ export class DockerApp
      * When true, all interactive prompts will be auto-accepted with defaults
      */
     public acceptDefaults: boolean = false;
+
+    /**
+     * Optional explicit overrides for the app's network identity (--domain / --ip).
+     */
+    public domainOverride: string | undefined;
+    public ipOverride: string | undefined;
+
+    /**
+     * The resolved (possibly worktree-isolated) network identity, cached per instance.
+     */
+    protected _identity: AppIdentityValues | undefined;
 
     public constructor(context: AppContext)
     {
@@ -215,6 +227,23 @@ export class DockerApp
     public get dockerCompose(): DockerCompose
     {
         return this._dockerCompose;
+    }
+
+    /**
+     * Returns the effective network identity (compose project, domain, ip) for
+     * this app. Inside a git worktree (or with --domain/--ip) this is an isolated
+     * overlay so the app can run side by side with the main checkout. Resolved
+     * lazily (after initialize() has loaded the env) and cached.
+     */
+    public get identity(): AppIdentityValues
+    {
+        if (this._identity === undefined) {
+            this._identity = (new AppIdentity(this._context, this._env, {
+                domain: this.domainOverride,
+                ip: this.ipOverride
+            })).resolve();
+        }
+        return this._identity;
     }
     
     /**

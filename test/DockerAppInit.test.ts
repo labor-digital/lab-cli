@@ -47,19 +47,23 @@ describe('DockerAppInit worktree identity isolation', () => {
     });
     afterEach(() => jest.restoreAllMocks());
 
-    it('suffixes compose project name, domain and short-name-derived values inside a worktree, keeping doppler on the base', async () => {
+    it('does NOT rewrite identity in .env inside a worktree (identity is a runtime overlay)', async () => {
         mockEnvStore.set('COMPOSE_PROJECT_NAME', 'my-project');
+        mockEnvStore.set('APP_DOMAIN', 'my-pro.project.dev.local');
         mockEnvStore.set('DOPPLER_PROJECT', 'null'); // "null" is treated as empty by the init
 
         await (makeInit(WORKTREE) as any).fillEmptyValuesInEnvFile();
 
-        expect(mockEnvStore.get('COMPOSE_PROJECT_NAME')).toBe('my-project-pyongyang');
-        expect(mockEnvStore.get('APP_DOMAIN')).toBe('my-pro-pyo.project.dev.local');
+        // .env keeps the base values (git stays clean); the worktree gets its own
+        // compose project / domain / ip from AppIdentity at runtime instead.
+        expect(mockEnvStore.get('COMPOSE_PROJECT_NAME')).toBe('my-project');
+        expect(mockEnvStore.get('APP_DOMAIN')).toBe('my-pro.project.dev.local');
+        expect(mockEnvStore.has('APP_IP')).toBe(false);
+        // Doppler stays on the base so the worktree shares the main checkout's secrets.
         expect(mockEnvStore.get('DOPPLER_PROJECT')).toBe('my_pro');
-        expect(mockEnvStore.get('APP_IP')).toBeTruthy();
     });
 
-    it('leaves the identity untouched outside a worktree', async () => {
+    it('generates domain and ip in a main checkout when they are empty', async () => {
         mockEnvStore.set('COMPOSE_PROJECT_NAME', 'my-project');
         mockEnvStore.set('DOPPLER_PROJECT', 'null');
 
@@ -67,34 +71,8 @@ describe('DockerAppInit worktree identity isolation', () => {
 
         expect(mockEnvStore.get('COMPOSE_PROJECT_NAME')).toBe('my-project');
         expect(mockEnvStore.get('APP_DOMAIN')).toBe('my-pro.project.dev.local');
+        expect(mockEnvStore.get('APP_IP')).toBeTruthy();
         expect(mockEnvStore.get('DOPPLER_PROJECT')).toBe('my_pro');
-    });
-
-    it('is idempotent - re-running does not stack the suffix', async () => {
-        mockEnvStore.set('COMPOSE_PROJECT_NAME', 'my-project-pyongyang');
-
-        await (makeInit(WORKTREE) as any).fillEmptyValuesInEnvFile();
-
-        expect(mockEnvStore.get('COMPOSE_PROJECT_NAME')).toBe('my-project-pyongyang');
-    });
-
-    it('replaces an inherited base domain with the worktree domain (no manual edit needed)', async () => {
-        mockEnvStore.set('COMPOSE_PROJECT_NAME', 'my-project');
-        // the .env was seeded from the main checkout / template with the base domain
-        mockEnvStore.set('APP_DOMAIN', 'my-pro.project.dev.local');
-
-        await (makeInit(WORKTREE) as any).fillEmptyValuesInEnvFile();
-
-        expect(mockEnvStore.get('APP_DOMAIN')).toBe('my-pro-pyo.project.dev.local');
-    });
-
-    it('keeps a user-customised domain inside a worktree', async () => {
-        mockEnvStore.set('COMPOSE_PROJECT_NAME', 'my-project');
-        mockEnvStore.set('APP_DOMAIN', 'my-custom.example.com');
-
-        await (makeInit(WORKTREE) as any).fillEmptyValuesInEnvFile();
-
-        expect(mockEnvStore.get('APP_DOMAIN')).toBe('my-custom.example.com');
     });
 
     it('does not rewrite an existing domain outside a worktree', async () => {

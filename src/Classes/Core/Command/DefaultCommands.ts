@@ -73,6 +73,14 @@ export class DefaultCommands
                     description: 'triggers the import process (database/user creation) during startup',
                     default: false
                 },
+                {
+                    definition: '--domain <domain>',
+                    description: 'override the app domain (e.g. to run an isolated instance in CI / a worktree)'
+                },
+                {
+                    definition: '--ip <ip>',
+                    description: 'override the app loopback ip (e.g. to run an isolated instance in CI / a worktree)'
+                },
                 ...(context.platform.isWindows ? [
                     {
                         definition: '-w, --separateWindow',

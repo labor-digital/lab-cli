@@ -125,6 +125,8 @@ Options:
 - `-p, --pull` — pull the newest image versions before starting.
 - `-y, --yes` — accept all defaults without prompting (create directories, pick the default service, …).
 - `-i, --import` — trigger the import process (database / user creation) during startup.
+- `--domain <domain>` — override the app domain (run an isolated instance, e.g. in CI or a worktree).
+- `--ip <ip>` — override the app loopback ip (run an isolated instance, e.g. in CI or a worktree).
 - `-w, --separateWindow` — _Windows only_ — open the docker process in a new window.
 
 ```bash
@@ -340,33 +342,37 @@ regenerated.
 identity** so it can run **side by side with your main checkout** without clashing — perfect for
 spinning up a feature branch next to `main`.
 
-Concretely, inside a worktree `lab` automatically:
+Concretely, inside a worktree `lab` resolves an isolated identity **at runtime** and injects it into
+docker compose / the hosts file / the loopback alias — it does **not** rewrite your `.env`:
 
 - suffixes `COMPOSE_PROJECT_NAME` with the worktree directory name (e.g. `my-project` →
   `my-project-featurex`), so all **containers, networks and volumes** are separate;
-- derives a separate **`APP_DOMAIN`**, allocates a separate **`APP_IP`** and writes a separate
-  **hosts-file entry**;
-- derives separate **database names** (`APP_MYSQL_*` / `APP_SQL_*`);
+- derives a separate **`APP_DOMAIN`** and allocates a separate, stable **`APP_IP`** (so the host
+  **port bind doesn't collide** with the main app) and writes its own **hosts-file entry**;
 - **keeps `DOPPLER_PROJECT` pointed at the main project**, so the worktree shares its secrets with
   the main checkout;
-- **does not rewrite the committed `.env.template`** — your worktree stays clean in `git status`.
+- leaves your **`.env` and `.env.template` untouched** — this works even when `.env` is committed or
+  read-only, and your worktree stays clean in `git status`.
 
-The worktree's `.env` is (like any `.env`) git-ignored and regenerated per worktree. Your **main
-checkout is completely unaffected**: detection is based on git's `--git-dir` vs `--git-common-dir`,
-and if git is unavailable or you are in the main working tree, behavior is exactly as before.
+Because the identity is a runtime overlay (not written to `.env`), it works regardless of whether
+`.env` is git-ignored or committed. Your **main checkout is completely unaffected**: detection is
+based on git's `--git-dir` vs `--git-common-dir`, and if git is unavailable or you are in the main
+working tree, behavior is exactly as before. You can also set the identity explicitly with
+`lab up --domain <domain> --ip <ip>` (handy in CI).
 
 ### Example
 
 ```bash
-# from your main checkout (e.g. .../my-project/app running as "my-project")
+# from your main checkout (e.g. .../my-project/app running as "my-project" on 127.88.0.4:443)
 git worktree add ../my-project-featurex featurex
 cd ../my-project-featurex/app
 
-lab up            # comes up as "my-project-featurex" with its own domain/ip/containers
+lab up            # comes up as "my-project-featurex" with its OWN domain + ip (e.g. 127.88.0.5) + containers
 lab status        # operates on the isolated worktree instance
 ```
 
-Both apps now run at the same time, each reachable under its own domain.
+Both apps run at the same time, each on its own IP/port and reachable under its own domain — no
+manual `.env` editing required.
 
 ## Configuration
 

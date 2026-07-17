@@ -34,6 +34,8 @@ export class DockerComposeUpCommand
         }
         const dockerApp = new DockerApp(context);
         dockerApp.acceptDefaults = cmd.opts().yes === true;
+        dockerApp.domainOverride = cmd.opts().domain;
+        dockerApp.ipOverride = cmd.opts().ip;
         return dockerApp.initialize().then(app => {
             if (cmd.opts().import === true) {
                 const importDir = app.importExportDirectory;
