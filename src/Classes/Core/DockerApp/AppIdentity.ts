@@ -15,6 +15,7 @@
  */
 
 import { isString } from 'radashi';
+import * as path from 'path';
 import {Ip} from '../../Api/Ip';
 import {AppContext} from '../AppContext';
 import {DockerEnv} from './DockerEnv';
@@ -28,6 +29,15 @@ export interface AppIdentityValues
     composeProjectName: string;
     appDomain: string;
     appIp: string;
+
+    /**
+     * Worktree-relative overrides for the app's directory variables (APP_ROOT_DIR,
+     * APP_WORKING_DIR, ...). Inside a worktree these repoint the container's
+     * bind-mounts (code, .env.app, opt, data, ...) at the WORKTREE's own paths, so
+     * the worktree app serves its own branch instead of the main checkout's code.
+     * Empty for a plain main-checkout run.
+     */
+    dirs: Record<string, string>;
 
     /**
      * True when the values differ from the raw .env values and therefore have to
@@ -78,7 +88,7 @@ export class AppIdentity
 
         // Nothing to overlay: plain main-checkout run without explicit overrides.
         if (!worktree.isWorktree && !domainOverride && !ipOverride) {
-            return {composeProjectName: baseName, appDomain: baseDomain, appIp: baseIp, isOverlay: false};
+            return {composeProjectName: baseName, appDomain: baseDomain, appIp: baseIp, dirs: {}, isOverlay: false};
         }
 
         // Compose project: suffix with the worktree name (idempotent).
@@ -92,8 +102,41 @@ export class AppIdentity
             composeProjectName: composeProjectName,
             appDomain: domainOverride || (worktree.isWorktree ? this.deriveDomain(composeProjectName) : baseDomain),
             appIp: ipOverride || (worktree.isWorktree ? this.resolveWorktreeIp() : baseIp),
+            dirs: worktree.isWorktree ? this.resolveWorktreeDirs() : {},
             isOverlay: true
         };
+    }
+
+    /**
+     * Repoints the app's directory variables at the CURRENT worktree so the
+     * container bind-mounts the worktree's own code / config instead of the main
+     * checkout's. Uses the same layout as a main checkout (see DockerAppInit), but
+     * rooted at this worktree. Only variables the app actually declares in .env are
+     * returned, so we never inject mounts the composition does not use.
+     */
+    protected resolveWorktreeDirs(): Record<string, string>
+    {
+        const root = this._context.rootDirectory;
+        const parent = path.join(root, '..');
+        const sep = path.sep;
+        const candidates: Record<string, string> = {
+            APP_ROOT_DIR: root,
+            APP_PARENT_DIR: parent + sep,
+            APP_WORKING_DIR: path.join(root, 'src') + sep,
+            APP_DATA_DIR: path.join(parent, 'data') + sep,
+            APP_LOG_DIR: path.join(parent, 'logs') + sep,
+            APP_IMPORT_DIR: path.join(parent, 'import') + sep,
+            APP_SSH_DIR: path.join(parent, 'ssh') + sep,
+            APP_OPT_DIR: path.join(root, 'opt') + sep
+        };
+
+        const dirs: Record<string, string> = {};
+        Object.keys(candidates).forEach(key => {
+            if (this._env.has(key)) {
+                dirs[key] = candidates[key];
+            }
+        });
+        return dirs;
     }
 
     /**

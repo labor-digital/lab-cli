@@ -348,7 +348,11 @@ docker compose / the hosts file / the loopback alias — it does **not** rewrite
 - suffixes `COMPOSE_PROJECT_NAME` with the worktree directory name (e.g. `my-project` →
   `my-project-featurex`), so all **containers, networks and volumes** are separate;
 - derives a separate **`APP_DOMAIN`** and allocates a separate, stable **`APP_IP`** (so the host
-  **port bind doesn't collide** with the main app) and writes its own **hosts-file entry**;
+  **port bind doesn't collide** with the main app) and writes its own **hosts-file entry** (kept in
+  sync with that ip on every `lab up`);
+- repoints the app's **directory bind-mounts** (`APP_ROOT_DIR`, `APP_WORKING_DIR`, `APP_OPT_DIR`,
+  data/logs/…) at the **worktree's own paths**, so the container serves the **worktree's code**, not
+  the main checkout's;
 - **keeps `DOPPLER_PROJECT` pointed at the main project**, so the worktree shares its secrets with
   the main checkout;
 - leaves your **`.env` and `.env.template` untouched** — this works even when `.env` is committed or
