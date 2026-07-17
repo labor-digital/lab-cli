@@ -28,6 +28,7 @@ export class DefaultCommands
             path.normalize(path.join(__dirname, '../../Command/NpmCommand')),
             {
                 alias: 'run',
+                platforms: {windows: true, darwin: true, linux: true},
                 description: 'works like "npm run" would, but is aware of the current app\'s directory structure. Works also with period prefix, like: "lab .watch"',
                 onRegistration: () => {
                     // Make commander listen to our "." prefix for npm commands
@@ -181,7 +182,8 @@ export class DefaultCommands
         });
         
         context.commandRegistry.registerCommand('restart-engine', '../../Command/DockerEngineRestartCommand', {
-            description: 'restarts the docker engine'
+            description: 'restarts the docker engine',
+            platforms: {windows: true, darwin: true, linux: true}
         });
         
         context.commandRegistry.registerCommand('status', '../../Command/DockerComposeStatusCommand', {
@@ -192,6 +194,7 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('stop-engine', '../../Command/DockerEngineStopCommand', {
             description: 'stops the docker engine, if it is currently running',
+            platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
                     definition: '--force',

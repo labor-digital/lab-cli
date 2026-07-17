@@ -103,9 +103,8 @@ Unless noted otherwise, every command is run from inside your app directory (the
 contains your `docker-compose.yml` / `docker-compose.dev.yml`, or a parent of it — see
 [apps & projects](#concept-apps--projects)).
 
-> **Platform support.** Most commands run on macOS, Linux and Windows. Commands marked
-> _Windows only_ are currently limited to Windows. Everything else is cross-platform, except
-> `sync`, which is macOS + Windows only.
+> **Platform support.** Every command runs on macOS, Linux and Windows, except `sync`
+> (macOS + Windows only) and the `up --separateWindow` flag (Windows only).
 
 ### Run & inspect your app
 
@@ -180,11 +179,11 @@ slow (large projects, inotify-heavy tooling).
 #### `start-engine`
 Starts the docker engine if it is not already running.
 
-#### `stop-engine`  _(Windows only)_
+#### `stop-engine`
 Stops the docker engine if it is running.
 - `--force` — ignore the current "running" state of the engine.
 
-#### `restart-engine`  _(Windows only)_
+#### `restart-engine`
 Restarts the docker engine.
 
 #### `stop-all`
@@ -227,7 +226,7 @@ as a trusted SSL root certificate, so the generated `https` domains are trusted 
 
 ### Utilities
 
-#### `npm` (alias `run`)  _(Windows only)_
+#### `npm` (alias `run`)
 Works like `npm run`, but is aware of your app's directory structure regardless of your current
 working directory (it finds the `package.json` in the app root or `app/src`). Also supports a
 period-prefix shorthand for scripts.
