@@ -18,7 +18,48 @@ import {forEach} from '../Core/Utils/ForEachHelper';
  */
 
 import * as childProcess from 'child_process';
+import * as path from 'path';
 import {AppContext} from '../Core/AppContext';
+
+/**
+ * Information about the git working tree the CLI is currently executed in.
+ * Used to give each linked worktree its own, isolated docker app identity.
+ */
+export interface WorktreeInfo
+{
+    /**
+     * True if the CLI runs inside a LINKED git worktree (not the main checkout)
+     */
+    isWorktree: boolean;
+
+    /**
+     * A docker-safe, unique suffix derived from the worktree directory name.
+     * null when not inside a linked worktree.
+     */
+    name: string | null;
+
+    /**
+     * Absolute path to the top level of the current worktree, or null.
+     */
+    topLevel: string | null;
+
+    /**
+     * Absolute path to the main working tree of the repository, or null.
+     */
+    mainWorkTreePath: string | null;
+}
+
+/**
+ * Turns an arbitrary directory name into a docker-safe identity suffix
+ * (lower case, only [a-z0-9] kept, everything else collapsed to a single dash).
+ */
+export function sanitizeIdentitySuffix(value: string): string
+{
+    return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
 
 export class Git
 {
@@ -74,6 +115,53 @@ export class Git
         return false;
     }
     
+    /**
+     * Detects whether the CLI is currently executed inside a LINKED git worktree
+     * and, if so, returns the information required to give this worktree its own
+     * isolated docker app identity (compose project, domain, ip, hosts entry, ...).
+     *
+     * The detection is completely side effect free and fails safe: if git is not
+     * installed, the directory is not a repository, or anything goes wrong, it
+     * reports "not a worktree" so the behaviour is byte for byte identical to before.
+     */
+    public getWorktreeInfo(): WorktreeInfo
+    {
+        const none: WorktreeInfo = {isWorktree: false, name: null, topLevel: null, mainWorkTreePath: null};
+
+        if (!this.isInstalled()) {
+            return none;
+        }
+
+        const cd = this._context.platform.choose({windows: 'cd /d ', linux: 'cd '});
+        const dir = this._context.rootDirectory;
+        const run = (args: string): string =>
+            childProcess.execSync(cd + '"' + dir + '" && git ' + args, {'stdio': 'pipe'})
+                        .toString('utf8').trim();
+
+        try {
+            const gitDir = path.resolve(dir, run('rev-parse --git-dir'));
+            const commonDir = path.resolve(dir, run('rev-parse --git-common-dir'));
+
+            // The main working tree resolves both to the very same ".git" directory.
+            // Only a LINKED worktree gets a dedicated git dir below ".git/worktrees/".
+            if (gitDir === commonDir) {
+                return none;
+            }
+
+            const topLevel = run('rev-parse --show-toplevel');
+            return {
+                isWorktree: true,
+                name: sanitizeIdentitySuffix(path.basename(topLevel)),
+                topLevel: topLevel,
+                // For a non-bare repository the common dir is "<mainWorkTree>/.git"
+                mainWorkTreePath: path.dirname(commonDir)
+            };
+        } catch (e) {
+            // Not a git repository / git failed / ... -> behave exactly as before
+            return none;
+        }
+    }
+
     /**
      * Returns true if the basic git user configuration has been done correctly
      */
