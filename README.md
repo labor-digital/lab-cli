@@ -1,154 +1,409 @@
 # LABOR.digital | LAB-CLI
 
-This toolset is intended to make your everyday work with your docker infrastructure easier. It will also help you to set up your development environment with
-the tools you need.
+`lab` is a command line tool that makes your everyday work with a docker based development
+environment easier. It wraps `docker compose`, wires up per-app domains, IPs and hosts-file
+entries, manages your `.env` files and Doppler secrets, and gives you a set of convenience
+commands to start, inspect and tear down your applications.
 
-Currently, this tool works only on windows but can be easily extended to work on other platforms as well (get in touch).
+It runs on **macOS, Linux and Windows** (a few commands are currently Windows-only — see the
+platform notes in the [command reference](#command-reference)).
+
+---
+
+## Table of contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Getting help](#getting-help) — including machine-readable output for scripts & AI agents
+- [Command reference](#command-reference)
+- [Concept: apps & projects](#concept-apps--projects)
+- [Environment files (`.env` / `.env.template`)](#environment-files-env--envtemplate)
+- [Git worktrees (new in 4.0.0)](#git-worktrees-new-in-400)
+- [Configuration](#configuration)
+- [File sync (unison)](#file-sync-unison)
+- [Troubleshooting](#troubleshooting)
+- [Postcardware](#postcardware)
+
+---
+
+## Requirements
+
+- **Node.js 22+** — the CLI is installed and run with node/npm.
+- **Docker** with the **`docker compose` plugin v2.29 or newer** and a running docker engine.
+  On macOS/Windows this is Docker Desktop; on Linux the docker daemon.
+- **Doppler CLI** — *only* required for apps that use Doppler-managed secrets
+  (`DOPPLER_*` variables in their `.env`). Apps without Doppler do not need it.
+- **git** — required for `lab init` and for the git-worktree isolation described below.
 
 ## Installation
 
-Install this package using npm, to update the script just run the same command again
+Install the package globally with npm. To update, run the exact same command again:
 
-```
+```bash
 npm install -g @labor-digital/lab-cli
 ```
 
-## What does it do:
+Verify the installation:
 
+```bash
+lab --version
 ```
-Usage: index [options] [command]
+
+## Quick start
+
+```bash
+# 1. create a new app from a boilerplate in an empty directory
+mkdir my-app && cd my-app
+lab init
+
+# 2. start it (creates .env, domain, IP and hosts entry on first run)
+lab up
+
+# 3. see whether it is running / read its logs / open a shell
+lab status
+lab logs -f
+lab shell
+
+# 4. open it in the browser, then stop it again
+lab open
+lab stop
+```
+
+## Getting help
+
+`lab help` prints a **grouped overview of every command** that is available on your platform,
+together with the prerequisites and a short explanation of the git-worktree behavior. It is the
+fastest way to get oriented if you have never used the CLI before:
+
+```bash
+lab help
+```
+
+For **scripts and AI agents**, the same information is available as JSON. This lists every
+command with its aliases, options and supported platforms, without having to scrape formatted
+text:
+
+```bash
+lab help --json
+```
+
+You can also get detailed help (including all options) for a single command with the standard
+`-h` / `--help` flag:
+
+```bash
+lab up --help
+```
+
+---
+
+## Command reference
+
+Unless noted otherwise, every command is run from inside your app directory (the directory that
+contains your `docker-compose.yml` / `docker-compose.dev.yml`, or a parent of it — see
+[apps & projects](#concept-apps--projects)).
+
+> **Platform support.** Most commands run on macOS, Linux and Windows. Commands marked
+> _Windows only_ are currently limited to Windows. Everything else is cross-platform, except
+> `sync`, which is macOS + Windows only.
+
+### Run & inspect your app
+
+#### `up` (alias `start`)
+Starts and (re)creates the current project composition — the equivalent of `docker compose up`.
+On the very first run (or whenever a docker/env file changes) it also initializes the app: it
+creates the `.env` file, allocates a domain + IP and writes the hosts-file entry.
 
 Options:
-  -h, --help                              display help for command
+- `-f, --follow` — follow the container output like `docker compose up` (no `-d`).
+- `-p, --pull` — pull the newest image versions before starting.
+- `-y, --yes` — accept all defaults without prompting (create directories, pick the default service, …).
+- `-i, --import` — trigger the import process (database / user creation) during startup.
+- `-w, --separateWindow` — _Windows only_ — open the docker process in a new window.
 
-Commands:
-  npm|run <npmRunCommand> [otherArgs...]  works like "npm run" would, but is aware of the current app's directory structure. It also works with period prefix, like: "lab .watch"
-  up|start [options]                      starts and restarts the current project composition (docker compose up)
-  stop [options]                          stops the current application (docker compose stop)
-  logs [options]                          displays the tail of your app container's log (docker compose logs)
-  shell|sh [options]                      attaches you to the shell of the current apps master container, or one of the running child containers
-  restart                                 performs a hard restart of the current project composition (docker compose stop && docker compose up)
-  down                                    destroys the current app's containers and removes their images if required (docker compose down)
-  sync [options]                          runs a unison sync into your application. Useful if the volume-mount is to slow!
-  open                                    opens the current apps main container in your default browser window
-  stop-all                                stops >ALL< currently running container instances
-  start-engine                            starts the docker engine, if it is currently not running
-  restart-engine                          restarts the docker engine
-  status|ps                               checks if the app is currently running or not
-  stop-engine [options]                   stops the docker engine, if it is currently running
-  import                                  triggers the import process using the LABOR import/export container
-  export                                  triggers the export process using the LABOR import/export container
-  init [options]                          initializes a new application stub based on our boilerplate
-  installCa                               installs our root ca (@labor-digital/ssl-certs) as trusted ssl root certificate
-  help [command]                          display help for command
+```bash
+lab up             # start in the background
+lab up -f          # start and follow the logs
+lab up -p -y       # pull latest images and accept all defaults
 ```
 
-**Good to know:** Every command that has an "[options]" behind it (like "shell" for example) can be used with the "-h" option to show additional help about the
-possible values.
+#### `restart`
+Performs a hard restart (`docker compose stop && docker compose up`) of the current composition.
+- `-y, --yes` — accept all defaults without prompting.
 
-## Apps and Projects
+#### `stop`
+Stops the current application (`docker compose stop`).
+- `-f, --force` — force-kill the application instead of gracefully stopping it.
 
-The basic concept we use for our projects is to work with "apps". Each app has it's own docker compose file that defines the local development environment.
+#### `down`
+Destroys the current app's containers and removes their images if required (`docker compose down`).
 
-Each app follows a particular convention that start's with a directory structure:
+#### `status` (alias `ps`)
+Checks whether the app is currently running.
 
-- C:\\work This is a generic path that defines the root of all your code
-- C:\\work\\$customer The name of the client you are working on
-- C:\\work\\$customer\\$project The name of the project you are working on (like Website Relaunch, Onlineshop)
-- C:\\work\\$customer\\$project\\$appName The name of your app that you are currently working on (like website, shop,...)
+```bash
+lab status
+```
 
-This is the main structure, now every app has it's own sub-structure:
+#### `logs`
+Displays the tail of the app container's log (`docker compose logs`).
+- `-l, --lines <lines>` — number of lines to show from the end of each log (default `15`; use `all` for the full log).
+- `-f, --follow` — follow the log output.
 
-- ...\\$appName\\app This is the directory where your docker-compose.yml or package.json lives
-- ...\\$appName\\app\\src The main source code of your app that is mounted into your container
-- ...\\$appName\\app\\opt Additional scripts to be added to your container (mostly in the /opt directory)
-- ...\\$appName\\data This is a directory tha can be mounted as volume to the containers to store persisted data
-- ...\\$appName\\import The directory for our [Import/Export container](https://github.com/labor-digital/docker-import-export)
-- ...\\$appName\\logs A directory to store apache/nginx logs ect from the container
-- ...\\$appName\\ssh An optional directory to store ssh credentials for the container
+```bash
+lab logs                 # last 15 lines
+lab logs -l all          # the whole log
+lab logs -f              # follow
+```
 
-Those directories are used in our (currently not public - working on it) boilerplates.
+#### `shell` (alias `sh`)
+Attaches you to the shell of the app's master container (or a running child container).
+- `--shell <shell>` — the shell to attach to (default from config, usually `bash`).
+- `-s, --select` — show a prompt to choose which container to attach to.
 
-By default, each of those apps receives a unique IP and a domain that is mapped to the services using the docker compose port mappings.
+```bash
+lab shell
+lab sh --shell sh -s
+```
+
+#### `open`
+Opens the app's main container in your default browser.
+- `-p, --protocol <protocol>` — the protocol to use (default `https`).
+
+#### `sync`  _(macOS + Windows only)_
+Runs a [unison](#file-sync-unison) sync into your application. Useful when the bind-mount is too
+slow (large projects, inotify-heavy tooling).
+- `--force` — run without existing archives (helps recover from a previous mess-up).
+
+### Docker engine
+
+#### `start-engine`
+Starts the docker engine if it is not already running.
+
+#### `stop-engine`  _(Windows only)_
+Stops the docker engine if it is running.
+- `--force` — ignore the current "running" state of the engine.
+
+#### `restart-engine`  _(Windows only)_
+Restarts the docker engine.
+
+#### `stop-all`
+Stops **all** currently running containers (not just the current app's).
+
+### Project setup & data
+
+#### `init`
+Initializes a new application stub from a boilerplate. Run it in a new, empty directory.
+- `-n, --name <name>` — the project name (e.g. `customer-project-app`).
+- `-b, --boilerplate <boilerplate>` — the boilerplate to use.
+- `-f, --force` — initialize even if the directory is not empty (**deletes existing files**).
+
+```bash
+lab init
+lab init --name "my-project-name" --boilerplate "PHP 8.4" --force
+```
+
+The command clones the configured `boilerplateRepository`
+([Docker Base Images](https://github.com/labor-digital/docker-base-images-v2) by default),
+lets you pick a boilerplate, prepares it in the current directory and initializes a fresh git
+repository. Then just run `lab up`.
+
+#### `import`
+Triggers the import process using the
+[LABOR import/export container](https://github.com/labor-digital/docker-import-export).
+- `-c, --copyFromTest` — copy import data from the test-data directory first (**overwrites existing files**).
+
+#### `export`
+Triggers the export process using the LABOR import/export container.
+- `-c, --copyToTest` — copy the exported files into the test-data directory if it exists (**overwrites existing files**).
+
+#### `test`
+Runs the test process using the LABOR jest-puppeteer container.
+- `-u, --update` — run `test-update` instead of `test` (usually updates reference snapshots).
+
+#### `installCa`
+Installs our root CA ([`@labor-digital/ssl-certs`](https://www.npmjs.com/package/@labor-digital/ssl-certs))
+as a trusted SSL root certificate, so the generated `https` domains are trusted by your browser.
+
+### Utilities
+
+#### `npm` (alias `run`)  _(Windows only)_
+Works like `npm run`, but is aware of your app's directory structure regardless of your current
+working directory (it finds the `package.json` in the app root or `app/src`). Also supports a
+period-prefix shorthand for scripts.
+
+```bash
+lab npm install
+lab run build
+lab .watch          # shorthand for "lab run watch"
+```
+
+#### `help`
+Shows the grouped overview of all commands (see [Getting help](#getting-help)).
+- `--json` — output the overview as JSON for scripts and AI agents.
+
+#### Built-in flags
+- `-v, --version` — print the installed version.
+- `-h, --help` — print commander's usage for the CLI or a single command.
+
+---
+
+## Concept: apps & projects
+
+The core concept is an **"app"**. Each app has its own docker compose file describing its local
+development environment, and follows a directory convention:
+
+```
+<work>/<customer>/<project>/<appName>/
+├── app/            # docker-compose.yml or package.json lives here (the "root directory")
+│   ├── src/        # your source code, mounted into the container
+│   └── opt/        # extra scripts added to the container (usually /opt)
+├── data/           # persisted data, mounted as a volume
+├── import/         # working dir for the import/export container
+├── logs/           # apache/nginx/... logs from the container
+└── ssh/            # optional ssh credentials for the container
+```
+
+`lab` discovers the **root directory** by walking up from your current directory until it finds a
+`docker-compose.dev.yml`, `docker-compose.yml`, `package.json` or `lab.config.json`. Every command
+then operates relative to that root.
+
+By default each app receives a **unique IP** and a **domain** that is mapped to its services via
+docker compose port mappings and written to your hosts file.
+
+## Environment files (`.env` / `.env.template`)
+
+When you first `lab up` an app (or after you change a docker-related config file), `lab` makes sure
+your `.env` file is set up correctly. If there is no `.env`, it is created from `.env.template`
+(or as an empty file). Then the following variables are generated if missing:
+
+- `COMPOSE_PROJECT_NAME` — a unique name for your app (a wizard asks for it on first run).
+- `PROJECT_ENV` — the project environment (default `dev`).
+- `APP_IP` — a unique local IP (in the `127.088.x.x` range) mapped for this app.
+- `APP_DOMAIN` — a unique domain (`<short-name>.labor.systems` by default) written to your hosts
+  file so you can open the app in the browser.
+
+These are filled **only if their key already exists and is empty** (so a boilerplate decides which
+of them an app uses):
+
+- `APP_MYSQL_DATABASE`, `APP_MYSQL_USER`, `APP_MYSQL_PASS`, `APP_MYSQL_PORT`
+- `MYSQL_ROOT_PASSWORD`, `APP_SQL_DATABASE`, `APP_SQL_PASS`, `APP_SQL_PORT`
+- `APP_PROTOCOL`
+- `DOPPLER_PROJECT`, `DOPPLER_CONFIG`, `DOPPLER_TOKEN` (for Doppler-based apps)
+
+And these directory variables are filled and **created on disk** if missing:
+`APP_ROOT_DIR`, `APP_PARENT_DIR`, `APP_WORKING_DIR`, `APP_DATA_DIR`, `APP_LOG_DIR`,
+`APP_IMPORT_DIR`, `APP_SSH_DIR`, `APP_OPT_DIR`.
+
+### Template generation & `LAB_CLI_KEEP`
+
+After the `.env` file is filled, a `.env.template` is generated with all values **stripped out**.
+Commit `.env.template` to your repository and keep `.env` on the ignore list.
+
+To keep specific values in the template, list them in the `.env` as a comma-separated
+`LAB_CLI_KEEP=PROJECT_ENV,APP_SQL_DATABASE,...`. Those keys keep their value when the template is
+regenerated.
+
+## Git worktrees (new in 4.0.0)
+
+`lab` is **git-worktree aware**. When you run it from inside a
+[linked git worktree](https://git-scm.com/docs/git-worktree), the app is given its **own isolated
+identity** so it can run **side by side with your main checkout** without clashing — perfect for
+spinning up a feature branch next to `main`.
+
+Concretely, inside a worktree `lab` automatically:
+
+- suffixes `COMPOSE_PROJECT_NAME` with the worktree directory name (e.g. `my-project` →
+  `my-project-featurex`), so all **containers, networks and volumes** are separate;
+- derives a separate **`APP_DOMAIN`**, allocates a separate **`APP_IP`** and writes a separate
+  **hosts-file entry**;
+- derives separate **database names** (`APP_MYSQL_*` / `APP_SQL_*`);
+- **keeps `DOPPLER_PROJECT` pointed at the main project**, so the worktree shares its secrets with
+  the main checkout;
+- **does not rewrite the committed `.env.template`** — your worktree stays clean in `git status`.
+
+The worktree's `.env` is (like any `.env`) git-ignored and regenerated per worktree. Your **main
+checkout is completely unaffected**: detection is based on git's `--git-dir` vs `--git-common-dir`,
+and if git is unavailable or you are in the main working tree, behavior is exactly as before.
+
+### Example
+
+```bash
+# from your main checkout (e.g. .../my-project/app running as "my-project")
+git worktree add ../my-project-featurex featurex
+cd ../my-project-featurex/app
+
+lab up            # comes up as "my-project-featurex" with its own domain/ip/containers
+lab status        # operates on the isolated worktree instance
+```
+
+Both apps now run at the same time, each reachable under its own domain.
 
 ## Configuration
 
-You can configure every aspect of the builtin commands using configuration files. The configuration is compiled based on the following options:
+Every aspect of the built-in commands can be configured with `lab.config.json` files. The config is
+merged from the following sources (**later sources override earlier ones**):
 
-1. Use the default options as a starting point
-2. Look in the $HOME directory if there is a lab.config.json. If so, merge it into the config
-3. Look in the root directory (where your docker-compose.yml or your package.json lives), if there is a lab.config.json. If so, merge it into the config
-4. Look in the current working directory (CWD). If there is a lab.config.json, merge it into the config.
+1. the built-in default config;
+2. `~/lab.config.json` (your home directory);
+3. `<root>/lab.config.json` (the app root directory);
+4. `<root>/../lab.config.json` (the app's parent directory);
+5. `<cwd>/lab.config.json` (the current working directory, if different from the root).
 
-The default config looks like this:
+Persistent state is stored in `~/lab.registry.json` (per-app data such as the allocated IP counter
+and the selected default service) and global settings in `~/lab.config.json`.
+
+The default config:
 
 ```javascript
 const config = {
-    
+
     // The list of extensions to load
     extensions: [],
-    
+
     // Docker related configuration
     docker: {
         // The shell to use when attaching to a container
         shell: "bash",
-        
+
         // The docker compose service key to attach to.
-        // Can be used to overwrite the default container name set by the docker app
+        // Overwrites the default container name set by the docker app.
         // NOTE: This overrides "containerName"!
         serviceKey: undefined,
-        
+
         // The name of the container to attach to.
-        // Can be used to overwrite the default container name set by the docker app
         // NOTE: This is overwritten by "serviceKey"
         containerName: undefined,
-        
+
         // The local socket to connect with docker
         socketPath: context.platform.choose({
             windows: "//./pipe/docker_engine",
             linux: "/var/run/docker.sock"
         })
     },
-    
+
     // Configuration of the docker network architecture
     network: {
-        
+
         // configuration for the domain creation
         domain: {
             // The base domain for the generated project domains
             base: ".labor.systems"
         },
-        
+
         // Defines the path of the hosts file on your platform
         hostsFilePath: context.platform.choose({
             windows: "C:\\Windows\\System32\\Drivers\\etc\\hosts",
             linux: "/etc/hosts"
         })
     },
-    
+
     // Unison related configuration options
     unison: {
-        
-        // Configuration for the sync host
-        host: {
-            // The local directory to sync with unison
-            directory: undefined
-        },
-        
-        // Configuration for the sync target
-        target: {
-            // The target ip of the unison server
-            ip: undefined,
-            // The remote unison port to sync with
-            port: 5000
-        },
-        
-        // True to include node modules into the sync
+        host: { directory: undefined },
+        target: { ip: undefined, port: 5000 },
         allowNodeModules: false,
-        // Additional arguments as a string
         additionalArgs: "",
-        
-        // Configuration for the unison migration
         migration: {
             targetVolume: "/var/www/html/",
             definition: {
@@ -164,7 +419,6 @@ const config = {
                 ports: []
             }
         },
-        // Project init
         projectInit: {
             // The git repository to clone and find boilerplates in
             boilerplateRepository: 'https://github.com/labor-digital/docker-base-images-v2.git'
@@ -173,98 +427,31 @@ const config = {
 };
 ```
 
-## Initialize a new app
+## File sync (unison)
 
-To create your first project with lab cli you can open your command line tool in a new, >empty directory< and simply type "lab init" there. The script will
-first ask you for a "name" for your app using a (hopefully) self-explanatory wizard.
+Docker bind-mounts can be slow on macOS and Windows. For big projects (e.g. TYPO3) or projects that
+rely on inotify events, use the [`sync`](#sync-macos--windows-only) command. It uses
+[unison](https://github.com/bcpierce00/unison) under the hood to sync files from your host into the
+container. If your project is not yet set up for unison, `lab sync` prints the instructions to
+adjust your docker compose file. Configure it under the `unison` config key.
 
-You can also run the initialization in a single line by providing the options directly:
-```
-lab init --name "my-project-name" --boilerplate "PHP 8.4" --force
-```
+## Troubleshooting
 
-Options:
-- `-n, --name <name>`: The name of the project to initialize (e.g. customer-project-app)
-- `-b, --boilerplate <boilerplate>`: The name of the boilerplate to use
-- `-f, --force`: Force initialization even if the directory is not empty (will delete existing files)
-
-After you have provided an app name the script will clone the configured "boilerplateRepository"
-and search all boilerplates in it. By default the script uses our [Docker Base Image repository](https://github.com/labor-digital/docker-base-images-v2).
-
-You can now select one of the possible boilerplates using the wizard, which will be prepared and ready to run in the current working directory.
-
-Simply call "lab up" and start coding :)
-
-## Initialize an existing app
-
-When you first start a project using the "up" command or if you changed one of the docker related config files, the script will automatically check if your .env
-file is set up correctly. It first checks if your .env file exists; if not, it will check if you have a .env.template. If the script finds a .env.template file,
-it will create a copy called .env. If it fails to find a .env.template, it will create a new, empty .env file.
-
-After the script validated that the .env file exists, it will iterate the variables in the data. The following variables will be created if they don't exist
-yet:
-
-- COMPOSE_PROJECT_NAME: (Shows a wizard) A unique name for your App/Project
-- PROJECT_ENV: (default: dev) Defines the environment of the project
-- APP_IP: (default: 127.088.xxx.xxx) Defines the local IP in the 127.088.xxx.xxx range that should be mapped for this app
-- APP_DOMAIN: ($COMPOSE_PROJECT_NAME.labor.systems) Defines a unique domain that will be mapped for this project in your hosts file. You can use this
-  domain to access your project in the browser.
-
-The following variables will be filled if their key exist and are empty:
-
-- APP_MYSQL_DATABASE: A valid database name like: cli_pro_app_d
-- APP_MYSQL_USER: A valid database user name like: cli_pro_app_d
-- APP_MYSQL_PASS: A random password
-- APP_MYSQL_PORT: 3306
-- MYSQL_ROOT_PASSWORD: A random password
-- APP_SQL_DATABASE: A valid database name like: cli_pro_app_d
-- APP_SQL_PASS: A random password
-- APP_SQL_PORT: 1433
-- APP_PROTOCOL: https://
-
-The following directories will automatically filled if their key exist and are empty:
-
-- APP_ROOT_DIR: ...\\$appName\\app
-- APP_PARENT_DIR: ...\\$appName
-- APP_WORKING_DIR: ...\\$appName\\app\\src
-- APP_DATA_DIR: ...\\$appName\\data
-- APP_LOG_DIR: ...\\$appName\\logs
-- APP_IMPORT_DIR: ...\\$appName\\import
-- APP_SSH_DIR: ...\\$appName\\ssh
-- APP_OPT_DIR: ...\\$appName\\app\\opt
-
-Note: All variables that are defined like APP_..._DIR: will be seen as directories and will be created on your hard drive automatically if they don't exist yet.
-
-### Template generation
-
-After the .env file has been filled the .env.template file is generated. It will strip out all values of the .env file and save an empty version of it as
-.env.template. You can safely commit the .env.template to your repository while your .env should be on the ignore list.
-
-If you want to keep certain values of the .env file in your .env.template, define them as comma-separated list as
-"LAB_CLI_KEEP=PROJECT_ENV,APP_SQL_DATABASE...". Those keys will then be kept when the template is generated.
-
-## Sync
-
-Docker volumes have the issue that they are really slow on windows and OSX. In bigger projects (like TYPO3) or in projects that depend on inotify events when a
-file changes you probably want another solution for your development.
-
-The ```sync``` command can be used if you deal with those projects. It utilizes unison under the hood to sync the files from your host machine into your
-container.
-
-When your project is not yet set up to work with unison, the ```sync``` command will show you the instructions on how to modify your docker compose file.
-
-You can configure how unison works using the configuration
-
-## Npm commands
-
-The CLI comes with a special wrapper for npm commands. If your package.json lives either in your root directory or in your app/src directory, you can simply
-call ```lab install``` or ```lab i``` to run the npm command but no matter on your current CWD in the shell. You can also run every registered script in your
-package JSON by prefixing it with a period like: ```lab .build```.
+- **Docker engine is not running** — run `lab start-engine`, or start Docker Desktop / the docker
+  daemon manually.
+- **`docker compose` not found / too old** — make sure the compose plugin v2.29+ is installed
+  (`docker compose version`).
+- **Hosts-file conflict** — if a domain is already mapped in your hosts file, `lab` asks whether to
+  overwrite the entry. Fix the hosts file if you decline.
+- **Doppler token expired / missing secrets** — for Doppler-based apps, `lab up` regenerates the
+  service token; make sure you are logged in with the Doppler CLI. In a git worktree the Doppler
+  project is intentionally shared with the main checkout.
+- **The SSL certificate is not trusted** — run `lab installCa` once to trust the LABOR root CA.
 
 ## Postcardware
 
-You're free to use this package, but if you use it regularly, we highly appreciate you sending us a postcard from your hometown, mentioning which of our
-package(s) you are using.
+You're free to use this package, but if you use it regularly, we highly appreciate you sending us a
+postcard from your hometown, mentioning which of our package(s) you are using.
 
 Our address is: LABOR.digital - Fischtorplatz 21 - 55116 Mainz, Germany.
 
