@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 4.3.0 (2026-07-17)
+
+
+### Features
+
+* worktree-isolated network identity (own ip/port/domain) + hosts crash fix ([#15](https://github.com/labor-digital/lab-cli/issues/15)) ([c453c5e](https://github.com/labor-digital/lab-cli/commit/c453c5efa42667eee0d439cac0d7c848f23d2fcc))
+
 ## 4.2.0 (2026-07-17)
 
 
