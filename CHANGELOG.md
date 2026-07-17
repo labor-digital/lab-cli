@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 4.3.1 (2026-07-17)
+
+
+### Bug Fixes
+
+* worktree mounts its own code + hosts entry stays in sync ([#16](https://github.com/labor-digital/lab-cli/issues/16)) ([8beb56c](https://github.com/labor-digital/lab-cli/commit/8beb56c448565ea740e9a9aa11321377b4cddc51))
+
 ## 4.3.0 (2026-07-17)
 
 
