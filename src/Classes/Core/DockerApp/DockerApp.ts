@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,10 @@
  * Last modified: 2020.04.05 at 16:05
  */
 
-import {forEach, isEmpty, isString, isUndefined, md5, PlainObject} from '@labor-digital/helferlein';
+import { isEmpty, isString } from 'radashi';
+import * as crypto from "crypto";
+import {PlainObject} from '../Utils/ForEachHelper';
+
 import * as fs from 'fs';
 import inquirer from 'inquirer';
 import * as path from 'path';
@@ -82,7 +86,12 @@ export class DockerApp
      * The environment config for the docker app
      */
     protected _env: DockerEnv;
-    
+
+    /**
+     * When true, all interactive prompts will be auto-accepted with defaults
+     */
+    public acceptDefaults: boolean = false;
+
     public constructor(context: AppContext)
     {
         this._context = context;
@@ -123,7 +132,7 @@ export class DockerApp
             }
             this._dockerComposeFile = filename;
         });
-        if (!isUndefined(this._dockerComposeFile)) {
+        if (!(this._dockerComposeFile === undefined)) {
             return this._dockerComposeFile;
         }
         this._dockerComposeFile = '-1';
@@ -145,7 +154,7 @@ export class DockerApp
             }
             this._dockerComposeOverrideFile = filename;
         });
-        if (!isUndefined(this._dockerComposeOverrideFile)) {
+        if (!(this._dockerComposeOverrideFile === undefined)) {
             return this._dockerComposeOverrideFile;
         }
         this._dockerComposeOverrideFile = '-1';
@@ -215,7 +224,7 @@ export class DockerApp
     {
         // Find the container name by the configured service key
         const serviceKey = this._context.config.get('docker.serviceKey');
-        if (!isUndefined(serviceKey)) {
+        if (!(serviceKey === undefined)) {
             let containerName = undefined;
             const services = this.dockerCompose.getServiceList();
             forEach(services, (service: PlainObject) => {
@@ -246,7 +255,7 @@ export class DockerApp
     {
         // Check if the key was configured
         let serviceKey = this._context.config.get('docker.serviceKey');
-        if (!isUndefined(serviceKey)) {
+        if (!(serviceKey === undefined)) {
             return serviceKey;
         }
         
@@ -333,10 +342,10 @@ export class DockerApp
             if (!fs.existsSync(filename)) {
                 rawHash.push('0');
             } else {
-                rawHash.push(md5(fs.readFileSync(filename).toString('utf-8')));
+                rawHash.push(crypto.createHash("md5").update(fs.readFileSync(filename)).digest("hex"));
             }
         });
-        return md5(rawHash.join(','));
+        return crypto.createHash("md5").update(rawHash.join(',')).digest("hex");
     }
     
     /**
@@ -344,7 +353,7 @@ export class DockerApp
      */
     protected hasDockerFiles(): boolean
     {
-        return !isUndefined(this.dockerComposeFile);
+        return !(this.dockerComposeFile === undefined);
     }
     
     /**
@@ -356,7 +365,12 @@ export class DockerApp
         if (this._api.isRunning) {
             return Promise.resolve();
         }
-        
+
+        if (this.acceptDefaults) {
+            console.log('Starting docker engine...');
+            return this._api.startEngine();
+        }
+
         // Ask user
         return inquirer.prompt({
             name: 'startDocker',
@@ -382,7 +396,20 @@ export class DockerApp
         if (this._doppler.isLoggedIn) {
             return Promise.resolve();
         }
-        
+
+        if (this.acceptDefaults) {
+            const loginCode = this._doppler.login(15);
+            switch (loginCode) {
+                case -1:
+                    return this.loginToDopplerIfRequired(true);
+                case 1:
+                    return Promise.resolve();
+                default:
+                case 0:
+                    return Promise.reject(new Error('Sorry, something went wrong while logging you into doppler!'));
+            }
+        }
+
         // Ask user
         return inquirer.prompt({
             name: 'loginDoppler',

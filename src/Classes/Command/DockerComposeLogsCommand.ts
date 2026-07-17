@@ -30,7 +30,7 @@ export class DockerComposeLogsCommand
                 return Promise.reject(
                     new Error('You can only see the logs of running apps. But the app is currently not running.'));
             }
-            return app.dockerCompose.attachToLogs(cmd.lines, cmd.follow);
+            return app.dockerCompose.attachToLogs(cmd.opts().lines, cmd.opts().follow);
         });
     }
 }

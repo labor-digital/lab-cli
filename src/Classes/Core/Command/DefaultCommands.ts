@@ -62,6 +62,16 @@ export class DefaultCommands
                     description: 'forces docker compose to pull the newest image versions before starting the application',
                     default: false
                 },
+                {
+                    definition: '-y, --yes',
+                    description: 'accepts all defaults without prompting (create directories, select default service, etc.)',
+                    default: false
+                },
+                {
+                    definition: '-i, --import',
+                    description: 'triggers the import process (database/user creation) during startup',
+                    default: false
+                },
                 ...(context.platform.isWindows ? [
                     {
                         definition: '-w, --separateWindow',
@@ -121,7 +131,14 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('restart', '../../Command/DockerComposeRestartCommand', {
             description: 'performs a hard restart of the current project composition (docker compose stop && docker compose up)',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-y, --yes',
+                    description: 'accepts all defaults without prompting',
+                    default: false
+                }
+            ]
         });
         
         context.commandRegistry.registerCommand('down', '../../Command/DockerComposeDownCommand', {
@@ -189,7 +206,7 @@ export class DefaultCommands
             platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
-                    definition: '-ct, --copyFromTest',
+                    definition: '-c, --copyFromTest',
                     description: 'will copy import data from the test-data directory (if it exists) first before importing (Caution: This will overwrite existing files!)',
                     default: false
                 }
@@ -201,7 +218,7 @@ export class DefaultCommands
             platforms: {windows: true, darwin: true, linux: true},
             options: [
                 {
-                    definition: '-ct, --copyToTest',
+                    definition: '-c, --copyToTest',
                     description: 'will copy the exported files to the test-data directory if it exists (Caution: This will overwrite existing files!)',
                     default: false
                 }
@@ -210,9 +227,24 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('init', '../../Command/ProjectInitCommand', {
             description: 'initializes a new application stub based on our boilerplate',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-n, --name <name>',
+                    description: 'The name of the project to initialize (e.g. customer-project-app)'
+                },
+                {
+                    definition: '-b, --boilerplate <boilerplate>',
+                    description: 'The name of the boilerplate to use'
+                },
+                {
+                    definition: '-f, --force',
+                    description: 'Force initialization even if the directory is not empty',
+                    default: false
+                }
+            ]
         });
-        
+
         context.commandRegistry.registerCommand('installCa', '../../Command/InstallCaCommand', {
             description: 'installs our root ca (@labor-digital/ssl-certs) as trusted ssl root certificate',
             platforms: {windows: true, darwin: true, linux: true}

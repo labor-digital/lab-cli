@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,9 @@
  * Last modified: 2020.04.06 at 09:55
  */
 
-import {forEach, getPath, isString, isUndefined, PlainObject} from '@labor-digital/helferlein';
+import { get as getPath, isString } from 'radashi';
+import {PlainObject} from '../Utils/ForEachHelper';
+
 import inquirer from 'inquirer';
 import {DockerCompose} from '../../Api/DockerCompose';
 import {Bugfixes} from '../Bugfixes';
@@ -35,7 +38,8 @@ export class DockerComposeServiceSelectWizard
         dockerCompose: DockerCompose,
         forWhat: string,
         suggestedServiceKey?: string,
-        currentContainerName?: string
+        currentContainerName?: string,
+        acceptDefaults: boolean = false
     ): Promise<string>
     {
         // Make sure to update the suggested service key when we got a container name
@@ -46,7 +50,26 @@ export class DockerComposeServiceSelectWizard
                 suggestedServiceKey = newSuggestedServiceKey;
             }
         }
-        
+
+        // Auto-accept the suggested service key if acceptDefaults is set
+        if (acceptDefaults && isString(suggestedServiceKey) &&
+            DockerComposeServiceSelectWizard.checkIfSuggestionExists(dockerCompose, suggestedServiceKey)) {
+            console.log('Using default service: "' + suggestedServiceKey + '"');
+            return Promise.resolve(
+                DockerComposeServiceSelectWizard.convertServiceKeyToContainerName(dockerCompose, suggestedServiceKey)
+            );
+        }
+
+        // If acceptDefaults but no valid suggestion, pick the first service
+        if (acceptDefaults) {
+            const services = dockerCompose.getServiceList();
+            if (services.length > 0) {
+                const first = (services[0] as PlainObject);
+                console.log('Using first available service: "' + first.key + '"');
+                return Promise.resolve(first.containerName);
+            }
+        }
+
         // Ask
         return inquirer.prompt([
             {
@@ -60,8 +83,8 @@ export class DockerComposeServiceSelectWizard
             {
                 name: 'target',
                 message: 'Which service should I use to ' + forWhat + '?',
-                when: answers => !answers.ok || isUndefined(answers.ok),
-                type: 'list',
+                when: answers => !answers.ok || (answers.ok === undefined),
+                type: 'select',
                 choices: DockerComposeServiceSelectWizard.buildServiceOptions(dockerCompose)
             }
         ]).then(answers => {

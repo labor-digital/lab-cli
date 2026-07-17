@@ -16,7 +16,11 @@
  * Last modified: 2020.04.03 at 19:43
  */
 
-import {getPath, hasPath, isPlainObject, ListPath, merge, PlainObject} from '@labor-digital/helferlein';
+import * as radashi from 'radashi';
+import { get as getPath, get, isObject as isPlainObject, assign as merge } from 'radashi';
+type ListPath = string | string[];
+import {PlainObject} from '../Utils/ForEachHelper';
+
 
 
 export class Config
@@ -42,7 +46,7 @@ export class Config
      */
     public has(key: ListPath): boolean
     {
-        return hasPath(this.config, key);
+        return (radashi.get(this.config, Array.isArray(key) ? key.join('.') : key) !== undefined);
     }
     
     /**
@@ -52,7 +56,7 @@ export class Config
      */
     public get(key: ListPath, fallback?: any): any
     {
-        return getPath(this.config, key, fallback);
+        return getPath(this.config, Array.isArray(key) ? key.join('.') : key, fallback);
     }
     
     /**

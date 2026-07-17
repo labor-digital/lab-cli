@@ -1,3 +1,4 @@
+import {forEach} from '../Core/Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,8 @@
  * Last modified: 2020.04.05 at 18:51
  */
 
-import {forEach, isNull, PlainObject} from '@labor-digital/helferlein';
+import {PlainObject} from '../Core/Utils/ForEachHelper';
+
 import chalk from 'chalk';
 import * as childProcess from 'child_process';
 import Dockerode from 'dockerode';
@@ -114,7 +116,7 @@ export class Docker
                         executablePath = options[i];
                         break;
                     }
-                    if (isNull(executablePath)) {
+                    if ((executablePath === null)) {
                         throw new Error('Could not find a matching docker executable!');
                     }
                     // Prepare command
@@ -258,14 +260,14 @@ export class Docker
             const eventName = 'timeout-' + Math.random() + Math.random();
             const timeoutId = setTimeout(() => {
                 reject(new Error('The action took too long and exceeded the timeout: ' + timeout));
-                this._context.eventEmitter.unbindAll(eventName);
+                (this._context.eventEmitter as any).unbindAll(eventName);
             }, timeout);
-            this._context.eventEmitter.bind(eventName, function () {
+            (this._context.eventEmitter as any).bind(eventName, function () {
                 return callback();
             });
-            this._context.eventEmitter.emitHook(eventName, {}).then(() => {
+            (this._context.eventEmitter as any).emitHook(eventName, {}).then(() => {
                 clearTimeout(timeoutId);
-                this._context.eventEmitter.unbindAll(eventName);
+                (this._context.eventEmitter as any).unbindAll(eventName);
                 resolve();
             }).catch(reject);
         });

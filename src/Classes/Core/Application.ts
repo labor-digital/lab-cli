@@ -1,3 +1,4 @@
+import {forEach} from './Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,17 +17,9 @@
  * Last modified: 2020.04.03 at 18:57
  */
 
-import {
-    EventBus,
-    forEach,
-    isArray,
-    isEmpty,
-    isFunction,
-    isObject,
-    isPlainObject,
-    isString,
-    isUndefined
-} from '@labor-digital/helferlein';
+import {EventEmitter} from './EventEmitter';
+import { isArray, isEmpty, isFunction, isObject as isPlainObject, isString } from 'radashi';
+
 import chalk from 'chalk';
 import {Command} from 'commander';
 // @ts-ignore
@@ -54,6 +47,7 @@ export class Application
         let context: AppContext | null = null;
         return this.createNewAppContext()
                    .then(c => context = c)
+                   .then(c => this.prepareOutputMode(c))
                    .then(c => this.showFancyIntro(c))
                    .then(c => DefaultCommands.make(c))
                    .then(c => this.loadExtensions(c))
@@ -62,7 +56,18 @@ export class Application
                    .then(c => this.handleCommand(c))
                    .then(() => process.exit())
                    .catch(err => {
-                       if (isObject(err) && !isUndefined(err.stack) && !(err instanceof UserError)) {
+                       if (context !== null && context.isMachineReadableOutput) {
+                           const message = typeof err?.message === 'string' && err.message.trim() !== ''
+                               ? err.message
+                               : 'Unexpected error.';
+                           process.stdout.write(JSON.stringify({
+                               status: 'error',
+                               message
+                           }) + '\n');
+                           process.exit(1);
+                           return context;
+                       }
+                       if (typeof err === 'object' && err !== null && !(err.stack === undefined) && !(err instanceof UserError)) {
                            err = err.stack;
                        }
                        console.error('');
@@ -73,6 +78,19 @@ export class Application
                        return context;
                    });
     }
+
+    /**
+     * Applies runtime output configuration before any output is emitted
+     * @param context
+     */
+    protected prepareOutputMode(context: AppContext): Promise<AppContext>
+    {
+        if (context.isMachineReadableOutput) {
+            chalk.level = 0;
+        }
+
+        return Promise.resolve(context);
+    }
     
     /**
      * Creates a new app config instance
@@ -82,7 +100,7 @@ export class Application
         return Promise.resolve(new AppContext(
             new Command(),
             require('../../../package.json').version,
-            EventBus.getEmitter(),
+            new EventEmitter(),
             new Platform(),
             new FileFinder(),
             new Registry(),
@@ -98,6 +116,9 @@ export class Application
      */
     protected showFancyIntro(context: AppContext): Promise<AppContext>
     {
+        if (context.isMachineReadableOutput) {
+            return Promise.resolve(context);
+        }
         const lang = [
             ['Guten Morgen', 'Guten Tag', 'Guten Abend'], // German
             ['Good morning', 'Good day', 'Good evening'], // English
@@ -140,7 +161,7 @@ export class Application
             }
             
             // Gather the required extensions
-            context.eventEmitter.unbindAll(AppEventList.EXTENSION_LOADING);
+            (context.eventEmitter as any).unbindAll(AppEventList.EXTENSION_LOADING);
             forEach(extensionsNames, (extensionName: string) => {
                 try {
                     if (!isString(extensionName)) {
@@ -148,17 +169,17 @@ export class Application
                     }
                     let extension = requireg(extensionName);
                     if (!isFunction(extension)) {
-                        if (isPlainObject(extension) && isFunction(extension.default)) {
-                            extension = extension.default;
+                        if (isPlainObject(extension) && isFunction((extension as any).default)) {
+                            extension = (extension as any).default;
                         } else {
                             throw new Error('The extension did not export a function!');
                         }
                     }
-                    context.eventEmitter.bind(AppEventList.EXTENSION_LOADING, () => {
+                    (context.eventEmitter as any).bind(AppEventList.EXTENSION_LOADING, () => {
                         return extension(context);
                     });
                 } catch (e) {
-                    if (isUndefined(e)) {
+                    if ((e === undefined)) {
                         e = new Error(e);
                     }
                     console.log(chalk.redBright('Error while loading extension: ' + extensionName + '! ' + e.message));
@@ -166,7 +187,7 @@ export class Application
             });
             
             // Trigger the extension import
-            return context.eventEmitter.emitHook(AppEventList.EXTENSION_LOADING, {})
+            return (context.eventEmitter as any).emitHook(AppEventList.EXTENSION_LOADING, {})
                           .then(() => context);
             
         });

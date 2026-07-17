@@ -16,7 +16,8 @@
  * Last modified: 2020.04.03 at 18:59
  */
 
-import {EventEmitter, isPlainObject, PlainObject} from '@labor-digital/helferlein';
+import { isObject as isPlainObject } from 'radashi';
+
 import commander from 'commander';
 import * as path from 'path';
 import {Platform} from '../Api/Platform';
@@ -24,8 +25,10 @@ import {AppRegistry} from './AppRegistry';
 import {CommandRegistry} from './Command/CommandRegistry';
 import {Config} from './Configuration/Config';
 import {ConfigLoader} from './Configuration/ConfigLoader';
+import {EventEmitter} from './EventEmitter';
 import {FileFinder} from './FileFinder';
 import {Registry} from './Registry';
+import {PlainObject} from './Utils/ForEachHelper';
 
 export class AppContext
 {
@@ -148,7 +151,15 @@ export class AppContext
     {
         return process.cwd().replace(/[\\\/\s]+$/, path.sep) + path.sep;
     }
-    
+
+    /**
+     * True if the current invocation should produce machine-readable output only
+     */
+    public get isMachineReadableOutput(): boolean
+    {
+        return process.argv.indexOf('--json') !== -1;
+    }
+
     /**
      * Returns the root directory of the cli package
      */

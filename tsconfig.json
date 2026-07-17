@@ -4,6 +4,8 @@
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"target": "es6",
+		"lib": ["es6"],
+		"skipLibCheck": true,
 		"noImplicitAny": true,
 		"moduleResolution": "node",
 		"sourceMap": true,

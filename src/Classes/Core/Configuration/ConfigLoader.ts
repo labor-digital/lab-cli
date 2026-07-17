@@ -1,3 +1,4 @@
+import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,9 @@
  * Last modified: 2020.04.03 at 19:42
  */
 
-import {forEach, merge, PlainObject} from '@labor-digital/helferlein';
+import { assign as merge } from 'radashi';
+import {PlainObject} from '../Utils/ForEachHelper';
+
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';

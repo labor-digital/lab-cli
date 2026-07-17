@@ -18,6 +18,8 @@
 
 import * as childProcess from 'child_process';
 import {Command} from 'commander';
+import * as fs from 'fs';
+import * as path from 'path';
 import {Processes} from '../Api/Processes';
 import {AppContext} from '../Core/AppContext';
 import {DockerApp} from '../Core/DockerApp/DockerApp';
@@ -27,11 +29,21 @@ export class DockerComposeUpCommand
     
     public execute(cmd: Command, context: AppContext): Promise<void>
     {
-        if (cmd.separateWindow === true) {
+        if (cmd.opts().separateWindow === true) {
             return this.runInSeparateWindow(cmd, context);
         }
-        return (new DockerApp(context)).initialize().then(app => {
-            return app.dockerCompose.up(cmd.follow === true, cmd.pull === true);
+        const dockerApp = new DockerApp(context);
+        dockerApp.acceptDefaults = cmd.opts().yes === true;
+        return dockerApp.initialize().then(app => {
+            if (cmd.opts().import === true) {
+                const importDir = app.importExportDirectory;
+                if (!fs.existsSync(importDir)) {
+                    fs.mkdirSync(importDir, {recursive: true});
+                }
+                fs.writeFileSync(path.join(importDir, 'do_import'), '');
+                console.log('Import marker created — import container will initialize the database.');
+            }
+            return app.dockerCompose.up(cmd.opts().follow === true, cmd.opts().pull === true);
         });
     }
     
@@ -48,7 +60,7 @@ export class DockerComposeUpCommand
             return new Promise(resolve => {
                 const command = '"' + process.argv[0] + '" ' +
                                 '"' + process.argv[1] + '" ' +
-                                (cmd.pull === true ? ' -p' : '') +
+                                (cmd.opts().pull === true ? ' -p' : '') +
                                 ' ' + cmd.name() +
                                 ' -f && timeout 10';
                 childProcess.exec('start "' + windowTitle + '" ' + command);

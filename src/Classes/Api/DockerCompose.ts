@@ -1,3 +1,4 @@
+import {forEach} from '../Core/Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -16,7 +17,9 @@
  * Last modified: 2020.04.06 at 09:44
  */
 
-import {forEach, isNumeric, isString, isUndefined, PlainObject} from '@labor-digital/helferlein';
+import { isNumber as isNumeric, isString } from 'radashi';
+import {PlainObject} from '../Core/Utils/ForEachHelper';
+
 import * as childProcess from 'child_process';
 import {clean, gte} from 'semver';
 // @ts-ignore
@@ -71,7 +74,7 @@ export class DockerCompose
      */
     public getConfig(forceReload?: boolean): PlainObject
     {
-        if (forceReload !== true && !isUndefined(this._config)) {
+        if (forceReload !== true && !(this._config === undefined)) {
             return this._config;
         }
         
@@ -260,9 +263,9 @@ export class DockerCompose
         return this._app.context.platform.choose({windows: 'cd /d ', linux: 'cd '}) +
                '"' + this._app.context.rootDirectory + '" && ' +
                'docker compose ' +
-               (!isUndefined(this._app.dockerComposeFile) ?
+               (!(this._app.dockerComposeFile === undefined) ?
                ' -f "' + this._app.dockerComposeFile + '"' : '') +
-               (!isUndefined(this._app.dockerComposeOverrideFile) ?
+               (!(this._app.dockerComposeOverrideFile === undefined) ?
                ' -f "' + this._app.dockerComposeOverrideFile + '"' : '') +
                ' ';
     }

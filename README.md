@@ -38,7 +38,7 @@ Commands:
   stop-engine [options]                   stops the docker engine, if it is currently running
   import                                  triggers the import process using the LABOR import/export container
   export                                  triggers the export process using the LABOR import/export container
-  init                                    initializes a new application stub based on our boilerplate
+  init [options]                          initializes a new application stub based on our boilerplate
   installCa                               installs our root ca (@labor-digital/ssl-certs) as trusted ssl root certificate
   help [command]                          display help for command
 ```
@@ -177,6 +177,16 @@ const config = {
 
 To create your first project with lab cli you can open your command line tool in a new, >empty directory< and simply type "lab init" there. The script will
 first ask you for a "name" for your app using a (hopefully) self-explanatory wizard.
+
+You can also run the initialization in a single line by providing the options directly:
+```
+lab init --name "my-project-name" --boilerplate "PHP 8.4" --force
+```
+
+Options:
+- `-n, --name <name>`: The name of the project to initialize (e.g. customer-project-app)
+- `-b, --boilerplate <boilerplate>`: The name of the boilerplate to use
+- `-f, --force`: Force initialization even if the directory is not empty (will delete existing files)
 
 After you have provided an app name the script will clone the configured "boilerplateRepository"
 and search all boilerplates in it. By default the script uses our [Docker Base Image repository](https://github.com/labor-digital/docker-base-images-v2).
