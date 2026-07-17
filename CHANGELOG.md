@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 4.2.0 (2026-07-17)
+
+
+### Features
+
+* add lab unlock / lab lock for passwordless privileged setup ([#14](https://github.com/labor-digital/lab-cli/issues/14)) ([f347913](https://github.com/labor-digital/lab-cli/commit/f347913f3298b30e78008fbb27aec64942b8222a))
+
 ## 4.1.0 (2026-07-17)
 
 
