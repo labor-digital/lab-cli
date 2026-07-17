@@ -28,6 +28,7 @@ import {Ip} from '../../Api/Ip';
 import {AppContext} from '../AppContext';
 import {AppEventList} from '../AppEventList';
 import {Bugfixes} from '../Bugfixes';
+import {UserError} from '../Error/UserError';
 import {DockerComposeServiceSelectWizard} from '../Ui/DockerComposeServiceSelectWizard';
 import {ProjectNameInputWizard} from '../Ui/ProjectNameInputWizard';
 import {DockerApp} from './DockerApp';
@@ -380,7 +381,7 @@ export class DockerAppInit
                 hosts2.write();
                 return Promise.resolve();
             }
-            return new Promise<void>(resolve => {
+            return new Promise<void>((resolve, reject) => {
                 console.log(chalk.yellowBright(e.message));
                 return inquirer.prompt(
                     [
@@ -395,8 +396,11 @@ export class DockerAppInit
                     answers => {
                         Bugfixes.inquirerChildProcessReadLineFix();
                         if (answers.ok === false) {
-                            console.log(chalk.redBright('Please fix your hosts file before continuing!'));
-                            process.exit();
+                            // Reject with a real error instead of killing the process, so
+                            // callers (and agents) get a diagnostic they can act on.
+                            return reject(new UserError(
+                                'Aborted: the hosts file entry for "' + this._app.env.get('APP_DOMAIN') +
+                                '" conflicts with an existing one. Please fix your hosts file before continuing.'));
                         }
                         hosts.removeDomain(this._app.env.get('APP_DOMAIN'));
                         hosts.set(this._app.env.get('APP_IP'), this._app.env.get('APP_DOMAIN'));

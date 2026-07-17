@@ -214,7 +214,6 @@ export class DockerCompose
             }
             const command = this.baseDockerComposeCommand + 'logs --timestamps ' +
                             '--tail="' + lines + '" ' + (follow === true ? '--follow ' : '');
-            childProcess.execSync(command, {'stdio': 'inherit'});
             try {
                 childProcess.execSync(command, {stdio: 'inherit'});
                 resolve();
