@@ -262,12 +262,18 @@ export class DockerAppInit
                     this._context.registry.set('nextIp', nextIp);
                 }
                 
-                // Generate domain if required
-                if (isValueEmpty('APP_DOMAIN')) {
-                    const domain =
-                        encodeURI(projectShortName).replace(/_/g, '-')
-                        + this._context.config.get('network.domain.base');
-                    env.set('APP_DOMAIN', domain);
+                // Generate / maintain the domain.
+                // - Outside a worktree: only generate it when empty (unchanged behaviour).
+                // - Inside a worktree: also replace a domain that was inherited from the
+                //   main checkout (i.e. still the base-name domain), so the worktree is
+                //   reachable under its own domain WITHOUT the user having to edit
+                //   APP_DOMAIN by hand. A domain the user customised themselves (that
+                //   matches neither the base nor the worktree derivation) is left intact.
+                const domainBase = this._context.config.get('network.domain.base');
+                const toDomain = (shortName: string) => encodeURI(shortName).replace(/_/g, '-') + domainBase;
+                const inheritedBaseDomain = worktree.isWorktree && env.get('APP_DOMAIN') === toDomain(baseShortName);
+                if (isValueEmpty('APP_DOMAIN') || inheritedBaseDomain) {
+                    env.set('APP_DOMAIN', toDomain(projectShortName));
                 }
                 
                 // Set empty variables

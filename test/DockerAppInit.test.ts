@@ -78,6 +78,34 @@ describe('DockerAppInit worktree identity isolation', () => {
         expect(mockEnvStore.get('COMPOSE_PROJECT_NAME')).toBe('my-project-pyongyang');
     });
 
+    it('replaces an inherited base domain with the worktree domain (no manual edit needed)', async () => {
+        mockEnvStore.set('COMPOSE_PROJECT_NAME', 'my-project');
+        // the .env was seeded from the main checkout / template with the base domain
+        mockEnvStore.set('APP_DOMAIN', 'my-pro.project.dev.local');
+
+        await (makeInit(WORKTREE) as any).fillEmptyValuesInEnvFile();
+
+        expect(mockEnvStore.get('APP_DOMAIN')).toBe('my-pro-pyo.project.dev.local');
+    });
+
+    it('keeps a user-customised domain inside a worktree', async () => {
+        mockEnvStore.set('COMPOSE_PROJECT_NAME', 'my-project');
+        mockEnvStore.set('APP_DOMAIN', 'my-custom.example.com');
+
+        await (makeInit(WORKTREE) as any).fillEmptyValuesInEnvFile();
+
+        expect(mockEnvStore.get('APP_DOMAIN')).toBe('my-custom.example.com');
+    });
+
+    it('does not rewrite an existing domain outside a worktree', async () => {
+        mockEnvStore.set('COMPOSE_PROJECT_NAME', 'my-project');
+        mockEnvStore.set('APP_DOMAIN', 'my-pro.project.dev.local');
+
+        await (makeInit(MAIN) as any).fillEmptyValuesInEnvFile();
+
+        expect(mockEnvStore.get('APP_DOMAIN')).toBe('my-pro.project.dev.local');
+    });
+
     it('skips .env.template regeneration inside a worktree', async () => {
         await (makeInit(WORKTREE) as any).generateEnvTemplateFile('.env');
         expect(mockWriteTemplate).not.toHaveBeenCalled();
