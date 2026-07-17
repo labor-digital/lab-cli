@@ -18,6 +18,7 @@
 
 import * as childProcess from 'child_process';
 import {AppContext} from '../Core/AppContext';
+import {Unlock} from './Unlock';
 
 export class Network
 {
@@ -43,7 +44,8 @@ export class Network
                 return;
             }
             console.log('A loopback must be registered to handle ip:' + ip + ', this requires root permissions!');
-            childProcess.execSync('sudo ifconfig lo0 alias ' + ip);
+            // Uses the passwordless helper when "lab unlock" is active, otherwise a plain (prompting) sudo.
+            childProcess.execSync((new Unlock(this._context)).aliasCommand(ip), {'stdio': 'inherit'});
             if (childProcess.execSync('ifconfig lo0').toString('utf-8').match(pattern)) {
                 console.log('Loopback setup successful!');
                 return;

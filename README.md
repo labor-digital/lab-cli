@@ -108,9 +108,10 @@ contains your `docker-compose.yml` / `docker-compose.dev.yml`, or a parent of it
 
 > **Non-interactive / AI-agent use.** Commands that would otherwise prompt for confirmation
 > accept **`-y, --yes`** to proceed with the defaults without asking: `up`, `restart`, `down`,
-> `stop-all`, `test`, `import`, `export`, `open`. Combine with `lab help --json` for a
-> machine-readable command overview. (Note: writing the hosts file still needs `sudo`/elevation,
-> and Doppler-based apps need a pre-authenticated Doppler CLI — neither can be answered by `-y`.)
+> `stop-all`, `test`, `import`, `export`, `open`. Run **`lab unlock`** once (see below) so the
+> privileged setup (macOS loopback alias, hosts-file write) stops prompting for a `sudo`
+> password too. Combine with `lab help --json` for a machine-readable command overview.
+> (Doppler-based apps still need a pre-authenticated Doppler CLI.)
 
 ### Run & inspect your app
 
@@ -248,6 +249,23 @@ lab npm install
 lab run build
 lab .watch          # shorthand for "lab run watch"
 ```
+
+#### `unlock` / `lock`  _(macOS + Linux)_
+`lab unlock` grants lab **passwordless `sudo` for only its own privileged setup** — the macOS
+loopback alias and the hosts-file write — so the CLI can run non-interactively (CI, AI agents,
+terminals where nobody can type a password). You are asked for your password **once**.
+
+How it works: it installs a small **root-owned** helper (`/usr/local/lib/lab-cli/lab-elevate.sh`)
+that performs only those two validated actions, and a `visudo`-validated
+`/etc/sudoers.d/lab-cli` rule granting `NOPASSWD` for **only that helper** — not blanket root.
+
+```bash
+lab unlock     # one password prompt; afterwards `lab up` never prompts for sudo
+lab lock       # reverts it (removes the sudoers rule + helper)
+```
+
+On **Windows** lab uses a UAC prompt that can't be pre-authorized this way; run your terminal
+“as Administrator” to avoid repeated prompts.
 
 #### `help`
 Shows the grouped overview of all commands (see [Getting help](#getting-help)).

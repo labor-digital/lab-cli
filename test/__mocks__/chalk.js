@@ -1,6 +1,9 @@
 module.exports = {
     redBright: (str) => str,
     greenBright: (str) => str,
+    yellowBright: (str) => str,
+    blueBright: (str) => str,
+    cyanBright: (str) => str,
     yellow: (str) => str,
     blue: (str) => str,
     cyan: (str) => str,
