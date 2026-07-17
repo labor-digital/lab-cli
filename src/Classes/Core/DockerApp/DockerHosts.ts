@@ -1,4 +1,3 @@
-import {forEach} from '../Utils/ForEachHelper';
 /*
  * Copyright 2020 LABOR.digital
  *
@@ -130,7 +129,9 @@ export class DockerHosts
      */
     public removeDomain(domain: string): DockerHosts
     {
-        forEach(this._domains, (_domain: string, k: number) => {
+        // Use the native Map iterator: the vendored forEach helper does not handle
+        // Maps and throws "Could not iterate given object!" (as set() already knows).
+        this._domains.forEach((_domain: string, k: number) => {
             if (_domain !== domain) {
                 return;
             }
@@ -148,7 +149,8 @@ export class DockerHosts
      */
     public removeCurrent(): DockerHosts
     {
-        forEach(this._directories, (dir: string, k: number) => {
+        // Native Map iterator (see removeDomain) - the vendored forEach can't iterate Maps.
+        this._directories.forEach((dir: string, k: number) => {
             if (dir !== this._context.rootDirectory) {
                 return;
             }
