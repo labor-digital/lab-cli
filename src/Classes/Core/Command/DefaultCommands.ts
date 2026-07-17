@@ -299,6 +299,17 @@ export class DefaultCommands
             ]
         });
 
+        context.commandRegistry.registerCommand('unlock', '../../Command/UnlockCommand', {
+            description: 'grants lab passwordless sudo for ONLY its privileged setup (loopback alias + hosts file) so it can run non-interactively (macOS & Linux). Asks for your password once.',
+            platforms: {windows: true, darwin: true, linux: true}
+        });
+
+        context.commandRegistry.registerCommand('lock', '../../Command/UnlockCommand', {
+            action: 'lock',
+            description: 'reverts "lab unlock" by removing the passwordless sudo rule and helper',
+            platforms: {windows: true, darwin: true, linux: true}
+        });
+
         context.commandRegistry.registerCommand('help', '../../Command/HelpCommand', {
             description: 'shows a grouped overview of all commands and how to use them (use --json for machine-readable output)',
             platforms: {windows: true, darwin: true, linux: true},

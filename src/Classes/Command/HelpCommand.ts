@@ -56,7 +56,7 @@ const COMMAND_GROUPS: Array<{title: string; commands: Array<string>}> = [
     {title: 'Run & inspect your app', commands: ['up', 'restart', 'stop', 'down', 'status', 'logs', 'shell', 'open', 'sync']},
     {title: 'Docker engine', commands: ['start-engine', 'stop-engine', 'restart-engine', 'stop-all']},
     {title: 'Project setup & data', commands: ['init', 'import', 'export', 'test', 'installCa']},
-    {title: 'Utilities', commands: ['npm', 'help']}
+    {title: 'Utilities', commands: ['npm', 'unlock', 'lock', 'help']}
 ];
 
 /**

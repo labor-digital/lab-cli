@@ -20,7 +20,9 @@ import {forEach} from '../Utils/ForEachHelper';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as childProcess from 'child_process';
 import {ElevatedProcess} from '../../Api/ElevatedProcess';
+import {Unlock} from '../../Api/Unlock';
 import {AppContext} from '../AppContext';
 
 export class DockerHosts
@@ -193,11 +195,18 @@ export class DockerHosts
         fs.writeFileSync(tmpFile, content);
         this._isDirty = false;
         
-        // Copy the hosts to the destination using elevation
-        (new ElevatedProcess(this._context)).execMultiple([
-            this._context.platform.choose({windows: 'copy /Y', linux: 'cp'}) +
-            ' "' + tmpFile + '" "' + this._filename + '"'
-        ]);
+        // Copy the hosts file to its destination using elevation.
+        // When "lab unlock" is active (macOS & Linux) this goes through the
+        // passwordless helper; otherwise it falls back to a prompting elevation.
+        const hostsCommand = (new Unlock(this._context)).hostsCommand(tmpFile);
+        if (hostsCommand !== null) {
+            childProcess.execSync(hostsCommand, {'stdio': 'inherit'});
+        } else {
+            (new ElevatedProcess(this._context)).execMultiple([
+                this._context.platform.choose({windows: 'copy /Y', linux: 'cp'}) +
+                ' "' + tmpFile + '" "' + this._filename + '"'
+            ]);
+        }
     }
     
     /**
