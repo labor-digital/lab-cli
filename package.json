@@ -20,10 +20,11 @@
 	"files": [
 		"lib/",
 		"bin/",
-		"flushLib.js"
+		"flushLib.js",
+		"postbuild.js"
 	],
 	"scripts": {
-		"build": "node flushLib.js && tsc",
+		"build": "node flushLib.js && tsc && node postbuild.js",
 		"watch": "node flushLib.js && tsc --watch",
 		"test": "jest"
 	},
