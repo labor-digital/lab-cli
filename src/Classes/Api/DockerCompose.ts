@@ -21,10 +21,12 @@ import { isNumber as isNumeric, isString } from 'radashi';
 import {PlainObject} from '../Core/Utils/ForEachHelper';
 
 import * as childProcess from 'child_process';
+import * as fs from 'fs';
 import {clean, gte} from 'semver';
 // @ts-ignore
 import * as yaml from 'yamljs';
 import {DockerApp} from '../Core/DockerApp/DockerApp';
+import {DockerHosts} from '../Core/DockerApp/DockerHosts';
 import {Network} from './Network';
 
 export class DockerCompose
@@ -143,9 +145,15 @@ export class DockerCompose
     {
         return new Promise<void>((resolve, reject) => {
             console.log('Starting application...');
-            
+
+            // Make the worktree's bind-mount targets exist and keep the hosts entry
+            // in sync with the effective (worktree) identity before starting.
+            this.ensureOverlayDirectories();
+
             (new Network(this._app.context))
                 .registerLoopBackAliasIfRequired(this._app.identity.appIp);
+
+            this.syncHostsEntry();
             
             const noAnsi = followOutput === true || !this._app.context.platform.isWindows;
             const noAnsiCommand = gte(this.version, '1.29.0') ? '--ansi never ' : '--no-ansi ';
@@ -271,8 +279,44 @@ export class DockerCompose
             ...process.env,
             COMPOSE_PROJECT_NAME: identity.composeProjectName,
             APP_DOMAIN: identity.appDomain,
-            APP_IP: identity.appIp
+            APP_IP: identity.appIp,
+            // Repoint the bind-mounts (code, config, data, ...) at the worktree's paths.
+            ...identity.dirs
         };
+    }
+
+    /**
+     * Makes sure the worktree-relative directories (data, logs, ...) exist before
+     * they are bind-mounted, so docker does not create them as root-owned empties.
+     * No-op for a plain main-checkout run.
+     */
+    protected ensureOverlayDirectories(): void
+    {
+        const dirs = this._app.identity.dirs;
+        Object.keys(dirs).forEach(key => {
+            const dir = dirs[key];
+            if (dir && !fs.existsSync(dir)) {
+                fs.mkdirSync(dir, {recursive: true});
+            }
+        });
+    }
+
+    /**
+     * Keeps the hosts-file entry in sync with the effective identity on every "up"
+     * (not just during init), so the app's domain always resolves to the ip it is
+     * actually bound to - e.g. a worktree domain points at the worktree ip, not the
+     * main app's. Writes only when something changed and never blocks "up".
+     */
+    protected syncHostsEntry(): void
+    {
+        try {
+            const identity = this._app.identity;
+            const hosts = new DockerHosts(this._app.context);
+            hosts.set(identity.appIp, identity.appDomain);
+            hosts.write();
+        } catch (e) {
+            // A genuine conflict is handled (with prompts) during init; do not block "up".
+        }
     }
 
     /**

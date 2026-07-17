@@ -2,7 +2,10 @@ import { AppIdentity } from '../src/Classes/Core/DockerApp/AppIdentity';
 import { WorktreeInfo } from '../src/Classes/Api/Git';
 
 function makeEnv(values: Record<string, string>): any {
-    return { get: (k: string, fb?: any) => (k in values ? values[k] : fb) };
+    return {
+        get: (k: string, fb?: any) => (k in values ? values[k] : fb),
+        has: (k: string) => k in values
+    };
 }
 
 function makeContext(worktree: WorktreeInfo, appRegStore: Record<string, any> = {}): any {
@@ -15,7 +18,7 @@ function makeContext(worktree: WorktreeInfo, appRegStore: Record<string, any> = 
         get(k: string, fb?: any) { return k in appRegStore ? appRegStore[k] : fb; },
         set(k: string, v: any) { appRegStore[k] = v; }
     };
-    return { worktree, config: { get: () => '.labor.systems' }, registry, appRegistry };
+    return { rootDirectory: '/wt/root/', worktree, config: { get: () => '.labor.systems' }, registry, appRegistry };
 }
 
 const WT: WorktreeInfo = { isWorktree: true, name: 'kathmandu', topLevel: '/w/kathmandu', mainWorkTreePath: '/main' };
@@ -54,6 +57,25 @@ describe('AppIdentity', () => {
         const env = makeEnv({ COMPOSE_PROJECT_NAME: 'labor-website-frontend-kathmandu' });
         const id = new AppIdentity(makeContext(WT), env).resolve();
         expect(id.composeProjectName).toBe('labor-website-frontend-kathmandu');
+    });
+
+    it('repoints the declared app directory variables at the worktree (BUG A)', () => {
+        const env = makeEnv({
+            COMPOSE_PROJECT_NAME: 'labor-website-frontend',
+            APP_ROOT_DIR: '/Users/main/app/',
+            APP_WORKING_DIR: '/Users/main/app/src/'
+        });
+        const id = new AppIdentity(makeContext(WT), env).resolve();
+        expect(id.dirs.APP_ROOT_DIR).toBe('/wt/root/');
+        expect(id.dirs.APP_WORKING_DIR).toBe('/wt/root/src/');
+        // A directory variable the app does not declare in .env is never injected.
+        expect(id.dirs.APP_DATA_DIR).toBeUndefined();
+    });
+
+    it('produces no directory overrides in a main checkout', () => {
+        const env = makeEnv({ COMPOSE_PROJECT_NAME: 'x', APP_WORKING_DIR: '/Users/main/app/src/' });
+        const id = new AppIdentity(makeContext(MAIN), env).resolve();
+        expect(id.dirs).toEqual({});
     });
 
     it('honors explicit --domain / --ip overrides (even in a main checkout)', () => {
