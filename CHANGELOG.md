@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 4.1.0 (2026-07-17)
+
+
+### Features
+
+* agent-friendly non-interactive CLI (-y/--yes) + logs/hosts fixes ([#13](https://github.com/labor-digital/lab-cli/issues/13)) ([83cb5af](https://github.com/labor-digital/lab-cli/commit/83cb5af6f912bb0a3add6c4973c153f20283d905))
+
 ### 4.0.1 (2026-07-17)
 
 
