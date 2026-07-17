@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 4.0.0 (2026-07-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrated the utility library from @labor-digital/helferlein to
+radashi and the runtime to Node 22, extracted the factory:* commands into the
+Factory pipeline-app, and changed how the docker app identity is derived when
+running inside a git worktree.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* release 4.0.0 ([12a0ecc](https://github.com/labor-digital/lab-cli/commit/12a0ecc6d43ea29a0c48020efba67b8989c5f3c8)), closes [#12](https://github.com/labor-digital/lab-cli/issues/12)
+
 ### 3.16.8 (2026-07-17)
 
 ### 3.16.7 (2026-06-08)
