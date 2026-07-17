@@ -27,19 +27,23 @@ export class DockerStopAllContainersCommand
     
     public execute(cmd: Command, context: AppContext): Promise<void>
     {
-        return this.askForConsent().then(execute => {
+        return this.askForConsent(cmd.opts().yes === true).then(execute => {
             if (!execute) {
                 return Promise.resolve();
             }
             return (new Docker(context)).stopAllContainers();
         });
     }
-    
+
     /**
      * Asks the user for consent to stop all containers
      */
-    protected askForConsent(): Promise<boolean>
+    protected askForConsent(acceptDefaults: boolean = false): Promise<boolean>
     {
+        // Non-interactive: proceed with stopping all containers.
+        if (acceptDefaults) {
+            return Promise.resolve(true);
+        }
         return new Promise((resolve) => {
             inquirer.prompt({
                 name: 'stopAll',

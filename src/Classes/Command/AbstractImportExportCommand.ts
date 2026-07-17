@@ -38,7 +38,10 @@ export abstract class AbstractImportExportCommand
     
     public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void>
     {
-        return (new DockerApp(context)).initialize().then(app => {
+        const acceptDefaults = cmd.opts().yes === true;
+        const dockerApp = new DockerApp(context);
+        dockerApp.acceptDefaults = acceptDefaults;
+        return dockerApp.initialize().then(app => {
             // Check if we have an import container
             let hasImportContainer = false;
             forEach(app.dockerCompose.getServiceList(), (container: { key: string, containerName: string }) => {
@@ -53,7 +56,7 @@ export abstract class AbstractImportExportCommand
             
             // Perform the import if the user consented
             return this
-                .askForConsent(context)
+                .askForConsent(context, acceptDefaults)
                 .then(execute => {
                     if (!execute) {
                         return Promise.reject();
@@ -125,8 +128,12 @@ export abstract class AbstractImportExportCommand
     /**
      * Asks the user for consent to stop all containers
      */
-    protected askForConsent(context: AppContext): Promise<boolean>
+    protected askForConsent(context: AppContext, acceptDefaults: boolean = false): Promise<boolean>
     {
+        // Non-interactive: proceed with the import/export.
+        if (acceptDefaults) {
+            return Promise.resolve(true);
+        }
         return new Promise((resolve) => {
             inquirer.prompt({
                 name: 'ok',

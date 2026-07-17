@@ -31,7 +31,10 @@ export class ProjectTestCommand
 {
     public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void>
     {
-        return (new DockerApp(context)).initialize().then(app => {
+        const acceptDefaults = cmd.opts().yes === true;
+        const dockerApp = new DockerApp(context);
+        dockerApp.acceptDefaults = acceptDefaults;
+        return dockerApp.initialize().then(app => {
             // Check if we have a test container
             let hasTestContainer = false;
             forEach(app.dockerCompose.getServiceList(), (container: { key: string, containerName: string }) => {
@@ -49,7 +52,7 @@ export class ProjectTestCommand
                     'It seems like your composition is not running. Please make sure to start your composition via "lab up" first.'));
             }
             
-            return this.askForConsent(context).then(execute => {
+            return this.askForConsent(context, acceptDefaults).then(execute => {
                 if (!execute) {
                     return Promise.resolve();
                 }
@@ -78,8 +81,12 @@ export class ProjectTestCommand
     /**
      * Asks the user for consent to stop all containers
      */
-    protected askForConsent(context: AppContext): Promise<boolean>
+    protected askForConsent(context: AppContext, acceptDefaults: boolean = false): Promise<boolean>
     {
+        // Non-interactive: proceed with the test run.
+        if (acceptDefaults) {
+            return Promise.resolve(true);
+        }
         return new Promise((resolve) => {
             inquirer.prompt({
                 name: 'ok',

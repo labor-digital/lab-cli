@@ -27,9 +27,12 @@ export class DockerComposeDownCommand
 {
     public execute(cmd: Command, context: AppContext): Promise<void>
     {
-        return (new DockerApp(context)).initialize().then(app => {
+        const acceptDefaults = cmd.opts().yes === true;
+        const dockerApp = new DockerApp(context);
+        dockerApp.acceptDefaults = acceptDefaults;
+        return dockerApp.initialize().then(app => {
             return Promise.resolve()
-                          .then(() => this.askForConsent(context))
+                          .then(() => this.askForConsent(context, acceptDefaults))
                           .then((consent: boolean) => {
                               if (!consent) {
                                   console.log('Ok, aborting the process!');
@@ -37,7 +40,7 @@ export class DockerComposeDownCommand
                               }
                               return app.dockerCompose.down();
                           })
-                          .then(() => this.askForHostsCleanup(context))
+                          .then(() => this.askForHostsCleanup(context, acceptDefaults))
                           .then((consent: boolean) => {
                               if (!consent) {
                                   console.log('Ok, I keep the host file as it is...');
@@ -60,8 +63,12 @@ export class DockerComposeDownCommand
      * Asks the user if he really wants to remove the containers
      * @param context
      */
-    protected askForConsent(context: AppContext): Promise<boolean>
+    protected askForConsent(context: AppContext, acceptDefaults: boolean = false): Promise<boolean>
     {
+        // Non-interactive: take the prompt default (proceed with the down).
+        if (acceptDefaults) {
+            return Promise.resolve(true);
+        }
         return new Promise((resolve) => {
             inquirer.prompt({
                 name: 'executeDown',
@@ -83,8 +90,12 @@ export class DockerComposeDownCommand
      * Asks if the user wants to remove the entry in the hosts file
      * @param context
      */
-    protected askForHostsCleanup(context: AppContext): Promise<boolean>
+    protected askForHostsCleanup(context: AppContext, acceptDefaults: boolean = false): Promise<boolean>
     {
+        // Non-interactive: take the prompt default (keep the hosts entry).
+        if (acceptDefaults) {
+            return Promise.resolve(false);
+        }
         return new Promise((resolve) => {
             inquirer.prompt({
                 name: 'removeHosts',

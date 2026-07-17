@@ -106,6 +106,12 @@ contains your `docker-compose.yml` / `docker-compose.dev.yml`, or a parent of it
 > **Platform support.** Every command runs on macOS, Linux and Windows, except `sync`
 > (macOS + Windows only) and the `up --separateWindow` flag (Windows only).
 
+> **Non-interactive / AI-agent use.** Commands that would otherwise prompt for confirmation
+> accept **`-y, --yes`** to proceed with the defaults without asking: `up`, `restart`, `down`,
+> `stop-all`, `test`, `import`, `export`, `open`. Combine with `lab help --json` for a
+> machine-readable command overview. (Note: writing the hosts file still needs `sudo`/elevation,
+> and Doppler-based apps need a pre-authenticated Doppler CLI — neither can be answered by `-y`.)
+
 ### Run & inspect your app
 
 #### `up` (alias `start`)
@@ -136,6 +142,7 @@ Stops the current application (`docker compose stop`).
 
 #### `down`
 Destroys the current app's containers and removes their images if required (`docker compose down`).
+- `-y, --yes` — proceed non-interactively (destroy the app; keep the hosts entry).
 
 #### `status` (alias `ps`)
 Checks whether the app is currently running.
@@ -168,6 +175,7 @@ lab sh --shell sh -s
 #### `open`
 Opens the app's main container in your default browser.
 - `-p, --protocol <protocol>` — the protocol to use (default `https`).
+- `-y, --yes` — if the app isn't running, start it automatically (non-interactively) and then open it.
 
 #### `sync`  _(macOS + Windows only)_
 Runs a [unison](#file-sync-unison) sync into your application. Useful when the bind-mount is too
@@ -188,6 +196,7 @@ Restarts the docker engine.
 
 #### `stop-all`
 Stops **all** currently running containers (not just the current app's).
+- `-y, --yes` — proceed non-interactively (skip the confirmation).
 
 ### Project setup & data
 
@@ -211,14 +220,17 @@ repository. Then just run `lab up`.
 Triggers the import process using the
 [LABOR import/export container](https://github.com/labor-digital/docker-import-export).
 - `-c, --copyFromTest` — copy import data from the test-data directory first (**overwrites existing files**).
+- `-y, --yes` — proceed non-interactively (skip the confirmation).
 
 #### `export`
 Triggers the export process using the LABOR import/export container.
 - `-c, --copyToTest` — copy the exported files into the test-data directory if it exists (**overwrites existing files**).
+- `-y, --yes` — proceed non-interactively (skip the confirmation).
 
 #### `test`
 Runs the test process using the LABOR jest-puppeteer container.
 - `-u, --update` — run `test-update` instead of `test` (usually updates reference snapshots).
+- `-y, --yes` — proceed non-interactively (skip the confirmation).
 
 #### `installCa`
 Installs our root CA ([`@labor-digital/ssl-certs`](https://www.npmjs.com/package/@labor-digital/ssl-certs))

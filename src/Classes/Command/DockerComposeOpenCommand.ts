@@ -28,9 +28,12 @@ export class DockerComposeOpenCommand
 {
     public execute(cmd: Command, context: AppContext, stack: CommandStack): Promise<void>
     {
-        return (new DockerApp(context)).initialize().then(app => {
+        const acceptDefaults = cmd.opts().yes === true;
+        const dockerApp = new DockerApp(context);
+        dockerApp.acceptDefaults = acceptDefaults;
+        return dockerApp.initialize().then(app => {
             if (!app.dockerCompose.isRunning) {
-                return this.askToStartContainer(context, stack);
+                return this.askToStartContainer(context, stack, acceptDefaults);
             }
             
             const domain = app.env.get('APP_DOMAIN', app.env.get('APP_IP'));
@@ -59,8 +62,14 @@ export class DockerComposeOpenCommand
      * @param context
      * @param stack
      */
-    protected askToStartContainer(context: AppContext, stack: CommandStack): Promise<void>
+    protected askToStartContainer(context: AppContext, stack: CommandStack, acceptDefaults: boolean = false): Promise<void>
     {
+        // Non-interactive: start the app (with -y so its init is non-interactive too) and re-open.
+        if (acceptDefaults) {
+            stack.push(['up', '-y']);
+            stack.push(['open', '-y']);
+            return Promise.resolve();
+        }
         return new Promise((resolve, reject) => {
             inquirer.prompt({
                 name: 'startApp',
