@@ -144,7 +144,14 @@ export class DefaultCommands
         
         context.commandRegistry.registerCommand('down', '../../Command/DockerComposeDownCommand', {
             description: 'destroys the current app\'s containers and removes their images if required (docker compose down)',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-y, --yes',
+                    description: 'accept all confirmations/defaults without prompting (for non-interactive / agent use)',
+                    default: false
+                }
+            ]
         });
         
         context.commandRegistry.registerCommand('sync', '../../Command/DockerComposeUnisonCommand', {
@@ -167,13 +174,25 @@ export class DefaultCommands
                     definition: '-p, --protocol <protocol>',
                     description: 'used to define the protocol to use',
                     default: 'https'
+                },
+                {
+                    definition: '-y, --yes',
+                    description: 'accept all confirmations/defaults without prompting (for non-interactive / agent use)',
+                    default: false
                 }
             ]
         });
         
         context.commandRegistry.registerCommand('stop-all', '../../Command/DockerStopAllContainersCommand', {
             description: 'stops >ALL< currently running container instances',
-            platforms: {windows: true, darwin: true, linux: true}
+            platforms: {windows: true, darwin: true, linux: true},
+            options: [
+                {
+                    definition: '-y, --yes',
+                    description: 'accept all confirmations/defaults without prompting (for non-interactive / agent use)',
+                    default: false
+                }
+            ]
         });
         
         context.commandRegistry.registerCommand('start-engine', '../../Command/DockerEngineStartCommand', {
@@ -212,6 +231,11 @@ export class DefaultCommands
                     definition: '-c, --copyFromTest',
                     description: 'will copy import data from the test-data directory (if it exists) first before importing (Caution: This will overwrite existing files!)',
                     default: false
+                },
+                {
+                    definition: '-y, --yes',
+                    description: 'accept all confirmations/defaults without prompting (for non-interactive / agent use)',
+                    default: false
                 }
             ]
         });
@@ -223,6 +247,11 @@ export class DefaultCommands
                 {
                     definition: '-c, --copyToTest',
                     description: 'will copy the exported files to the test-data directory if it exists (Caution: This will overwrite existing files!)',
+                    default: false
+                },
+                {
+                    definition: '-y, --yes',
+                    description: 'accept all confirmations/defaults without prompting (for non-interactive / agent use)',
                     default: false
                 }
             ]
@@ -260,6 +289,11 @@ export class DefaultCommands
                 {
                     definition: '-u, --update',
                     description: 'will call the "test-update" command instead of the "test" command (normally this will update all reference snapshots)',
+                    default: false
+                },
+                {
+                    definition: '-y, --yes',
+                    description: 'accept all confirmations/defaults without prompting (for non-interactive / agent use)',
                     default: false
                 }
             ]
